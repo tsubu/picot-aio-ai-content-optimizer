@@ -18,7 +18,7 @@ class PicotAioOptimizer_REST_Handlers
 
         $content = $request->get_param('content');
         $post_id = $request->get_param('post_id');
-        
+
         PicotAioOptimizer::log("Analyze Content Request - Post ID: " . $post_id);
 
         $api_key = get_option('picot_aio_optimizer_api_key');
@@ -81,7 +81,7 @@ class PicotAioOptimizer_REST_Handlers
 
             $full_prompt = "Title: {$title}\n\nContent: {$content}";
             $result = PicotAioOptimizer_Client::gar_call_gemini_api_rewrite($full_prompt, $api_key, $model_id, $gen_img, $instructions);
-            
+
             if (is_wp_error($result)) {
                 PicotAioOptimizer::log("Rewrite API Error: " . $result->get_error_message());
                 return $result;
@@ -113,7 +113,7 @@ class PicotAioOptimizer_REST_Handlers
             $params = $request->get_json_params();
             $title = isset($params['title']) ? $params['title'] : $request->get_param('title');
             $content = isset($params['content']) ? $params['content'] : $request->get_param('content');
-            
+
             $api_key = get_option('picot_aio_optimizer_api_key');
             $model_id = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
 
@@ -195,7 +195,7 @@ class PicotAioOptimizer_REST_Handlers
             $content_raw = $result['content'];
             // Clean trailing commas which are invalid in standard JSON
             $content_clean = preg_replace('/,\s*([\]\}])/', '$1', $content_raw);
-            
+
             $parsed = json_decode($content_clean, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 // Fallback: try to clean markdown
@@ -279,7 +279,7 @@ class PicotAioOptimizer_REST_Handlers
         }
 
         $parsed = is_string($suggestions_raw) ? json_decode($suggestions_raw, true) : $suggestions_raw;
-        
+
         if (is_array($parsed) && isset($parsed['suggestions'])) {
             $suggestions = $parsed['suggestions'];
             $featured_text = isset($parsed['featured_text']) ? $parsed['featured_text'] : '';
@@ -314,7 +314,7 @@ class PicotAioOptimizer_REST_Handlers
         $updated = get_post_meta($post_id, '_picot_aio_optimizer_image_suggestions_updated', true);
 
         $suggestions = is_string($suggestions_meta) ? json_decode($suggestions_meta, true) : $suggestions_meta;
-        
+
         // Recover from old format where the entire payload was stored in 'suggestions'
         if (is_array($suggestions) && isset($suggestions['suggestions'])) {
             if (empty($featured_text) && isset($suggestions['featured_text'])) {

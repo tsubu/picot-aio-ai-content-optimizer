@@ -199,7 +199,6 @@ class PicotAioOptimizer_Client
             $image_prompt_off_text = "               - この行より上の画像プロンプトルールは無視してください。画像プロンプトを生成しないでください。";
 
             $additional_label = '追加の指示: ';
-
         } elseif ($lang_code === 'zh') {
             $base_instruction = '您是專業的 WordPress 編輯。請在保持其核心訊息的同時，重寫以下部落格文章內容以提高其品質、流暢度和視覺吸引力。
             請以適用於 WordPress 區塊編輯器的有效 HTML 格式輸出。
