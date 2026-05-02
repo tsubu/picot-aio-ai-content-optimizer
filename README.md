@@ -11,6 +11,11 @@ AI-powered content analysis and optimization plugin for WordPress using Google G
 - **Dual Panel UI**: Access the optimizer from the Gutenberg Document panel or the sidebar.
 - **Analysis History**: Review past analyses per post directly in the editor.
 
+## Supported Models
+
+- **Text Analysis/Rewrite**: Gemini 1.5 Flash (Recommended), Gemini 1.5 Pro, Gemini 2.0 Flash Exp, Gemini 2.0 Flash Thinking Exp.
+- **Image Generation**: Imagen 3.0 (Generate/Fast), Gemini 2.0 Flash (Built-in multimodal).
+
 ## Requirements
 
 - WordPress 6.0 or higher

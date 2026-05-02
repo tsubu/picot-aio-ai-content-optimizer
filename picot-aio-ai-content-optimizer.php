@@ -271,7 +271,7 @@ class PicotAioOptimizer
         ";
         wp_add_inline_style('picot_aio_optimizer-admin-css', $inline_css);
 
-        wp_localize_script('picot_aio_optimizer-admin', 'picot_aio_optimizer', array(
+        wp_add_inline_script('picot_aio_optimizer-admin', 'window.picot_aio_optimizer = ' . wp_json_encode(array(
             'ajax_url'                  => admin_url('admin-ajax.php'),
             'rest_url_rewrite'          => rest_url('picot_aio_optimizer/v1/rewrite'),
             'rest_url_analyze'          => rest_url('picot_aio_optimizer/v1/analyze'),
@@ -287,7 +287,7 @@ class PicotAioOptimizer
             'image_style_desc'          => PicotAioOptimizer_Admin_Views::get_selected_image_style_desc(),
             'debug_mode'                => (defined('WP_DEBUG') && WP_DEBUG),
             'strings'                   => PicotAioOptimizer_Admin_Views::get_localized_strings(),
-        ));
+        )), 'before');
     }
 
 

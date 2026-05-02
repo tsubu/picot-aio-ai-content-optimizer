@@ -330,27 +330,45 @@ class PicotAioOptimizer_Client
     public static function gar_generate_image_via_api($prompt, $api_key, $model_id = '')
     {
         if (empty($model_id)) {
-            $model_id = 'gemini-2.0-flash-preview-image-generation';
+            $model_id = 'imagen-3.0-generate-001';
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key={$api_key}";
+        $is_imagen = (strpos($model_id, 'imagen') !== false);
 
-        $body = array(
-            'contents' => array(
-                array(
-                    'parts' => array(
-                        array('text' => 'Generate an image based on this description: ' . $prompt)
-                    )
+        if ($is_imagen) {
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:predict?key={$api_key}";
+            $body = array(
+                'instances' => array(
+                    array('prompt' => $prompt)
+                ),
+                'parameters' => array(
+                    'sampleCount' => 1,
                 )
-            ),
-            'generationConfig' => array(
-                'responseModalities' => array('TEXT', 'IMAGE')
-            )
-        );
+            );
+        } else {
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key={$api_key}";
+            $body = array(
+                'contents' => array(
+                    array(
+                        'parts' => array(
+                            array('text' => 'Generate an image based on this description: ' . $prompt)
+                        )
+                    )
+                ),
+                'generationConfig' => array(
+                    'responseModalities' => array('TEXT', 'IMAGE')
+                )
+            );
+        }
 
         $json_body = wp_json_encode($body);
         if ($json_body === false) {
-            $body['contents'][0]['parts'][0]['text'] = mb_convert_encoding('Generate an image based on this description: ' . $prompt, 'UTF-8', 'UTF-8');
+            $text_val = $is_imagen ? $prompt : 'Generate an image based on this description: ' . $prompt;
+            if ($is_imagen) {
+                $body['instances'][0]['prompt'] = mb_convert_encoding($text_val, 'UTF-8', 'UTF-8');
+            } else {
+                $body['contents'][0]['parts'][0]['text'] = mb_convert_encoding($text_val, 'UTF-8', 'UTF-8');
+            }
             $json_body = wp_json_encode($body);
         }
 
@@ -373,10 +391,16 @@ class PicotAioOptimizer_Client
             return new WP_Error('api_error', "Image Gen Failed ({$code}): {$msg}");
         }
 
-        if (isset($data['candidates'][0]['content']['parts'])) {
-            foreach ($data['candidates'][0]['content']['parts'] as $part) {
-                if (isset($part['inlineData']['data'])) {
-                    return $part['inlineData']['data'];
+        if ($is_imagen) {
+            if (isset($data['predictions'][0]['bytesBase64Encoded'])) {
+                return $data['predictions'][0]['bytesBase64Encoded'];
+            }
+        } else {
+            if (isset($data['candidates'][0]['content']['parts'])) {
+                foreach ($data['candidates'][0]['content']['parts'] as $part) {
+                    if (isset($part['inlineData']['data'])) {
+                        return $part['inlineData']['data'];
+                    }
                 }
             }
         }
