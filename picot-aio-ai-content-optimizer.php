@@ -2,10 +2,10 @@
 
 /**
  * Plugin Name: Picot AIO AI Content Optimizer
- * Plugin URI: https://github.com/tsubu/aiogemini
+ * Plugin URI: https://github.com/tsubu/picot-aio-ai-content-optimizer
  * Description: AI-powered content analysis and optimization plugin using Google Gemini API. Provides SEO advice, content recommendations, and automated image generation for WordPress posts and pages.
  * Version: 1.0.0
- * Author: PICOT
+ * Author: Toshifumi Tsuburaya (PICOT)
  * Author URI: https://picot.tokyo/
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -60,15 +60,6 @@ class PicotAioOptimizer
         PicotAioOptimizer_Database::gar_init_db();
     }
 
-    /**
-     * Log message to custom log file
-     */
-    public static function log($message)
-    {
-        // Debug logging disabled for official release
-    }
-
-
     public function admin_init()
     {
         // Manual Settings Save Handler
@@ -100,8 +91,6 @@ class PicotAioOptimizer
 
             // Force Table Check on Save (just to be safe)
             PicotAioOptimizer_Database::gar_init_db();
-
-            PicotAioOptimizer::log("Settings Saved - Model: " . get_option('picot_aio_optimizer_model') . " | Image Gen: " . $enable_gen);
 
             // Redirect back
             $redirect_url = add_query_arg('settings-updated', 'true', admin_url('options-general.php?page=picot_aio_optimizer'));

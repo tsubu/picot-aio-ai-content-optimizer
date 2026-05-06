@@ -133,7 +133,6 @@ class PicotAioOptimizer_Client
         ));
 
         if (is_wp_error($response)) {
-            PicotAioOptimizer::log("HTTP Error in Analysis API: " . $response->get_error_message());
             return $response;
         }
 
@@ -141,7 +140,6 @@ class PicotAioOptimizer_Client
         $data = json_decode($response_body, true);
 
         if (empty($data) || isset($data['error'])) {
-            PicotAioOptimizer::log("API Error Response: " . $response_body);
             return new WP_Error('api_error', isset($data['error']['message']) ? $data['error']['message'] : 'Unknown API Error');
         }
 
@@ -296,7 +294,6 @@ class PicotAioOptimizer_Client
         ));
 
         if (is_wp_error($response)) {
-            PicotAioOptimizer::log("HTTP Error in Request: " . $response->get_error_message());
             return $response;
         }
 

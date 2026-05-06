@@ -19,27 +19,23 @@ class PicotAioOptimizer_REST_Handlers
         $content = $request->get_param('content');
         $post_id = $request->get_param('post_id');
 
-        PicotAioOptimizer::log("Analyze Content Request - Post ID: " . $post_id);
 
         $api_key = get_option('picot_aio_optimizer_api_key');
         $model = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
 
         if (empty($api_key)) {
-            PicotAioOptimizer::log("Error: Missing API Key");
             return new WP_Error('missing_api_key', 'Google Gemini API Key is not set in settings', array('status' => 400));
         }
 
         $result = PicotAioOptimizer_Client::call_gemini_api($content, $api_key, $model);
 
         if (is_wp_error($result)) {
-            PicotAioOptimizer::log("API Error: " . $result->get_error_message());
             return $result;
         }
 
         // Save log to DB
         if (!empty($post_id)) {
             PicotAioOptimizer_Database::gar_save_analysis_log($post_id, $result);
-            PicotAioOptimizer::log("Saved analysis result to DB for Post ID: " . $post_id);
         }
 
         return rest_ensure_response(array(
@@ -65,10 +61,8 @@ class PicotAioOptimizer_REST_Handlers
             $model_id = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
             $gen_img = get_option('picot_aio_optimizer_enable_image_gen', 0);
 
-            PicotAioOptimizer::log("Rewrite Request - Title: " . $title . " | Instructions: " . $instructions);
 
             if (empty($api_key)) {
-                PicotAioOptimizer::log("Error: Missing API Key in Rewrite");
                 return new WP_Error('missing_api_key', 'API Key not set', array('status' => 400));
             }
 
@@ -83,11 +77,9 @@ class PicotAioOptimizer_REST_Handlers
             $result = PicotAioOptimizer_Client::gar_call_gemini_api_rewrite($full_prompt, $api_key, $model_id, $gen_img, $instructions);
 
             if (is_wp_error($result)) {
-                PicotAioOptimizer::log("Rewrite API Error: " . $result->get_error_message());
                 return $result;
             }
 
-            PicotAioOptimizer::log("Rewrite Successful");
 
             return rest_ensure_response(array(
                 'success' => true,
@@ -97,7 +89,6 @@ class PicotAioOptimizer_REST_Handlers
                 )
             ));
         } catch (Throwable $e) {
-            PicotAioOptimizer::log("Fatal Error in Rewrite: " . $e->getMessage());
             return new WP_Error('fatal_error', 'PHP Fatal Error in Rewrite: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), array('status' => 500));
         }
     }
@@ -117,7 +108,6 @@ class PicotAioOptimizer_REST_Handlers
             $api_key = get_option('picot_aio_optimizer_api_key');
             $model_id = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
 
-            PicotAioOptimizer::log("Suggest Images Request - Title: " . $title);
 
             if (empty($api_key)) {
                 return new WP_Error('missing_api_key', 'API Key not set', array('status' => 400));
@@ -233,24 +223,19 @@ class PicotAioOptimizer_REST_Handlers
             return new WP_Error('missing_api_key', 'API Key not set', array('status' => 400));
         }
 
-        PicotAioOptimizer::log("Generate Image Request - Prompt: " . $prompt);
 
         $image_data = PicotAioOptimizer_Client::gar_generate_image_via_api($prompt, $api_key, $image_model);
 
         if (is_wp_error($image_data)) {
-            PicotAioOptimizer::log("Generate Image API Error: " . $image_data->get_error_message());
             return $image_data;
         }
 
-        PicotAioOptimizer::log("Image generated via API, uploading to media library...");
         $upload_result = PicotAioOptimizer_Media::gar_upload_base64_image_to_wp($image_data, $prompt);
 
         if (is_wp_error($upload_result)) {
-            PicotAioOptimizer::log("Media Upload Error: " . $upload_result->get_error_message());
             return $upload_result;
         }
 
-        PicotAioOptimizer::log("Image uploaded successfully - Attachment ID: " . (isset($upload_result['id']) ? $upload_result['id'] : 'N/A'));
 
         return rest_ensure_response(array(
             'success' => true,

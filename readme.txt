@@ -1,6 +1,6 @@
 === Picot AIO AI Content Optimizer ===
 Contributors: tsubu
-Donate link: https://github.com/tsubu/aiogemini
+Donate link: https://github.com/tsubu/picot-aio-ai-content-optimizer
 Tags: ai, gemini, seo, content-quality, rewrite
 Requires at least: 6.0
 Tested up to: 6.9
@@ -13,7 +13,7 @@ AI-powered content analysis and optimization plugin using Google Gemini API. Pro
 
 == Description ==
 
-Picot AIO AI Content Optimizer is a powerful WordPress plugin designed to elevate your content quality using the latest Gemini AI technology. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).
+Picot AIO AI Content Optimizer is a powerful WordPress plugin developed by Toshifumi Tsuburaya (PICOT) and designed to elevate your content quality using the latest Gemini AI technology. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).
 
 = Key Features =
 
@@ -28,13 +28,12 @@ Picot AIO AI Content Optimizer is a powerful WordPress plugin designed to elevat
 
 This plugin relies on the **Google Generative Language API (Gemini)** provided by Google LLC to provide AI-powered content analysis, text generation, and image generation features.
 
-- **Service Domain**: `https://generativelanguage.googleapis.com`
-- **What the service is used for**: Analyzing post content for SEO/AIO advice, rewriting text based on user instructions, and generating relevant images based on article context.
-- **What data is sent**: The content of your post (title and body) and your custom AI prompts are sent to Google's API when you manually trigger an analysis, rewrite, or image generation request.
-- **When data is sent**: Data is only sent when the user explicitly clicks the "Analyze", "AI Rewrite", or "Generate Image" buttons.
-- **Legal Links**:
-    - [Google AI Studio Terms of Service](https://ai.google.dev/terms)
-    - [Google Privacy Policy](https://policies.google.com/privacy)
+* **What the service is used for**: This plugin connects to the Google Gemini API to analyze post content for SEO/AIO advice, rewrite text based on user instructions, and generate relevant images based on article context.
+* **What data is sent and when**: The content of your post (title and body) and your custom AI prompts are sent to Google's API only when you manually trigger an analysis, rewrite, or image generation request by clicking the respective buttons. No data is sent automatically in the background.
+* **Legal Links**:
+    * Service Provider: Google LLC
+    * Terms of Service: https://ai.google.dev/terms
+    * Privacy Policy: https://policies.google.com/privacy
 
 == Installation ==
 
