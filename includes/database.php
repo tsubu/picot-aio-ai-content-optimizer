@@ -71,45 +71,8 @@ class PicotAioOptimizer_Database
             wp_schedule_event(time(), 'daily', 'picot_aio_optimizer_cleanup_old_logs');
         }
 
-        // Migrate data from old AIOGemini plugin if exists
-        self::migrate_from_aiogemini();
-    }
-
-    /**
-     * Migrate data from legacy AIOGemini plugin
-     */
-    private static function migrate_from_aiogemini()
-    {
-        global $wpdb;
-        $old_table = $wpdb->prefix . 'aiogemini_logs';
-        $new_table = $wpdb->prefix . 'picot_aio_optimizer_logs';
-
-        // Skip if already migrated
-        if (get_option('picot_aio_optimizer_migrated_from_aiogemini')) {
-            return;
-        }
-
-        // Check if old table exists
-        $table_exists = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $old_table)) === $old_table); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time migration check, no caching needed
-        if (!$table_exists) {
-            update_option('picot_aio_optimizer_migrated_from_aiogemini', '1');
-            return;
-        }
-
-        // Table names cannot use placeholders in wpdb->prepare(); esc_sql() is the correct escaping method.
-        $safe_new_table = esc_sql($new_table);
-        $safe_old_table = esc_sql($old_table);
-        $new_count = $wpdb->get_var("SELECT count(*) FROM `{$safe_new_table}`"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table names cannot be parameterized; esc_sql() applied
-        if ($new_count > 0) {
-            update_option('picot_aio_optimizer_migrated_from_aiogemini', '1');
-            return;
-        }
-
-        // Copy data (table names cannot be parameterized; esc_sql() applied)
-        $wpdb->query("INSERT INTO `{$safe_new_table}` (post_id, advice_result, created_at) SELECT post_id, advice_result, created_at FROM `{$safe_old_table}`"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- esc_sql() applied to all table names
-
-        update_option('picot_aio_optimizer_migrated_from_aiogemini', '1');
-        self::log_error('Data migrated from AIOGemini successfully', false);
+        // Force Table Check on Save (handled in admin_init or on load)
+        // No migration from legacy needed for official release
     }
 
     /**

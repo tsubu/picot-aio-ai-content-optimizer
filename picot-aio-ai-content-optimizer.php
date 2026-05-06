@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/tsubu/picot-aio-ai-content-optimizer
  * Description: AI-powered content analysis and optimization plugin using Google Gemini API. Provides SEO advice, content recommendations, and automated image generation for WordPress posts and pages.
  * Version: 1.0.0
- * Author: Toshifumi Tsuburaya (PICOT)
+ * Author: tsubu
  * Author URI: https://picot.tokyo/
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html

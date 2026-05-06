@@ -1,6 +1,6 @@
 === Picot AIO AI Content Optimizer ===
 Contributors: tsubu
-Donate link: https://github.com/tsubu/picot-aio-ai-content-optimizer
+Donate link: https://github.com/tsubu/aiogemini
 Tags: ai, gemini, seo, content-quality, rewrite
 Requires at least: 6.0
 Tested up to: 6.9
