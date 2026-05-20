@@ -39,6 +39,19 @@ require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/rest-handlers.php';
 require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/media.php';
 
 /**
+ * Load plugin translations.
+ */
+function picot_aio_optimizer_load_textdomain()
+{
+    load_plugin_textdomain(
+        'picot-aio-ai-content-optimizer',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
+    );
+}
+add_action('plugins_loaded', 'picot_aio_optimizer_load_textdomain');
+
+/**
  * Main plugin class
  */
 class PicotAioOptimizer
@@ -107,7 +120,7 @@ class PicotAioOptimizer
 
     public function add_settings_link($links)
     {
-        $settings_link = '<a href="options-general.php?page=picot_aio_optimizer">' . esc_html__('設定', 'picot-aio-ai-content-optimizer') . '</a>';
+        $settings_link = '<a href="options-general.php?page=picot_aio_optimizer">' . esc_html__('Settings', 'picot-aio-ai-content-optimizer') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
@@ -262,6 +275,7 @@ class PicotAioOptimizer
 
         wp_add_inline_script('picot_aio_optimizer-admin', 'window.picot_aio_optimizer = ' . wp_json_encode(array(
             'ajax_url'                  => admin_url('admin-ajax.php'),
+            'admin_url'                 => admin_url(),
             'rest_url_rewrite'          => rest_url('picot_aio_optimizer/v1/rewrite'),
             'rest_url_analyze'          => rest_url('picot_aio_optimizer/v1/analyze'),
             'rest_url_history'          => rest_url('picot_aio_optimizer/v1/history'),

@@ -1,468 +1,353 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-18 22:54+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Project-Id-Version: Picot AIO AI Content Optimizer 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/picot-aio-ai-content-optimizer/\n"
+"POT-Creation-Date: 2026-05-20 02:26+0000\n"
+"PO-Revision-Date: 2026-05-20 02:26+0000\n"
+"Last-Translator: Picot\n"
+"Language-Team: English\n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: picot-aio-ai-content-optimizer\n"
 
-#: ../picot_aio_optimizer.php:71
-msgid "Security check failed"
-msgstr ""
-
-#: ../picot_aio_optimizer.php:110
-msgid "Settings"
-msgstr ""
-
-#: ../includes/gemini-client.php:158 ../includes/admin-views.php:59
-msgid "Thumbnail Prompt"
-msgstr ""
-
-#: ../includes/admin-views.php:21
-msgid "Analyzing..."
-msgstr ""
-
-#: ../includes/admin-views.php:22
-msgid "Rewriting..."
-msgstr ""
-
-#: ../includes/admin-views.php:23
-msgid ""
-"Are you sure you want to rewrite content? The current title and content will "
-"be overwritten."
-msgstr ""
-
-#: ../includes/admin-views.php:24
-msgid "Rewrite Success!"
-msgstr ""
-
-#: ../includes/admin-views.php:25
-msgid "Error occurred."
-msgstr ""
-
-#: ../includes/admin-views.php:26
-msgid "Analysis completed successfully"
-msgstr ""
-
-#: ../includes/admin-views.php:27
-msgid "No content found."
-msgstr ""
-
-#: ../includes/admin-views.php:28
-msgid "Analyze Content"
-msgstr ""
-
-#: ../includes/admin-views.php:29
-msgid "Gemini Rewrite"
-msgstr ""
-
-#: ../includes/admin-views.php:31 ../includes/admin-views.php:363
-#: ../includes/admin-views.php:499
-msgid "Summary"
-msgstr ""
-
-#: ../includes/admin-views.php:32 ../includes/admin-views.php:504
-msgid "Structure Analysis"
-msgstr ""
-
-#: ../includes/admin-views.php:33 ../includes/admin-views.php:505
-msgid "Content Advice"
-msgstr ""
-
-#: ../includes/admin-views.php:34 ../includes/admin-views.php:506
-msgid "SEO Advice"
-msgstr ""
-
-#: ../includes/admin-views.php:35 ../includes/admin-views.php:507
-msgid "AIO Advice"
-msgstr ""
-
-#: ../includes/admin-views.php:36 ../includes/admin-views.php:508
-msgid "Recommended Content"
-msgstr ""
-
-#: ../includes/admin-views.php:37 ../includes/admin-views.php:513
-msgid "SEO Title Ideas"
-msgstr ""
-
-#: ../includes/admin-views.php:38 ../includes/admin-views.php:523
-msgid "Meta Description Suggestions"
-msgstr ""
-
-#: ../includes/admin-views.php:39
-msgid "View History for this Post"
-msgstr ""
-
-#: ../includes/admin-views.php:40
-msgid "Discover Image Opportunities"
-msgstr ""
-
-#: ../includes/admin-views.php:41
-msgid "Discovering image opportunities..."
-msgstr ""
-
-#: ../includes/admin-views.php:42
-msgid "Generate"
-msgstr ""
-
-#: ../includes/admin-views.php:43
-msgid "Generating..."
-msgstr ""
-
-#: ../includes/admin-views.php:44
-msgid "Featured Image"
-msgstr ""
-
-#: ../includes/admin-views.php:45
-msgid "Generate featured image for the article"
-msgstr ""
-
-#: ../includes/admin-views.php:46
-msgid "No image suggestions found"
-msgstr ""
-
-#: ../includes/admin-views.php:47
-msgid "No placement opportunities found (excluding areas near existing images)"
-msgstr ""
-
-#: ../includes/admin-views.php:48
-msgid "🚀 Generate and Place"
-msgstr ""
-
-#: ../includes/admin-views.php:49
-msgid "🚀 Batch Generate and Place"
-msgstr ""
-
-#: ../includes/admin-views.php:50
-msgid "💾 Saved: "
-msgstr ""
-
-#: ../includes/admin-views.php:51
-msgid "Featured image set successfully!"
-msgstr ""
-
-#: ../includes/admin-views.php:52
-msgid "Placeholder replaced with image!"
-msgstr ""
-
-#: ../includes/admin-views.php:53
-msgid "Image inserted successfully!"
-msgstr ""
-
-#: ../includes/admin-views.php:54
-msgid "Failed to insert image. It has been saved to the media library."
-msgstr ""
-
-#: ../includes/admin-views.php:55
-msgid "No target images (markers) found for generation."
-msgstr ""
-
-#: ../includes/admin-views.php:56
-msgid "All image generation completed!"
-msgstr ""
-
-#: ../includes/admin-views.php:57
-msgid "🔄 Generating... "
-msgstr ""
-
-#: ../includes/admin-views.php:58
-msgid "✅ Done!"
-msgstr ""
-
-#: ../includes/admin-views.php:60
-msgid "Copied!"
-msgstr ""
-
-#: ../includes/admin-views.php:61
-msgid "Loading history..."
-msgstr ""
-
-#: ../includes/admin-views.php:62 ../includes/admin-views.php:355
-msgid "Analysis History"
-msgstr ""
-
-#: ../includes/admin-views.php:63
-msgid "Show"
-msgstr ""
-
-#: ../includes/admin-views.php:64
-msgid "No history found for this post."
-msgstr ""
-
-#: ../includes/admin-views.php:65
-msgid "Failed to load history."
-msgstr ""
-
-#: ../includes/admin-views.php:66
-msgid "Analysis Result"
-msgstr ""
-
-#: ../includes/admin-views.php:67
-msgid "Copy"
-msgstr ""
-
-#: ../includes/admin-views.php:68
-msgid "Clear Results"
-msgstr ""
-
-#: ../includes/admin-views.php:69
-msgid "API Error occurred."
-msgstr ""
-
-#: ../includes/admin-views.php:70
-msgid "Permission denied. Please refresh the page and try again."
-msgstr ""
-
-#: ../includes/admin-views.php:71
-msgid "Server error. Please check the error log."
-msgstr ""
-
-#: ../includes/admin-views.php:72
-msgid "Network error. Please check your connection."
-msgstr ""
-
-#: ../includes/admin-views.php:73
-msgid "AI response format was unexpected. Displaying as text."
-msgstr ""
-
-#: ../includes/admin-views.php:83
-msgid "None (Prompt Only)"
-msgstr ""
-
-#: ../includes/admin-views.php:84
-msgid "Professional (Photo)"
-msgstr ""
-
-#: ../includes/admin-views.php:85
-msgid "Photo Realistic"
-msgstr ""
-
-#: ../includes/admin-views.php:88
-msgid "Flat Illustration"
-msgstr ""
-
-#: ../includes/admin-views.php:89
-msgid "Isometric"
-msgstr ""
-
-#: ../includes/admin-views.php:90
-msgid "Vector Art"
-msgstr ""
-
-#: ../includes/admin-views.php:91
-msgid "Infographic"
-msgstr ""
-
-#: ../includes/admin-views.php:92
-msgid "Icon Style"
-msgstr ""
-
-#: ../includes/admin-views.php:95
-msgid "Watercolor"
-msgstr ""
-
-#: ../includes/admin-views.php:96
-msgid "Oil Painting"
-msgstr ""
-
-#: ../includes/admin-views.php:97
-msgid "Digital Art"
-msgstr ""
-
-#: ../includes/admin-views.php:98
-msgid "Concept Art"
-msgstr ""
-
-#: ../includes/admin-views.php:99
-msgid "Sketch"
-msgstr ""
-
-#: ../includes/admin-views.php:102
-msgid "3D Render"
-msgstr ""
-
-#: ../includes/admin-views.php:103
-msgid "Low Poly"
-msgstr ""
-
-#: ../includes/admin-views.php:104
-msgid "Clay Render"
-msgstr ""
-
-#: ../includes/admin-views.php:105
-msgid "Neon 3D"
-msgstr ""
-
-#: ../includes/admin-views.php:108
-msgid "Glassmorphism"
-msgstr ""
-
-#: ../includes/admin-views.php:109
-msgid "Gradient Mesh"
-msgstr ""
-
-#: ../includes/admin-views.php:110
-msgid "Geometric"
-msgstr ""
-
-#: ../includes/admin-views.php:111
-msgid "Minimalist"
-msgstr ""
-
-#: ../includes/admin-views.php:112
-msgid "Brutalist"
-msgstr ""
-
-#: ../includes/admin-views.php:115
-msgid "Vintage"
-msgstr ""
-
-#: ../includes/admin-views.php:116
-msgid "Cyberpunk"
-msgstr ""
-
-#: ../includes/admin-views.php:117
-msgid "Anime"
-msgstr ""
-
-#: ../includes/admin-views.php:118
-msgid "Pixel Art"
-msgstr ""
-
-#: ../includes/admin-views.php:119
-msgid "Paper Cut"
-msgstr ""
-
-#: ../includes/admin-views.php:120
-msgid "Collage"
-msgstr ""
-
-#: ../includes/admin-views.php:143
-msgid "Analyze with Gemini"
-msgstr ""
-
-#: ../includes/admin-views.php:146
-msgid "Discover Images"
-msgstr ""
-
-#: ../includes/admin-views.php:151
-msgid "Analysis results will appear here."
-msgstr ""
-
-#: ../includes/admin-views.php:171
-msgid "AIO Gemini Settings"
-msgstr ""
-
-#: ../includes/admin-views.php:174
-msgid "Settings saved."
-msgstr ""
-
-#: ../includes/admin-views.php:182
-msgid "Google Gemini API Key"
-msgstr ""
-
-#: ../includes/admin-views.php:186
-msgid "Analysis Model"
-msgstr ""
-
-#: ../includes/admin-views.php:207
-msgid "Fetch Latest Model List"
-msgstr ""
-
-#: ../includes/admin-views.php:211
-msgid ""
-"After saving the API key, you can add the latest available models to the "
-"dropdown using the button above."
-msgstr ""
-
-#: ../includes/admin-views.php:216
-msgid "Image Generation Function"
-msgstr ""
-
-#: ../includes/admin-views.php:220
-msgid "Enable"
-msgstr ""
-
-#: ../includes/admin-views.php:223
-msgid "Generate high-quality images using the selected image model."
-msgstr ""
-
-#: ../includes/admin-views.php:226
-msgid ""
-"* Image generation (Imagen) may not be available with free tier API keys. "
-"Check <a href=\"https://aistudio.google.com/api-keys\" "
-"target=\"_blank\">Google AI Studio</a> for details."
-msgstr ""
-
-#: ../includes/admin-views.php:231
-msgid "Image Prompt Model"
-msgstr ""
-
-#: ../includes/admin-views.php:252
-msgid "Image Style"
-msgstr ""
-
-#: ../includes/admin-views.php:265
-msgid ""
-"Select the style for generated images. This will be automatically added to "
-"prompts."
-msgstr ""
-
-#: ../includes/admin-views.php:281
-msgid "Fetching..."
-msgstr ""
-
-#: ../includes/admin-views.php:328
-msgid "✅ Done"
-msgstr ""
-
-#: ../includes/admin-views.php:330 ../includes/admin-views.php:334
-msgid "❌ Error"
-msgstr ""
-
-#: ../includes/admin-views.php:357
-msgid "Showing the last 20 analysis records. Click a row to view details."
-msgstr ""
-
-#: ../includes/admin-views.php:361
-msgid "Date"
-msgstr ""
-
-#: ../includes/admin-views.php:362
-msgid "Post ID"
-msgstr ""
-
-#: ../includes/admin-views.php:364
-msgid "Action"
-msgstr ""
-
-#: ../includes/admin-views.php:369
-msgid "Loading..."
-msgstr ""
-
-#: ../includes/admin-views.php:380
-msgid "Analysis Details"
-msgstr ""
-
-#: ../includes/admin-views.php:403
 msgid "(No data)"
 msgstr ""
 
-#: ../includes/admin-views.php:416
+msgid "3D Render"
+msgstr ""
+
+msgid "AI Rewrite"
+msgstr ""
+
+msgid "AI response format was unexpected. Displaying as text."
+msgstr ""
+
+msgid "AIO Advice"
+msgstr ""
+
+msgid "API Error occurred."
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "After saving the API key, click the button above to add the latest available models to the list."
+msgstr ""
+
+msgid "All image generation completed!"
+msgstr ""
+
+msgid "Analysis Details"
+msgstr ""
+
+msgid "Analysis History"
+msgstr ""
+
+msgid "Analysis Model"
+msgstr ""
+
+msgid "Analysis Result"
+msgstr ""
+
+msgid "Analysis completed successfully"
+msgstr ""
+
+msgid "Analysis results will appear here."
+msgstr ""
+
+msgid "Analyzing..."
+msgstr ""
+
+msgid "Anime"
+msgstr ""
+
+msgid "Are you sure you want to rewrite content? The current title and content will be overwritten."
+msgstr ""
+
+msgid "Batch Generate and Place"
+msgstr ""
+
+msgid "Brutalist"
+msgstr ""
+
+msgid "Clay Render"
+msgstr ""
+
+msgid "Clear Results"
+msgstr ""
+
+msgid "Collage"
+msgstr ""
+
+msgid "Concept Art"
+msgstr ""
+
+msgid "Content Advice"
+msgstr ""
+
+msgid "Control Panel"
+msgstr ""
+
+msgid "Copied!"
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "Cyberpunk"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Digital Art"
+msgstr ""
+
+msgid "Discovering images..."
+msgstr ""
+
+msgid "Done"
+msgstr ""
+
+msgid "Done!"
+msgstr ""
+
+msgid "Enable"
+msgstr ""
+
+msgid "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Error occurred."
+msgstr ""
+
+msgid "Expand"
+msgstr ""
+
+msgid "Failed to insert image."
+msgstr ""
+
+msgid "Failed to load history."
+msgstr ""
+
+msgid "Featured Image"
+msgstr ""
+
+msgid "Featured image set successfully!"
+msgstr ""
+
+msgid "Fetch Latest Model List"
+msgstr ""
+
+msgid "Fetching..."
+msgstr ""
+
+msgid "Flat Illustration"
+msgstr ""
+
+msgid "Generate"
+msgstr ""
+
+msgid "Generate and Place"
+msgstr ""
+
+msgid "Generate featured image for the article"
+msgstr ""
+
+msgid "Generate high-quality images using the selected image model."
+msgstr ""
+
+msgid "Generating..."
+msgstr ""
+
+msgid "Generating... "
+msgstr ""
+
+msgid "Geometric"
+msgstr ""
+
+msgid "Glassmorphism"
+msgstr ""
+
+msgid "Google Gemini API Key"
+msgstr ""
+
+msgid "Gradient Mesh"
+msgstr ""
+
+msgid "Icon Style"
+msgstr ""
+
+msgid "Image Generation"
+msgstr ""
+
+msgid "Image Generation Model"
+msgstr ""
+
+msgid "Image Style"
+msgstr ""
+
+msgid "Image inserted successfully!"
+msgstr ""
+
+msgid "Infographic"
+msgstr ""
+
+msgid "Isometric"
+msgstr ""
+
+msgid "Loading history..."
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Low Poly"
+msgstr ""
+
+msgid "Meta Description Suggestions"
+msgstr ""
+
+msgid "Minimalist"
+msgstr ""
+
+msgid "Neon 3D"
+msgstr ""
+
+msgid "Network error. Please check your connection."
+msgstr ""
+
+msgid "No content found."
+msgstr ""
+
+msgid "No history found for this post."
+msgstr ""
+
+msgid "No image suggestions found"
+msgstr ""
+
+msgid "No suitable image placement found"
+msgstr ""
+
+msgid "None (Prompt Only)"
+msgstr ""
+
+msgid "Oil Painting"
+msgstr ""
+
+msgid "Paper Cut"
+msgstr ""
+
+msgid "Permission denied. Please refresh the page and try again."
+msgstr ""
+
+msgid "Photo Realistic"
+msgstr ""
+
+msgid "Picot AIO AI Content Optimizer"
+msgstr ""
+
+msgid "Picot AIO AI Content Optimizer Settings"
+msgstr ""
+
+msgid "Pixel Art"
+msgstr ""
+
+msgid "Placeholder replaced with image!"
+msgstr ""
+
+msgid "Post ID"
+msgstr ""
+
+msgid "Processing..."
+msgstr ""
+
+msgid "Professional (Photo)"
+msgstr ""
+
+msgid "Recommended Content"
+msgstr ""
+
+msgid "Rewrite Instructions"
+msgstr ""
+
+msgid "Rewrite completed successfully!"
+msgstr ""
+
+msgid "Rewriting..."
+msgstr ""
+
+msgid "SEO Advice"
+msgstr ""
+
+msgid "SEO Title Ideas"
+msgstr ""
+
+msgid "SEO/AIO Analyze"
+msgstr ""
+
+msgid "Save Settings"
+msgstr ""
+
+msgid "Saved: "
+msgstr ""
+
+msgid "Security check failed"
+msgstr ""
+
+msgid "Select the style for generated images. It will be automatically added to the prompt."
+msgstr ""
+
+msgid "Server error. Please check the error log."
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Settings saved."
+msgstr ""
+
+msgid "Showing the last 20 analysis records. Click a post ID to open the editor, or use Expand to view results in a centered modal."
+msgstr ""
+
+msgid "Sketch"
+msgstr ""
+
+msgid "Structure Analysis"
+msgstr ""
+
+msgid "Suggest Images"
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid "Thumbnail Prompt"
+msgstr ""
+
+msgid "Vector Art"
+msgstr ""
+
 msgid "View"
 msgstr ""
 
-#: ../includes/admin-views.php:532
-msgid "Could not parse as JSON. Showing as text."
+msgid "View History for this Post"
+msgstr ""
+
+msgid "Vintage"
+msgstr ""
+
+msgid "Watercolor"
+msgstr ""
+
+msgid "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above."
+msgstr ""
+
+msgid "You do not have permission to change these options."
 msgstr ""

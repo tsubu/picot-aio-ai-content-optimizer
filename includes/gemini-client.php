@@ -35,6 +35,42 @@ class PicotAioOptimizer_Client
     }
 
     /**
+     * Validate HTTP status and decode a Gemini API JSON response body.
+     *
+     * @param array|WP_Error $response  wp_remote_* response.
+     * @param string         $context   Label used in error messages.
+     * @return array|WP_Error Decoded JSON array or WP_Error on failure.
+     */
+    private static function decode_api_json_response($response, $context = 'API')
+    {
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        $code = wp_remote_retrieve_response_code($response);
+        $body_str = wp_remote_retrieve_body($response);
+
+        if ($code !== 200) {
+            $data = json_decode($body_str, true);
+            $msg = (is_array($data) && isset($data['error']['message']))
+                ? $data['error']['message']
+                : 'Unknown API Error';
+            return new WP_Error('api_error', "{$context} Failed ({$code}): {$msg}");
+        }
+
+        if ($body_str === '') {
+            return new WP_Error('api_error', 'Empty API response');
+        }
+
+        $data = json_decode($body_str, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return new WP_Error('api_error', 'Invalid JSON from API: ' . json_last_error_msg());
+        }
+
+        return $data;
+    }
+
+    /**
      * Call Gemini API for Analysis
      * Analyzes content and returns structured feedback
      * 
@@ -132,12 +168,10 @@ class PicotAioOptimizer_Client
             'timeout' => PICOT_AIO_OPTIMIZER_API_TIMEOUT
         ));
 
-        if (is_wp_error($response)) {
-            return $response;
+        $data = self::decode_api_json_response($response, 'Analysis');
+        if (is_wp_error($data)) {
+            return $data;
         }
-
-        $response_body = wp_remote_retrieve_body($response);
-        $data = json_decode($response_body, true);
 
         if (empty($data) || isset($data['error'])) {
             return new WP_Error('api_error', isset($data['error']['message']) ? $data['error']['message'] : 'Unknown API Error');
@@ -293,19 +327,9 @@ class PicotAioOptimizer_Client
             'timeout' => PICOT_AIO_OPTIMIZER_API_TIMEOUT
         ));
 
-        if (is_wp_error($response)) {
-            return $response;
-        }
-
-        $response_body = wp_remote_retrieve_body($response);
-        if (empty($response_body)) {
-            return new WP_Error('api_error', 'Empty API response');
-        }
-
-        // Handle potentially huge JSON responses safely
-        $data = json_decode($response_body, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return new WP_Error('api_error', 'Invalid JSON from API: ' . json_last_error_msg());
+        $data = self::decode_api_json_response($response, 'Rewrite');
+        if (is_wp_error($data)) {
+            return $data;
         }
 
         if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
@@ -375,17 +399,9 @@ class PicotAioOptimizer_Client
             'timeout' => PICOT_AIO_OPTIMIZER_IMAGE_API_TIMEOUT
         ));
 
-        if (is_wp_error($response)) {
-            return $response;
-        }
-
-        $code = wp_remote_retrieve_response_code($response);
-        $body_str = wp_remote_retrieve_body($response);
-        $data = json_decode($body_str, true);
-
-        if ($code !== 200) {
-            $msg = isset($data['error']['message']) ? $data['error']['message'] : 'Unknown API Error';
-            return new WP_Error('api_error', "Image Gen Failed ({$code}): {$msg}");
+        $data = self::decode_api_json_response($response, 'Image Gen');
+        if (is_wp_error($data)) {
+            return $data;
         }
 
         if ($is_imagen) {

@@ -383,8 +383,26 @@ class PicotAioOptimizer_REST_Handlers
             return $response;
         }
 
+        $code = wp_remote_retrieve_response_code($response);
         $body = wp_remote_retrieve_body($response);
+
+        if ($code !== 200) {
+            $data = json_decode($body, true);
+            $msg = (is_array($data) && isset($data['error']['message']))
+                ? $data['error']['message']
+                : 'Unknown API Error';
+            return new WP_Error('api_error', "Models Failed ({$code}): {$msg}", array('status' => $code));
+        }
+
+        if ($body === '') {
+            return new WP_Error('api_error', 'Empty API response', array('status' => 502));
+        }
+
         $data = json_decode($body, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return new WP_Error('api_error', 'Invalid JSON from API: ' . json_last_error_msg(), array('status' => 502));
+        }
+
         $models = isset($data['models']) ? $data['models'] : array();
 
         if (!empty($models)) {

@@ -5,8 +5,8 @@ msgstr ""
 "POT-Creation-Date: 2026-05-20 02:25+0000\n"
 "PO-Revision-Date: 2026-05-20 02:25+0000\n"
 "Last-Translator: Picot\n"
-"Language-Team: Spanish\n"
-"Language: es_ES\n"
+"Language-Team: Dutch\n"
+"Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,340 +14,340 @@ msgstr ""
 "X-Domain: picot-aio-ai-content-optimizer\n"
 
 msgid "(No data)"
-msgstr "(Sin datos)"
+msgstr "(Keine Daten)"
 
 msgid "3D Render"
-msgstr "Renderizado 3D"
+msgstr "3D-Render"
 
 msgid "AI Rewrite"
-msgstr "Reescritura Gemini"
+msgstr "Gemini-Rewrite"
 
 msgid "AI response format was unexpected. Displaying as text."
-msgstr "El formato de respuesta de la IA fue inesperado. Mostrando como texto."
+msgstr "AI-Antwortformat war unerwartet. Anzeige als Text."
 
 msgid "AIO Advice"
-msgstr "Consejos AIO"
+msgstr "AIO-Beratung"
 
 msgid "API Error occurred."
-msgstr "Ocurrió un error de API."
+msgstr "API-Fehler aufgetreten."
 
 msgid "Action"
-msgstr "Acción"
+msgstr "Aktion"
 
 msgid "After saving the API key, click the button above to add the latest available models to the list."
-msgstr "Después de guardar la clave API, puedes añadir los últimos modelos disponibles al menú desplegable usando el botón de arriba."
+msgstr "Nach dem Speichern des API-Schlüssels können Sie die neuesten verfügbaren Modelle über die Schaltfläche oben zum Dropdown-Menü hinzufügen."
 
 msgid "All image generation completed!"
-msgstr "¡Todas las generaciones de imágenes completadas!"
+msgstr "Alle Bildgenerierungen abgeschlossen!"
 
 msgid "Analysis Details"
-msgstr "Detalles del análisis"
+msgstr "Analysedetails"
 
 msgid "Analysis History"
-msgstr "Historial de análisis"
+msgstr "Analyseverlauf"
 
 msgid "Analysis Model"
-msgstr "Modelo de análisis"
+msgstr "Analysemodell"
 
 msgid "Analysis Result"
-msgstr "Resultado del análisis"
+msgstr "Analyseergebnis"
 
 msgid "Analysis completed successfully"
-msgstr "Análisis completado con éxito"
+msgstr "Analyse erfolgreich abgeschlossen"
 
 msgid "Analysis results will appear here."
-msgstr "Los resultados del análisis aparecerán aquí."
+msgstr "Analyseergebnisse werden hier angezeigt."
 
 msgid "Analyzing..."
-msgstr "Analizando..."
+msgstr "Analysiere..."
 
 msgid "Anime"
 msgstr "Anime"
 
 msgid "Are you sure you want to rewrite content? The current title and content will be overwritten."
-msgstr "¿Estás seguro de que quieres reescribir el contenido? El título y el contenido actuales se sobrescribirán."
+msgstr "Sind Sie sicher, dass Sie den Inhalt umschreiben möchten? Der aktuelle Titel und Inhalt werden überschrieben."
 
 msgid "Batch Generate and Place"
-msgstr "🚀 Generación y colocación por lotes"
+msgstr "🚀 Stapelgenerierung und Platzierung"
 
 msgid "Brutalist"
-msgstr "Brutalista"
+msgstr "Brutalistisch"
 
 msgid "Clay Render"
-msgstr "Renderizado de arcilla"
+msgstr "Ton-Render"
 
 msgid "Clear Results"
-msgstr "Limpiar resultados"
+msgstr "Ergebnisse löschen"
 
 msgid "Collage"
 msgstr "Collage"
 
 msgid "Concept Art"
-msgstr "Arte conceptual"
+msgstr "Konzeptkunst"
 
 msgid "Content Advice"
-msgstr "Consejos de contenido"
+msgstr "Inhaltsberatung"
 
 msgid "Control Panel"
-msgstr "Panel de control"
+msgstr "Bedienpaneel"
 
 msgid "Copied!"
-msgstr "¡Copiado!"
+msgstr "Kopiert!"
 
 msgid "Copy"
-msgstr "Copiar"
+msgstr "Kopieren"
 
 msgid "Cyberpunk"
 msgstr "Cyberpunk"
 
 msgid "Date"
-msgstr "Fecha"
+msgstr "Datum"
 
 msgid "Digital Art"
-msgstr "Arte digital"
+msgstr "Digitale Kunst"
 
 msgid "Discovering images..."
-msgstr "Descubriendo oportunidades de imagen..."
+msgstr "Entdecke Bildmöglichkeiten..."
 
 msgid "Done"
-msgstr "✅ Hecho"
+msgstr "✅ Fertig"
 
 msgid "Done!"
-msgstr "✅ ¡Hecho!"
+msgstr "✅ Fertig!"
 
 msgid "Enable"
-msgstr "Activar"
+msgstr "Aktivieren"
 
 msgid "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)"
-msgstr "Introduce instrucciones de reescritura (p. ej., más amigable, resumir más brevemente, etc.)"
+msgstr "Voer herschrijfinstructies in (bijv. vriendelijker, korter samenvatten, enz.)"
 
 msgid "Error"
-msgstr "❌ Error"
+msgstr "❌ Fehler"
 
 msgid "Error occurred."
-msgstr "Ocurrió un error."
+msgstr "Ein Fehler ist aufgetreten."
 
 msgid "Expand"
-msgstr "Ampliar"
+msgstr "Uitvouwen"
 
 msgid "Failed to insert image."
-msgstr "Fallo al insertar imagen. Se ha guardado en la biblioteca de medios."
+msgstr "Bild konnte nicht eingefügt werden. Es wurde in die Mediathek gespeichert."
 
 msgid "Failed to load history."
-msgstr "Fallo al cargar el historial."
+msgstr "Verlauf konnte nicht geladen werden."
 
 msgid "Featured Image"
-msgstr "Imagen destacada"
+msgstr "Beitragsbild"
 
 msgid "Featured image set successfully!"
-msgstr "¡Imagen destacada establecida con éxito!"
+msgstr "Beitragsbild erfolgreich gesetzt!"
 
 msgid "Fetch Latest Model List"
-msgstr "Obtener lista de modelos"
+msgstr "Neueste Modellliste abrufen"
 
 msgid "Fetching..."
-msgstr "Obteniendo..."
+msgstr "Rufe ab..."
 
 msgid "Flat Illustration"
-msgstr "Ilustración plana"
+msgstr "Flache Illustration"
 
 msgid "Generate"
-msgstr "Generar"
+msgstr "Generieren"
 
 msgid "Generate and Place"
-msgstr "🚀 Generar y colocar"
+msgstr "🚀 Generieren und platzieren"
 
 msgid "Generate featured image for the article"
-msgstr "Generar imagen destacada para el artículo"
+msgstr "Beitragsbild für den Artikel generieren"
 
 msgid "Generate high-quality images using the selected image model."
-msgstr "Generar imágenes de alta calidad usando el modelo de imagen seleccionado."
+msgstr "Generieren Sie hochwertige Bilder mit dem ausgewählten Bildmodell."
 
 msgid "Generating..."
-msgstr "Generando..."
+msgstr "Generiere..."
 
 msgid "Generating... "
-msgstr "Generando... "
+msgstr "Genereren... "
 
 msgid "Geometric"
-msgstr "Geométrico"
+msgstr "Geometrisch"
 
 msgid "Glassmorphism"
-msgstr "Glassmorphism"
+msgstr "Glassmorphismus"
 
 msgid "Google Gemini API Key"
-msgstr "Clave API de Google Gemini"
+msgstr "Google Gemini API-Schlüssel"
 
 msgid "Gradient Mesh"
-msgstr "Malla de degradado"
+msgstr "Verlaufsnetz"
 
 msgid "Icon Style"
-msgstr "Estilo de icono"
+msgstr "Icon-Stil"
 
 msgid "Image Generation"
-msgstr "Función de generación de imagenes"
+msgstr "Bildgenerierung-Funktion"
 
 msgid "Image Generation Model"
-msgstr "Modelo de prompt de imagen"
+msgstr "Bild-Prompt-Modell"
 
 msgid "Image Style"
-msgstr "Estilo de imagen"
+msgstr "Bildstil"
 
 msgid "Image inserted successfully!"
-msgstr "¡Imagen insertada con éxito!"
+msgstr "Bild erfolgreich eingefügt!"
 
 msgid "Infographic"
-msgstr "Infografía"
+msgstr "Infografik"
 
 msgid "Isometric"
-msgstr "Isométrico"
+msgstr "Isometrisch"
 
 msgid "Loading history..."
-msgstr "Cargando historial..."
+msgstr "Lade Verlauf..."
 
 msgid "Loading..."
-msgstr "Cargando..."
+msgstr "Lade..."
 
 msgid "Low Poly"
-msgstr "Low Poly"
+msgstr "Low-Poly"
 
 msgid "Meta Description Suggestions"
-msgstr "Sugerencias de meta descripción"
+msgstr "Meta-Beschreibungsvorschläge"
 
 msgid "Minimalist"
-msgstr "Minimalista"
+msgstr "Minimalistisch"
 
 msgid "Neon 3D"
-msgstr "Neon 3D"
+msgstr "Neon-3D"
 
 msgid "Network error. Please check your connection."
-msgstr "Error de red. Por favor, comprueba tu conexión."
+msgstr "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung."
 
 msgid "No content found."
-msgstr "No se encontró contenido."
+msgstr "Kein Inhalt gefunden."
 
 msgid "No history found for this post."
-msgstr "No se encontró historial para esta entrada."
+msgstr "Kein Verlauf für diesen Beitrag gefunden."
 
 msgid "No image suggestions found"
-msgstr "No se encontraron sugerencias de imagen"
+msgstr "Keine Bildvorschläge gefunden"
 
 msgid "No suitable image placement found"
-msgstr "No se encontraron oportunidades de colocación (excluyendo áreas cercanas a imágenes existentes)"
+msgstr "Keine Platzierungsmöglichkeiten gefunden (außer Bereichen in der Nähe vorhandener Bilder)"
 
 msgid "None (Prompt Only)"
-msgstr "Ninguno (Solo prompt)"
+msgstr "Keine (nur Prompt)"
 
 msgid "Oil Painting"
-msgstr "Pintura al óleo"
+msgstr "Ölgemälde"
 
 msgid "Paper Cut"
-msgstr "Papel recortado"
+msgstr "Papierschnitt"
 
 msgid "Permission denied. Please refresh the page and try again."
-msgstr "Permiso denegado. Por favor, refresca la página e inténtalo de nuevo."
+msgstr "Zugriff verweigert. Bitte laden Sie die Seite neu und versuchen Sie es erneut."
 
 msgid "Photo Realistic"
-msgstr "Fotorrealista"
+msgstr "Fotorealistisch"
 
 msgid "Picot AIO AI Content Optimizer"
 msgstr "Picot AIO AI Content Optimizer"
 
 msgid "Picot AIO AI Content Optimizer Settings"
-msgstr "Ajustes de AIO Gemini"
+msgstr "AIO Gemini Einstellungen"
 
 msgid "Pixel Art"
-msgstr "Pixel Art"
+msgstr "Pixel-Art"
 
 msgid "Placeholder replaced with image!"
-msgstr "¡Marcador de posición reemplazado por imagen!"
+msgstr "Platzhalter durch Bild ersetzt!"
 
 msgid "Post ID"
-msgstr "ID de entrada"
+msgstr "Beitrags-ID"
 
 msgid "Processing..."
-msgstr "Procesando..."
+msgstr "Verwerken..."
 
 msgid "Professional (Photo)"
-msgstr "Profesional (Foto)"
+msgstr "Professionell (Foto)"
 
 msgid "Recommended Content"
-msgstr "Contenido recomendado"
+msgstr "Empfohlener Inhalt"
 
 msgid "Rewrite Instructions"
-msgstr "Instrucciones de reescritura"
+msgstr "Herschrijfinstructies"
 
 msgid "Rewrite completed successfully!"
-msgstr "¡Reescritura exitosa!"
+msgstr "Umschreiben erfolgreich!"
 
 msgid "Rewriting..."
-msgstr "Reescribiendo..."
+msgstr "Schreibe um..."
 
 msgid "SEO Advice"
-msgstr "Consejos SEO"
+msgstr "SEO-Beratung"
 
 msgid "SEO Title Ideas"
-msgstr "Ideas de títulos SEO"
+msgstr "SEO-Titelideen"
 
 msgid "SEO/AIO Analyze"
-msgstr "Analizar contenido"
+msgstr "Inhalt analysieren"
 
 msgid "Save Settings"
-msgstr "Guardar ajustes"
+msgstr "Instellingen opslaan"
 
 msgid "Saved: "
-msgstr "💾 Guardado: "
+msgstr "💾 Gespeichert: "
 
 msgid "Security check failed"
-msgstr "Fallo en la comprobación de seguridad"
+msgstr "Sicherheitsprüfung fehlgeschlagen"
 
 msgid "Select the style for generated images. It will be automatically added to the prompt."
-msgstr "Selecciona el estilo para las imágenes generadas. Esto se añadirá automáticamente a los prompts."
+msgstr "Wählen Sie den Stil für generierte Bilder aus. Dieser wird automatisch zu den Prompts hinzugefügt."
 
 msgid "Server error. Please check the error log."
-msgstr "Error de servidor. Por favor, comprueba el registro de errores."
+msgstr "Serverfehler. Bitte überprüfen Sie das Fehlerprotokoll."
 
 msgid "Settings"
-msgstr "Ajustes"
+msgstr "Einstellungen"
 
 msgid "Settings saved."
-msgstr "Ajustes guardados."
+msgstr "Einstellungen gespeichert."
 
 msgid "Showing the last 20 analysis records. Click a post ID to open the editor, or use Expand to view results in a centered modal."
-msgstr "Mostrando los últimos 20 registros de análisis. Pulsa en una fila para ver detalles."
+msgstr "Zeige die letzten 20 Analyse-Einträge an. Klicken Sie auf eine Zeile, um Details anzuzeigen."
 
 msgid "Sketch"
-msgstr "Boceto"
+msgstr "Skizze"
 
 msgid "Structure Analysis"
-msgstr "Análisis de estructura"
+msgstr "Strukturanalyse"
 
 msgid "Suggest Images"
-msgstr "Descubrir oportunidades de imagen"
+msgstr "Bildmöglichkeiten entdecken"
 
 msgid "Summary"
-msgstr "Resumen"
+msgstr "Zusammenfassung"
 
 msgid "Thumbnail Prompt"
-msgstr "Prompt de miniatura"
+msgstr "Vorschaubild-Prompt"
 
 msgid "Vector Art"
-msgstr "Arte vectorial"
+msgstr "Vektorkunst"
 
 msgid "View"
-msgstr "Ver"
+msgstr "Ansehen"
 
 msgid "View History for this Post"
-msgstr "Ver historial de esta entrada"
+msgstr "Verlauf für diesen Beitrag anzeigen"
 
 msgid "Vintage"
 msgstr "Vintage"
 
 msgid "Watercolor"
-msgstr "Acuarela"
+msgstr "Aquarell"
 
 msgid "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above."
-msgstr "Puedes obtener una clave API gratuita en Google AI Studio. <a href=\"%s\" target=\"_blank\">Crea tu clave aquí</a> y pégala en el campo de arriba."
+msgstr "Je kunt een gratis API-sleutel krijgen via Google AI Studio. <a href=\"%s\" target=\"_blank\">Maak hier je sleutel</a> en plak deze in het veld hierboven."
 
 msgid "You do not have permission to change these options."
-msgstr "No tienes permiso para cambiar estas opciones."
+msgstr "Je hebt geen toestemming om deze opties te wijzigen."

@@ -1,0 +1,170 @@
+{
+  "ja": {
+    "Control Panel": "操作パネル",
+    "Processing...": "処理中...",
+    "Expand": "拡大表示",
+    "Rewrite Instructions": "リライト指示",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "リライトの指示を入力（例：もっと親しみやすく、短く要約して、など）",
+    "Generating... ": "生成中... ",
+    "Picot AIO AI Content Optimizer": "Picot AIO AI コンテンツ最適化",
+    "Save Settings": "設定を保存",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Google AI StudioからAPIキーを無料で取得できます。<a href=\"%s\" target=\"_blank\">こちらからキーを作成</a>して、上のフィールドに貼り付けてください。",
+    "You do not have permission to change these options.": "これらのオプションを変更する権限がありません。"
+  },
+  "de_DE": {
+    "Control Panel": "Bedienfeld",
+    "Processing...": "Verarbeitung...",
+    "Expand": "Erweitern",
+    "Rewrite Instructions": "Umschreib-Anweisungen",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Umschreib-Anweisungen eingeben (z. B. freundlicher formulieren, kürzer zusammenfassen usw.)",
+    "Generating... ": "Generiere... ",
+    "Save Settings": "Einstellungen speichern",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Sie können einen kostenlosen API-Schlüssel von Google AI Studio erhalten. <a href=\"%s\" target=\"_blank\">Erstellen Sie hier Ihren Schlüssel</a> und fügen Sie ihn oben ein.",
+    "You do not have permission to change these options.": "Sie haben keine Berechtigung, diese Optionen zu ändern."
+  },
+  "fr_FR": {
+    "Control Panel": "Panneau de contrôle",
+    "Processing...": "Traitement...",
+    "Expand": "Agrandir",
+    "Rewrite Instructions": "Instructions de réécriture",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Saisissez les instructions de réécriture (ex. : plus convivial, résumé plus court, etc.)",
+    "Generating... ": "Génération... ",
+    "Save Settings": "Enregistrer les paramètres",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Vous pouvez obtenir une clé API gratuite sur Google AI Studio. <a href=\"%s\" target=\"_blank\">Créez votre clé ici</a> et collez-la dans le champ ci-dessus.",
+    "You do not have permission to change these options.": "Vous n'avez pas l'autorisation de modifier ces options."
+  },
+  "es_ES": {
+    "Control Panel": "Panel de control",
+    "Processing...": "Procesando...",
+    "Expand": "Ampliar",
+    "Rewrite Instructions": "Instrucciones de reescritura",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Introduce instrucciones de reescritura (p. ej., más amigable, resumir más brevemente, etc.)",
+    "Generating... ": "Generando... ",
+    "Save Settings": "Guardar ajustes",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Puedes obtener una clave API gratuita en Google AI Studio. <a href=\"%s\" target=\"_blank\">Crea tu clave aquí</a> y pégala en el campo de arriba.",
+    "You do not have permission to change these options.": "No tienes permiso para cambiar estas opciones."
+  },
+  "zh_TW": {
+    "Control Panel": "操作面板",
+    "Processing...": "處理中...",
+    "Expand": "放大顯示",
+    "Rewrite Instructions": "改寫指示",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "輸入改寫指示（例如：更親切、縮短摘要等）",
+    "Generating... ": "產生中... ",
+    "Picot AIO AI Content Optimizer": "Picot AIO AI 內容最佳化",
+    "Save Settings": "儲存設定",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "您可從 Google AI Studio 免費取得 API 金鑰。<a href=\"%s\" target=\"_blank\">在此建立金鑰</a>並貼到上方欄位。",
+    "You do not have permission to change these options.": "您沒有變更這些選項的權限。"
+  },
+  "it_IT": {
+    "Control Panel": "Pannello di controllo",
+    "Processing...": "Elaborazione...",
+    "Expand": "Espandi",
+    "Rewrite Instructions": "Istruzioni di riscrittura",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Inserisci le istruzioni di riscrittura (es. più amichevole, riassunto più breve, ecc.)",
+    "Generating... ": "Generazione... ",
+    "Save Settings": "Salva impostazioni",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Puoi ottenere una chiave API gratuita da Google AI Studio. <a href=\"%s\" target=\"_blank\">Crea la chiave qui</a> e incollala nel campo sopra.",
+    "You do not have permission to change these options.": "Non hai l'autorizzazione per modificare queste opzioni."
+  },
+  "pt_BR": {
+    "Control Panel": "Painel de controle",
+    "Processing...": "Processando...",
+    "Expand": "Expandir",
+    "Rewrite Instructions": "Instruções de reescrita",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Digite instruções de reescrita (ex.: mais amigável, resumir de forma mais curta, etc.)",
+    "Generating... ": "Gerando... ",
+    "Save Settings": "Salvar configurações",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Você pode obter uma chave de API gratuita no Google AI Studio. <a href=\"%s\" target=\"_blank\">Crie sua chave aqui</a> e cole no campo acima.",
+    "You do not have permission to change these options.": "Você não tem permissão para alterar estas opções."
+  },
+  "nl_NL": {
+    "Control Panel": "Bedienpaneel",
+    "Processing...": "Verwerken...",
+    "Expand": "Uitvouwen",
+    "Rewrite Instructions": "Herschrijfinstructies",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Voer herschrijfinstructies in (bijv. vriendelijker, korter samenvatten, enz.)",
+    "Generating... ": "Genereren... ",
+    "Save Settings": "Instellingen opslaan",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Je kunt een gratis API-sleutel krijgen via Google AI Studio. <a href=\"%s\" target=\"_blank\">Maak hier je sleutel</a> en plak deze in het veld hierboven.",
+    "You do not have permission to change these options.": "Je hebt geen toestemming om deze opties te wijzigen."
+  },
+  "ko_KR": {
+    "Control Panel": "제어 패널",
+    "Processing...": "처리 중...",
+    "Expand": "확대",
+    "Rewrite Instructions": "다시 쓰기 지침",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "다시 쓰기 지침을 입력하세요(예: 더 친근하게, 더 짧게 요약 등)",
+    "Generating... ": "생성 중... ",
+    "Picot AIO AI Content Optimizer": "Picot AIO AI 콘텐츠 최적화",
+    "Save Settings": "설정 저장",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Google AI Studio에서 무료 API 키를 받을 수 있습니다. <a href=\"%s\" target=\"_blank\">여기에서 키를 생성</a>한 후 위 필드에 붙여넣으세요.",
+    "You do not have permission to change these options.": "이 옵션을 변경할 권한이 없습니다."
+  },
+  "pl_PL": {
+    "Control Panel": "Panel sterowania",
+    "Processing...": "Przetwarzanie...",
+    "Expand": "Rozwiń",
+    "Rewrite Instructions": "Instrukcje przepisywania",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Wpisz instrukcje przepisywania (np. bardziej przyjazny ton, krótsze podsumowanie itd.)",
+    "Generating... ": "Generowanie... ",
+    "Save Settings": "Zapisz ustawienia",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Możesz uzyskać darmowy klucz API w Google AI Studio. <a href=\"%s\" target=\"_blank\">Utwórz klucz tutaj</a> i wklej go w pole powyżej.",
+    "You do not have permission to change these options.": "Nie masz uprawnień do zmiany tych opcji."
+  },
+  "ru_RU": {
+    "Control Panel": "Панель управления",
+    "Processing...": "Обработка...",
+    "Expand": "Развернуть",
+    "Rewrite Instructions": "Инструкции для переписывания",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Введите инструкции для переписывания (например, сделать дружелюбнее, сократить и т. д.)",
+    "Generating... ": "Генерация... ",
+    "Save Settings": "Сохранить настройки",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Вы можете получить бесплатный API-ключ в Google AI Studio. <a href=\"%s\" target=\"_blank\">Создайте ключ здесь</a> и вставьте его в поле выше.",
+    "You do not have permission to change these options.": "У вас нет прав на изменение этих параметров."
+  },
+  "id_ID": {
+    "Control Panel": "Panel kontrol",
+    "Processing...": "Memproses...",
+    "Expand": "Perluas",
+    "Rewrite Instructions": "Instruksi penulisan ulang",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Masukkan instruksi penulisan ulang (mis. lebih ramah, ringkas lebih pendek, dll.)",
+    "Generating... ": "Menghasilkan... ",
+    "Save Settings": "Simpan pengaturan",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Anda bisa mendapatkan kunci API gratis dari Google AI Studio. <a href=\"%s\" target=\"_blank\">Buat kunci di sini</a> lalu tempelkan ke kolom di atas.",
+    "You do not have permission to change these options.": "Anda tidak memiliki izin untuk mengubah opsi ini."
+  },
+  "vi": {
+    "Control Panel": "Bảng điều khiển",
+    "Processing...": "Đang xử lý...",
+    "Expand": "Mở rộng",
+    "Rewrite Instructions": "Hướng dẫn viết lại",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Nhập hướng dẫn viết lại (ví dụ: thân thiện hơn, tóm tắt ngắn hơn, v.v.)",
+    "Generating... ": "Đang tạo... ",
+    "Save Settings": "Lưu cài đặt",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Bạn có thể lấy khóa API miễn phí từ Google AI Studio. <a href=\"%s\" target=\"_blank\">Tạo khóa tại đây</a> và dán vào ô phía trên.",
+    "You do not have permission to change these options.": "Bạn không có quyền thay đổi các tùy chọn này."
+  },
+  "tr_TR": {
+    "Control Panel": "Kontrol paneli",
+    "Processing...": "İşleniyor...",
+    "Expand": "Genişlet",
+    "Rewrite Instructions": "Yeniden yazma talimatları",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Yeniden yazma talimatlarını girin (ör. daha samimi, daha kısa özetleme vb.)",
+    "Generating... ": "Oluşturuluyor... ",
+    "Save Settings": "Ayarları kaydet",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Google AI Studio'dan ücretsiz bir API anahtarı alabilirsiniz. <a href=\"%s\" target=\"_blank\">Anahtarınızı burada oluşturun</a> ve yukarıdaki alana yapıştırın.",
+    "You do not have permission to change these options.": "Bu seçenekleri değiştirme izniniz yok."
+  },
+  "th": {
+    "Control Panel": "แผงควบคุม",
+    "Processing...": "กำลังประมวลผล...",
+    "Expand": "ขยาย",
+    "Rewrite Instructions": "คำแนะนำการเขียนใหม่",
+    "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "ป้อนคำแนะนำการเขียนใหม่ (เช่น เป็นกันเองมากขึ้น สรุปให้สั้นลง ฯลฯ)",
+    "Generating... ": "กำลังสร้าง... ",
+    "Save Settings": "บันทึกการตั้งค่า",
+    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "คุณสามารถรับคีย์ API ฟรีจาก Google AI Studio ได้ <a href=\"%s\" target=\"_blank\">สร้างคีย์ที่นี่</a> แล้ววางในช่องด้านบน",
+    "You do not have permission to change these options.": "คุณไม่มีสิทธิ์เปลี่ยนตัวเลือกเหล่านี้"
+  }
+}

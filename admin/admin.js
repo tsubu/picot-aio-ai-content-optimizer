@@ -1432,7 +1432,8 @@
                         response.data.forEach(function(log) {
                              html += '<li style="margin-bottom:10px; font-size:12px;">';
                              html += '<strong>[' + log.created_at + ']</strong><br>';
-                             html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.restoreHistoryItem(' + log.id + ')">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button>';
+                             html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.restoreHistoryItem(' + log.id + ')">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button> ';
+                             html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.openHistoryExpand(' + log.id + ')">' + (picot_aio_optimizer.strings.expand_view || '拡大表示') + '</button>';
                              html += '</li>';
                         });
                         html += '</ul>';
@@ -1453,6 +1454,16 @@
 
     // Expose helper to global window for onclick handlers
     window.PicotAioOptimizer = window.PicotAioOptimizer || {};
+    window.PicotAioOptimizer.openHistoryExpand = function(id) {
+        if (!window.PicotAioOptimizer.currentHistory) {
+            return;
+        }
+        var item = window.PicotAioOptimizer.currentHistory.find(function(h) { return h.id == id; });
+        if (item) {
+            openHistoryDetailModal(item);
+        }
+    };
+
     window.PicotAioOptimizer.restoreHistoryItem = function(id, isClassic) {
         if (!window.PicotAioOptimizer.currentHistory) return;
         var item = window.PicotAioOptimizer.currentHistory.find(function(h) { return h.id == id; });
@@ -1584,53 +1595,138 @@
         });
     }
 
-    function displayResultsInternal(response, targetDiv) {
-        // Render to both panels if a specific target isn't explicitly provided
-        var renderTargets = [];
-        if (targetDiv) {
-            renderTargets.push(targetDiv);
-        } else {
-            getAllResultPanels().each(function() { renderTargets.push($(this)); });
+    function parseAdviceResult(adviceResult) {
+        if (!adviceResult) {
+            return null;
         }
-        
-        if (!response) {
-             renderTargets.forEach(function(target) {
-                 target.html('<div class="notice notice-error"><p>' + (picot_aio_optimizer.strings.error || 'No analysis data found.') + '</p></div>');
-             });
+        var raw = typeof adviceResult === 'string' ? adviceResult : JSON.stringify(adviceResult);
+        var clean = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+        try {
+            return JSON.parse(clean);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function normalizeAnalysisResponse(response) {
+        if (!response || typeof response !== 'object') {
+            return response;
+        }
+        var normalized = $.extend({}, response);
+        if (!normalized.summary && normalized.summary_ja) {
+            normalized.summary = normalized.summary_ja;
+        }
+        return normalized;
+    }
+
+    function getPostEditUrl(postId) {
+        if (!postId || !picot_aio_optimizer.admin_url) {
+            return '#';
+        }
+        return picot_aio_optimizer.admin_url + 'post.php?post=' + encodeURIComponent(postId) + '&action=edit';
+    }
+
+    function closeHistoryModal() {
+        $('#picot_aio_optimizer-modal').hide().attr('aria-hidden', 'true');
+        $('body').removeClass('picot-aio-optimizer-modal-open');
+    }
+
+    function ensureHistoryModal() {
+        var $modal = $('#picot_aio_optimizer-modal');
+        if ($modal.length) {
+            $modal.addClass('picot-aio-optimizer-modal');
             return;
         }
 
-        // Handle raw string responses (Markdown)
+        var titleDefault = picot_aio_optimizer.strings.analysis_result_title || 'Analysis Result';
+        $modal = $(
+            '<div id="picot_aio_optimizer-modal" class="picot-aio-optimizer-modal" style="display:none;" aria-hidden="true">' +
+            '<div class="picot-aio-optimizer-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="picot_aio_optimizer-modal-title">' +
+            '<div class="picot-aio-optimizer-modal__header">' +
+            '<span id="picot_aio_optimizer-modal-close" class="picot-aio-optimizer-modal__close" role="button" tabindex="0">&times;</span>' +
+            '<h3 id="picot_aio_optimizer-modal-title">' + escapeHtml(titleDefault) + '</h3>' +
+            '</div>' +
+            '<div id="picot_aio_optimizer-modal-content" class="picot-aio-optimizer-modal__body"></div>' +
+            '</div></div>'
+        );
+        $('body').append($modal);
+
+        $modal.on('click', function(e) {
+            if ($(e.target).is('#picot_aio_optimizer-modal')) {
+                closeHistoryModal();
+            }
+        });
+        $('#picot_aio_optimizer-modal-close').on('click', closeHistoryModal);
+        $(document).on('keydown.picotHistoryModal', function(e) {
+            if (e.key === 'Escape' && $('#picot_aio_optimizer-modal').is(':visible')) {
+                closeHistoryModal();
+            }
+        });
+    }
+
+    function openHistoryDetailModal(log) {
+        if (!log) {
+            return;
+        }
+
+        ensureHistoryModal();
+
+        var parsed = parseAdviceResult(log.advice_result);
+        var resultHtml = '';
+
+        if (parsed) {
+            resultHtml = buildAnalysisResultHtml(normalizeAnalysisResponse(parsed), {
+                includeHistory: false,
+                includeClearButton: false,
+                showCopyButtons: true
+            });
+        } else {
+            resultHtml = '<div class="notice notice-warning"><p>' + (picot_aio_optimizer.strings.format_warning || 'AI response format was unexpected.') + '</p></div>';
+            resultHtml += '<pre style="white-space:pre-wrap;">' + escapeHtml(log.advice_result) + '</pre>';
+        }
+
+        $('#picot_aio_optimizer-modal-title').text(
+            (picot_aio_optimizer.strings.analysis_result_title || 'Analysis Result') +
+            ' - ' + (picot_aio_optimizer.strings.save_date || '') + new Date(log.created_at).toLocaleString()
+        );
+        $('#picot_aio_optimizer-modal-content').html(resultHtml);
+        $('#picot_aio_optimizer-modal').show().attr('aria-hidden', 'false');
+        $('body').addClass('picot-aio-optimizer-modal-open');
+    }
+
+    function buildAnalysisResultHtml(response, options) {
+        options = options || {};
+        var includeHistory = !!options.includeHistory;
+        var includeClearButton = options.includeClearButton !== false;
+        var showCopyButtons = options.showCopyButtons !== false;
+        var isClassicTarget = !!options.isClassicTarget;
+
+        if (!response) {
+            return '<div class="notice notice-error"><p>' + (picot_aio_optimizer.strings.error || 'No analysis data found.') + '</p></div>';
+        }
+
         if (typeof response === 'string' || !response.summary) {
             var rawText = (typeof response === 'string') ? response : JSON.stringify(response, null, 2);
             var htmlFallback = '<div class="notice notice-warning" style="padding:15px;">';
             htmlFallback += '<h3 style="margin-top:0;">' + (picot_aio_optimizer.strings.analysis_result_title || 'Analysis Result') + '</h3>';
             htmlFallback += '<p><strong>⚠️ ' + (picot_aio_optimizer.strings.format_warning || 'AI response format was unexpected. Displaying as text.') + '</strong></p>';
             htmlFallback += '<div style="background:#fff; padding:15px; border:1px solid #ddd; border-radius:4px;">' + renderMarkdown(rawText) + '</div>';
-            htmlFallback += '<div style="margin-top:15px; border-top:1px solid #ccd0d4; padding-top:10px;">';
-            htmlFallback += '<button type="button" class="button button-secondary" onclick="window.location.reload();">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
-            htmlFallback += '</div></div>';
-            renderTargets.forEach(function(target) {
-                target.html(htmlFallback);
-            });
-            return;
+            if (includeClearButton) {
+                htmlFallback += '<div style="margin-top:15px; border-top:1px solid #ccd0d4; padding-top:10px;">';
+                htmlFallback += '<button type="button" class="button button-secondary" onclick="window.location.reload();">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
+                htmlFallback += '</div>';
+            }
+            htmlFallback += '</div>';
+            return htmlFallback;
         }
 
-        var html = '<div style="font-size:13px; color:#1d2327;">';
-        html += '<h3 style="margin-top:0; margin-bottom:15px; padding-bottom:8px; border-bottom:1px solid #ccd0d4; font-size:14px;">' + (picot_aio_optimizer.strings.analysis_result_title || 'Analysis Result') + '</h3>';
-        
-        // Summary
-        html += '<div style="margin-bottom:20px;">';
-        html += '<strong style="display:block; margin-bottom:5px; font-size:13px;">' + (picot_aio_optimizer.strings.label_summary || 'Summary') + '</strong>';
-        html += '<div style="line-height:1.5;">' + renderMarkdown(response.summary) + '</div>';
-        html += '</div>';
-
-        // Helper to render sections (Flat Design)
-        function renderSection(title, items, borderColor) {
-            if (!items || items.length === 0) return '';
+        function renderAnalysisSection(title, items, borderColor) {
+            if (!items || (Array.isArray(items) && items.length === 0)) {
+                return '';
+            }
             var sectionHtml = '<div style="margin-bottom:20px; padding-left:10px; border-left:3px solid ' + borderColor + ';">';
             sectionHtml += '<strong style="display:block; margin-bottom:5px; font-size:13px; color:#2271b1;">' + title + '</strong>';
-            
+
             if (Array.isArray(items)) {
                 sectionHtml += '<ul style="margin:0 0 0 16px; list-style:disc; padding:0; line-height:1.5;">';
                 items.forEach(function(item) {
@@ -1644,65 +1740,86 @@
             return sectionHtml;
         }
 
-        // Structure Analysis
-        html += renderSection(picot_aio_optimizer.strings.label_structure || 'Structure Analysis', response.structure_analysis, '#2271b1');
+        var html = '<div style="font-size:13px; color:#1d2327;">';
+        html += '<h3 style="margin-top:0; margin-bottom:15px; padding-bottom:8px; border-bottom:1px solid #ccd0d4; font-size:14px;">' + (picot_aio_optimizer.strings.analysis_result_title || 'Analysis Result') + '</h3>';
+        html += '<div style="margin-bottom:20px;">';
+        html += '<strong style="display:block; margin-bottom:5px; font-size:13px;">' + (picot_aio_optimizer.strings.label_summary || 'Summary') + '</strong>';
+        html += '<div style="line-height:1.5;">' + renderMarkdown(response.summary) + '</div>';
+        html += '</div>';
+        html += renderAnalysisSection(picot_aio_optimizer.strings.label_structure || 'Structure Analysis', response.structure_analysis, '#2271b1');
+        html += renderAnalysisSection(picot_aio_optimizer.strings.label_content_advice || 'Content Advice', response.content_advice, '#d63638');
+        html += renderAnalysisSection(picot_aio_optimizer.strings.label_seo_advice || 'SEO Advice', response.seo_advice, '#008a20');
+        html += renderAnalysisSection(picot_aio_optimizer.strings.label_aio_advice || 'AIO Advice', response.aio_advice, '#dba617');
+        html += renderAnalysisSection(picot_aio_optimizer.strings.label_recommended || 'Recommended Content', response.recommended_content, '#8224e3');
 
-        // Content Advice
-        html += renderSection(picot_aio_optimizer.strings.label_content_advice || 'Content Advice', response.content_advice, '#d63638');
-
-        // SEO Advice
-        html += renderSection(picot_aio_optimizer.strings.label_seo_advice || 'SEO Advice', response.seo_advice, '#008a20');
-
-        // AIO Advice
-        html += renderSection(picot_aio_optimizer.strings.label_aio_advice || 'AIO Advice', response.aio_advice, '#dba617');
-
-        // Recommended Content
-        html += renderSection(picot_aio_optimizer.strings.label_recommended || 'Recommended Content', response.recommended_content, '#8224e3');
-
-        // SEO Title Ideas
         if (response.seo_title_ideas && response.seo_title_ideas.length > 0) {
             html += '<div style="margin-bottom:20px; padding-left:10px; border-left:3px solid #50575e;">';
             html += '<strong style="display:block; margin-bottom:5px; font-size:13px; color:#50575e;">' + (picot_aio_optimizer.strings.label_titles || 'SEO Title Ideas') + '</strong>';
             html += '<ul style="margin:0 0 0 16px; list-style:none; padding:0; line-height:1.5;">';
             response.seo_title_ideas.forEach(function(title) {
-                 html += '<li style="margin-bottom:8px;">' + renderMarkdown(title) + 
-                 ' <button type="button" class="button button-small" onclick="window.PicotAioOptimizer.copyToClipboard(\'' + escapeHtml(title).replace(/'/g, "\\'") + '\')" style="margin-left:5px; vertical-align:middle;">' + (picot_aio_optimizer.strings.copy_btn || 'Copy') + '</button></li>';
+                html += '<li style="margin-bottom:8px;">' + renderMarkdown(title);
+                if (showCopyButtons) {
+                    html += ' <button type="button" class="button button-small" onclick="window.PicotAioOptimizer.copyToClipboard(\'' + escapeHtml(title).replace(/'/g, "\\'") + '\')" style="margin-left:5px; vertical-align:middle;">' + (picot_aio_optimizer.strings.copy_btn || 'Copy') + '</button>';
+                }
+                html += '</li>';
             });
             html += '</ul></div>';
         }
 
-        // Meta Description Suggestions
         if (response.meta_description_suggestions && response.meta_description_suggestions.length > 0) {
             html += '<div style="margin-bottom:20px; padding-left:10px; border-left:3px solid #00acc1;">';
             html += '<strong style="display:block; margin-bottom:5px; font-size:13px; color:#00acc1;">' + (picot_aio_optimizer.strings.label_meta || 'Meta Description Suggestions') + '</strong>';
             html += '<ul style="margin:0 0 0 16px; list-style:none; padding:0; line-height:1.5;">';
             response.meta_description_suggestions.forEach(function(desc) {
-                 html += '<li style="margin-bottom:8px;">' + renderMarkdown(desc) + 
-                 ' <button type="button" class="button button-small" onclick="window.PicotAioOptimizer.copyToClipboard(\'' + escapeHtml(desc).replace(/'/g, "\\'") + '\')" style="margin-left:5px; vertical-align:middle;">Copy</button></li>';
+                html += '<li style="margin-bottom:8px;">' + renderMarkdown(desc);
+                if (showCopyButtons) {
+                    html += ' <button type="button" class="button button-small" onclick="window.PicotAioOptimizer.copyToClipboard(\'' + escapeHtml(desc).replace(/'/g, "\\'") + '\')" style="margin-left:5px; vertical-align:middle;">' + (picot_aio_optimizer.strings.copy_btn || 'Copy') + '</button>';
+                }
+                html += '</li>';
             });
             html += '</ul></div>';
         }
 
-        // Append history list at the bottom for quick access
-        if (window.PicotAioOptimizer.currentHistory && window.PicotAioOptimizer.currentHistory.length > 0) {
+        if (includeHistory && window.PicotAioOptimizer.currentHistory && window.PicotAioOptimizer.currentHistory.length > 0) {
             html += '<div style="margin-top:30px; border-top:1px solid #ccd0d4; padding-top:15px;">';
             html += '<h4 style="margin:0 0 10px 0; font-size:13px; color:#1d2327;">' + (picot_aio_optimizer.strings.history_title || 'Analysis History') + '</h4>';
             html += '<ul style="margin:0; padding:0; list-style:none;">';
             window.PicotAioOptimizer.currentHistory.forEach(function(log) {
                 html += '<li style="margin-bottom:8px; font-size:12px; display:flex; justify-content:space-between; align-items:center;">';
                 html += '<span>' + log.created_at.split(' ')[0] + '</span>';
-                html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.restoreHistoryItem(' + log.id + ', ' + (targetDiv ? 'true' : 'false') + ')">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button>';
+                html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.restoreHistoryItem(' + log.id + ', ' + (isClassicTarget ? 'true' : 'false') + ')">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button> ';
+                html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.openHistoryExpand(' + log.id + ')">' + (picot_aio_optimizer.strings.expand_view || '拡大表示') + '</button>';
                 html += '</li>';
             });
             html += '</ul></div>';
         }
 
-        // Actions
-        html += '<div style="margin-top:20px; padding-top:15px;">';
-        html += '<button type="button" class="button button-secondary" onclick="window.location.reload();">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
+        if (includeClearButton) {
+            html += '<div style="margin-top:20px; padding-top:15px;">';
+            html += '<button type="button" class="button button-secondary" onclick="window.location.reload();">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
+            html += '</div>';
+        }
+
         html += '</div>';
-        
-        html += '</div>';
+        return html;
+    }
+
+    function displayResultsInternal(response, targetDiv) {
+        var renderTargets = [];
+        if (targetDiv) {
+            renderTargets.push(targetDiv);
+        } else {
+            getAllResultPanels().each(function() { renderTargets.push($(this)); });
+        }
+
+        var normalized = normalizeAnalysisResponse(response);
+        var html = buildAnalysisResultHtml(normalized, {
+            includeHistory: !!(window.PicotAioOptimizer.currentHistory && window.PicotAioOptimizer.currentHistory.length > 0),
+            includeClearButton: true,
+            showCopyButtons: true,
+            isClassicTarget: !!targetDiv
+        });
+
         renderTargets.forEach(function(target) {
             target.html(html);
         });
@@ -2161,20 +2278,19 @@
                         if (response.success && response.data) {
                             historyData = response.data;
                             $.each(response.data, function(i, log) {
+                                var parsed = parseAdviceResult(log.advice_result);
                                 var summary = picot_aio_optimizer.strings.no_data || '(No data)';
-                                try {
-                                    var parsed = typeof log.advice_result === 'string' ? JSON.parse(log.advice_result) : log.advice_result;
-                                    if (parsed && (parsed.summary || parsed.summary_ja)) {
-                                        summary = parsed.summary_ja || parsed.summary;
-                                    }
-                                } catch (e) {}
-                                
+                                if (parsed && (parsed.summary || parsed.summary_ja)) {
+                                    summary = parsed.summary_ja || parsed.summary;
+                                }
+
                                 var dateStr = new Date(log.created_at).toLocaleString();
-                                var row = $('<div class="picot-history-row" data-index="' + i + '" style="display:flex; padding:10px; border-bottom:1px solid #eee; cursor:pointer;">' +
-                                    '<div class="col-date" style="width:150px;">' + dateStr + '</div>' +
-                                    '<div class="col-id" style="width:80px;">' + log.post_id + '</div>' +
-                                    '<div class="col-summary" style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(summary) + '</div>' +
-                                    '<div class="col-action" style="width:80px; text-align:right;"><button type="button" class="button view-detail">' + (picot_aio_optimizer.strings.view_detail || '表示') + '</button></div>' +
+                                var editUrl = getPostEditUrl(log.post_id);
+                                var row = $('<div class="picot-history-item" data-index="' + i + '">' +
+                                    '<div class="col-date">' + escapeHtml(dateStr) + '</div>' +
+                                    '<div class="col-id"><a href="' + escapeHtml(editUrl) + '" class="picot-history-post-link">' + escapeHtml(String(log.post_id)) + '</a></div>' +
+                                    '<div class="col-summary">' + escapeHtml(summary) + '</div>' +
+                                    '<div class="col-action picot-history-actions"><button type="button" class="button expand-view">' + (picot_aio_optimizer.strings.expand_view || '拡大表示') + '</button></div>' +
                                     '</div>');
                                 $historyList.append(row);
                             });
@@ -2187,53 +2303,19 @@
 
             fetchGlobalHistory();
 
-            // Modal logic
-            $(document).on('click', '.picot-history-row, .view-detail', function(e) {
-                var $row = $(this).closest('.picot-history-row');
+            ensureHistoryModal();
+
+            $(document).on('click', '.picot-history-item .expand-view', function(e) {
+                e.preventDefault();
+                var $row = $(this).closest('.picot-history-item');
                 var idx = $row.data('index');
                 var log = historyData[idx];
-                if (!log) return;
-
-                var $modal = $('#picot_aio_optimizer-modal');
-                var $content = $('#picot_aio_optimizer-modal-content');
-                
-                var resultHtml = '';
-                try {
-                    var adviceStr = log.advice_result;
-                    var cleanAdvice = adviceStr.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-                    var parsed = JSON.parse(cleanAdvice);
-                    
-                    // Use internal formatter if available
-                    resultHtml = '<strong>' + (picot_aio_optimizer.strings.label_history || '分析記録') + ' - Post ID: ' + log.post_id + '</strong><hr>';
-                    
-                    // Simple display for modal
-                    if (parsed.summary_ja || parsed.summary) {
-                        resultHtml += '<h4>Summary</h4><p>' + (parsed.summary_ja || parsed.summary) + '</p>';
-                    }
-                    if (parsed.advice) {
-                        resultHtml += '<h4>Advice</h4><ul>';
-                        $.each(parsed.advice, function(j, adv) {
-                            resultHtml += '<li>' + (adv.advice_ja || adv.advice) + '</li>';
-                        });
-                        resultHtml += '</ul>';
-                    }
-                } catch (e) {
-                    resultHtml = '<strong>Post ID: ' + log.post_id + '</strong><br><br><pre style="white-space:pre-wrap;">' + escapeHtml(log.advice_result) + '</pre>';
-                }
-
-                $content.html(resultHtml);
-                $modal.show();
-            });
-
-            $('#picot_aio_optimizer-modal-close').on('click', function() {
-                $('#picot_aio_optimizer-modal').hide();
-            });
-
-            $(window).on('click', function(e) {
-                if ($(e.target).is('#picot_aio_optimizer-modal')) {
-                    $('#picot_aio_optimizer-modal').hide();
+                if (log) {
+                    openHistoryDetailModal(log);
                 }
             });
+
+            $('#picot_aio_optimizer-modal-close').off('click.picotHistory').on('click.picotHistory', closeHistoryModal);
         }
     }
 
