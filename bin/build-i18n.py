@@ -50,7 +50,6 @@ MSGID_ALIASES = {
     "Error": "❌ Error",
     "Failed to insert image.": "Failed to insert image. It has been saved to the media library.",
     "No suitable image placement found": "No placement opportunities found (excluding areas near existing images)",
-    "Picot AIO AI Content Optimizer Settings": "AIO Gemini Settings",
     "Image Generation": "Image Generation Function",
     "Image Generation Model": "Image Prompt Model",
     "Fetch Latest Model List": "Fetch Latest Model List",

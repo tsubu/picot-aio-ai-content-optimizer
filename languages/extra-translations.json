@@ -1,5 +1,7 @@
 {
   "ja": {
+    "Picot AIO AI Content Optimizer Settings": "Picot AIO AI コンテンツ最適化 設定",
+    "AI Rewrite": "AIリライト",
     "Control Panel": "操作パネル",
     "Processing...": "処理中...",
     "Expand": "拡大表示",
@@ -12,6 +14,8 @@
     "You do not have permission to change these options.": "これらのオプションを変更する権限がありません。"
   },
   "de_DE": {
+    "Picot AIO AI Content Optimizer Settings": "Picot AIO AI Content Optimizer – Einstellungen",
+    "AI Rewrite": "KI-Umschreiben",
     "Control Panel": "Bedienfeld",
     "Processing...": "Verarbeitung...",
     "Expand": "Erweitern",
@@ -23,6 +27,8 @@
     "You do not have permission to change these options.": "Sie haben keine Berechtigung, diese Optionen zu ändern."
   },
   "fr_FR": {
+    "Picot AIO AI Content Optimizer Settings": "Réglages Picot AIO AI Content Optimizer",
+    "AI Rewrite": "Réécriture IA",
     "Control Panel": "Panneau de contrôle",
     "Processing...": "Traitement...",
     "Expand": "Agrandir",
@@ -34,6 +40,8 @@
     "You do not have permission to change these options.": "Vous n'avez pas l'autorisation de modifier ces options."
   },
   "es_ES": {
+    "Picot AIO AI Content Optimizer Settings": "Ajustes de Picot AIO AI Content Optimizer",
+    "AI Rewrite": "Reescritura con IA",
     "Control Panel": "Panel de control",
     "Processing...": "Procesando...",
     "Expand": "Ampliar",
@@ -45,6 +53,8 @@
     "You do not have permission to change these options.": "No tienes permiso para cambiar estas opciones."
   },
   "zh_TW": {
+    "Picot AIO AI Content Optimizer Settings": "Picot AIO AI 內容最佳化 設定",
+    "AI Rewrite": "AI 改寫",
     "Control Panel": "操作面板",
     "Processing...": "處理中...",
     "Expand": "放大顯示",
@@ -57,6 +67,8 @@
     "You do not have permission to change these options.": "您沒有變更這些選項的權限。"
   },
   "it_IT": {
+    "Picot AIO AI Content Optimizer Settings": "Impostazioni Picot AIO AI Content Optimizer",
+    "AI Rewrite": "Riscrittura IA",
     "Control Panel": "Pannello di controllo",
     "Processing...": "Elaborazione...",
     "Expand": "Espandi",
@@ -68,6 +80,8 @@
     "You do not have permission to change these options.": "Non hai l'autorizzazione per modificare queste opzioni."
   },
   "pt_BR": {
+    "Picot AIO AI Content Optimizer Settings": "Configurações do Picot AIO AI Content Optimizer",
+    "AI Rewrite": "Reescrita com IA",
     "Control Panel": "Painel de controle",
     "Processing...": "Processando...",
     "Expand": "Expandir",
@@ -79,6 +93,8 @@
     "You do not have permission to change these options.": "Você não tem permissão para alterar estas opções."
   },
   "nl_NL": {
+    "Picot AIO AI Content Optimizer Settings": "Picot AIO AI Content Optimizer-instellingen",
+    "AI Rewrite": "AI-herschrijven",
     "Control Panel": "Bedienpaneel",
     "Processing...": "Verwerken...",
     "Expand": "Uitvouwen",
@@ -90,6 +106,8 @@
     "You do not have permission to change these options.": "Je hebt geen toestemming om deze opties te wijzigen."
   },
   "ko_KR": {
+    "Picot AIO AI Content Optimizer Settings": "Picot AIO AI 콘텐츠 최적화 설정",
+    "AI Rewrite": "AI 다시 쓰기",
     "Control Panel": "제어 패널",
     "Processing...": "처리 중...",
     "Expand": "확대",
@@ -102,6 +120,8 @@
     "You do not have permission to change these options.": "이 옵션을 변경할 권한이 없습니다."
   },
   "pl_PL": {
+    "Picot AIO AI Content Optimizer Settings": "Ustawienia Picot AIO AI Content Optimizer",
+    "AI Rewrite": "Przepisywanie AI",
     "Control Panel": "Panel sterowania",
     "Processing...": "Przetwarzanie...",
     "Expand": "Rozwiń",
@@ -113,6 +133,8 @@
     "You do not have permission to change these options.": "Nie masz uprawnień do zmiany tych opcji."
   },
   "ru_RU": {
+    "Picot AIO AI Content Optimizer Settings": "Настройки Picot AIO AI Content Optimizer",
+    "AI Rewrite": "ИИ-переписывание",
     "Control Panel": "Панель управления",
     "Processing...": "Обработка...",
     "Expand": "Развернуть",
@@ -124,6 +146,8 @@
     "You do not have permission to change these options.": "У вас нет прав на изменение этих параметров."
   },
   "id_ID": {
+    "Picot AIO AI Content Optimizer Settings": "Pengaturan Picot AIO AI Content Optimizer",
+    "AI Rewrite": "Tulis ulang AI",
     "Control Panel": "Panel kontrol",
     "Processing...": "Memproses...",
     "Expand": "Perluas",
@@ -135,6 +159,8 @@
     "You do not have permission to change these options.": "Anda tidak memiliki izin untuk mengubah opsi ini."
   },
   "vi": {
+    "Picot AIO AI Content Optimizer Settings": "Cài đặt Picot AIO AI Content Optimizer",
+    "AI Rewrite": "Viết lại bằng AI",
     "Control Panel": "Bảng điều khiển",
     "Processing...": "Đang xử lý...",
     "Expand": "Mở rộng",
@@ -146,6 +172,8 @@
     "You do not have permission to change these options.": "Bạn không có quyền thay đổi các tùy chọn này."
   },
   "tr_TR": {
+    "Picot AIO AI Content Optimizer Settings": "Picot AIO AI Content Optimizer Ayarları",
+    "AI Rewrite": "YZ ile yeniden yazma",
     "Control Panel": "Kontrol paneli",
     "Processing...": "İşleniyor...",
     "Expand": "Genişlet",
@@ -157,6 +185,8 @@
     "You do not have permission to change these options.": "Bu seçenekleri değiştirme izniniz yok."
   },
   "th": {
+    "Picot AIO AI Content Optimizer Settings": "การตั้งค่า Picot AIO AI Content Optimizer",
+    "AI Rewrite": "เขียนใหม่ด้วย AI",
     "Control Panel": "แผงควบคุม",
     "Processing...": "กำลังประมวลผล...",
     "Expand": "ขยาย",
