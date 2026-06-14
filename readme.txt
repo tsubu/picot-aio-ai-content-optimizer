@@ -2,10 +2,10 @@
 Contributors: tsubu
 Donate link: https://github.com/tsubu/picot-aio-ai-content-optimizer
 Tags: ai, gemini, seo, content-quality, rewrite
-Requires at least: 6.0
+Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 1.0.0
-Requires PHP: 7.4
+Stable tag: 1.0.1
+Requires PHP: 8.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,10 +61,18 @@ Yes. When the Classic Editor is active, the plugin automatically shows a meta bo
 
 == Changelog ==
 
+= 1.0.1 =
+* Raised minimum requirements to WordPress 7.0 and PHP 8.3.
+* Fixed Classic Editor support for analyze, rewrite, and image suggestions.
+* Improved script loading, REST API permissions, and image placement reliability.
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Classic Editor fixes, security improvements, and WordPress 7.0 / PHP 8.3 requirement update.
 
 = 1.0.0 =
 Initial version.

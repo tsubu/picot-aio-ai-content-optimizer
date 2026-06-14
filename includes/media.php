@@ -97,6 +97,11 @@ class PicotAioOptimizer_Media
         // Insert attachment
         $attach_id = wp_insert_attachment($attachment, $file_path);
 
+        if (is_wp_error($attach_id) || !$attach_id) {
+            self::delete_upload_file($file_path);
+            return new WP_Error('upload_error', 'Failed to create attachment');
+        }
+
         // Generate metadata
         require_once ABSPATH . 'wp-admin/includes/image.php';
         $attach_data = wp_generate_attachment_metadata($attach_id, $file_path);

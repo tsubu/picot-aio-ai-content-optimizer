@@ -4,7 +4,9 @@
  * Plugin Name: Picot AIO AI Content Optimizer
  * Plugin URI: https://github.com/tsubu/picot-aio-ai-content-optimizer
  * Description: AI-powered content analysis and optimization plugin using Google Gemini API. Provides SEO advice, content recommendations, and automated image generation for WordPress posts and pages.
- * Version: 1.0.0
+ * Version: 1.0.1
+ * Requires at least: 7.0
+ * Requires PHP: 8.3
  * Author: tsubu
  * Author URI: https://picot.tokyo/
  * License: GPL v2 or later
@@ -19,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 
 // Define plugin constants
-define('PICOT_AIO_OPTIMIZER_VERSION', '1.0.0');
+define('PICOT_AIO_OPTIMIZER_VERSION', '1.0.1');
 define('PICOT_AIO_OPTIMIZER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PICOT_AIO_OPTIMIZER_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -37,19 +39,6 @@ require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/database.php';
 require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/admin-views.php';
 require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/rest-handlers.php';
 require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/media.php';
-
-/**
- * Load plugin translations.
- */
-function picot_aio_optimizer_load_textdomain()
-{
-    load_plugin_textdomain(
-        'picot-aio-ai-content-optimizer',
-        false,
-        dirname(plugin_basename(__FILE__)) . '/languages'
-    );
-}
-add_action('plugins_loaded', 'picot_aio_optimizer_load_textdomain');
 
 /**
  * Main plugin class
@@ -180,9 +169,7 @@ class PicotAioOptimizer
         register_rest_route($ns, '/analyze', array(
             'methods' => 'POST',
             'callback' => array('PicotAioOptimizer_REST_Handlers', 'analyze_content'),
-            'permission_callback' => function () {
-                return current_user_can('edit_posts');
-            }
+            'permission_callback' => array('PicotAioOptimizer_REST_Handlers', 'can_edit_post_param'),
         ));
 
         register_rest_route($ns, '/generate-image', array(
@@ -196,9 +183,7 @@ class PicotAioOptimizer
         register_rest_route($ns, '/history', array(
             'methods' => 'GET',
             'callback' => array('PicotAioOptimizer_REST_Handlers', 'fetch_history'),
-            'permission_callback' => function () {
-                return current_user_can('edit_posts');
-            }
+            'permission_callback' => array('PicotAioOptimizer_REST_Handlers', 'can_fetch_history'),
         ));
 
         register_rest_route($ns, '/suggest-images', array(
@@ -212,17 +197,13 @@ class PicotAioOptimizer
         register_rest_route($ns, '/save-image-suggestions', array(
             'methods' => 'POST',
             'callback' => array('PicotAioOptimizer_REST_Handlers', 'save_suggestions'),
-            'permission_callback' => function () {
-                return current_user_can('edit_posts');
-            }
+            'permission_callback' => array('PicotAioOptimizer_REST_Handlers', 'can_edit_post_param'),
         ));
 
         register_rest_route($ns, '/load-image-suggestions', array(
             'methods' => 'GET',
             'callback' => array('PicotAioOptimizer_REST_Handlers', 'load_suggestions'),
-            'permission_callback' => function () {
-                return current_user_can('edit_posts');
-            }
+            'permission_callback' => array('PicotAioOptimizer_REST_Handlers', 'can_edit_post_param'),
         ));
     }
 
@@ -238,6 +219,11 @@ class PicotAioOptimizer
             return;
         }
 
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if (! $is_settings_page && $screen && ! in_array($screen->post_type, array('post', 'page'), true)) {
+            return;
+        }
+
         wp_enqueue_style(
             'picot_aio_optimizer-admin-css',
             plugins_url('admin/admin.css', __FILE__),
@@ -245,12 +231,15 @@ class PicotAioOptimizer
             PICOT_AIO_OPTIMIZER_VERSION
         );
 
-        // Gutenberg deps for post editor; minimal deps for settings page only
+        $is_block_editor = $screen && method_exists($screen, 'is_block_editor') && $screen->is_block_editor();
+
+        // Block editor needs @wordpress/* packages; classic editor only needs jQuery.
         if ($is_settings_page) {
             $deps = array('jquery');
-        } else {
-            // Include wp-editor (WP 6.6+) AND wp-edit-post (older WP) for maximum compatibility
+        } elseif ($is_block_editor) {
             $deps = array('jquery', 'wp-plugins', 'wp-editor', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-dom-ready');
+        } else {
+            $deps = array('jquery');
         }
 
         wp_enqueue_script(
@@ -261,8 +250,9 @@ class PicotAioOptimizer
             true
         );
 
-        // Inline CSS for hiding suggestion markers — registered only on pages where the script loads
-        $inline_css = "
+        // Block-editor-only styles; classic editor does not use block markup.
+        if ($is_block_editor) {
+            $inline_css = "
             .block-editor-block-list__block[data-type='core/html'] .picot_aio_optimizer-suggestion-marker,
             .block-editor-block-list__block[data-type='core/html'] .picot_aio_optimizer-suggestions-data { display: none !important; }
             .block-editor-block-list__block[data-type='core/html']:has(.picot_aio_optimizer-suggestion-marker),
@@ -271,11 +261,14 @@ class PicotAioOptimizer
             }
             .picot_aio_optimizer-suggestion-marker { display: none !important; }
         ";
-        wp_add_inline_style('picot_aio_optimizer-admin-css', $inline_css);
+            wp_add_inline_style('picot_aio_optimizer-admin-css', $inline_css);
+        }
 
         wp_add_inline_script('picot_aio_optimizer-admin', 'window.picot_aio_optimizer = ' . wp_json_encode(array(
             'ajax_url'                  => admin_url('admin-ajax.php'),
             'admin_url'                 => admin_url(),
+            'is_post_editor'            => ! $is_settings_page,
+            'is_block_editor'           => ! $is_settings_page && $is_block_editor,
             'rest_url_rewrite'          => rest_url('picot_aio_optimizer/v1/rewrite'),
             'rest_url_analyze'          => rest_url('picot_aio_optimizer/v1/analyze'),
             'rest_url_history'          => rest_url('picot_aio_optimizer/v1/history'),

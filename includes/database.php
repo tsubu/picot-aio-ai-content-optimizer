@@ -54,6 +54,10 @@ class PicotAioOptimizer_Database
 
             require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
             dbDelta($sql);
+
+            if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table_name)) === $table_name) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+                set_transient('picot_aio_optimizer_table_exists', '1', DAY_IN_SECONDS);
+            }
         }
 
         // Check and add missing index if needed (cached for 24h)
@@ -110,8 +114,13 @@ class PicotAioOptimizer_Database
         );
 
         if ($result !== false) {
-            wp_cache_delete('picot_aio_optimizer_history_' . $post_id, 'picot_aio_optimizer');
-            wp_cache_delete('picot_aio_optimizer_history_all', 'picot_aio_optimizer');
+            $limits = array_unique(array(10, 20, (int) PICOT_AIO_OPTIMIZER_HISTORY_LIMIT));
+            foreach ($limits as $limit) {
+                wp_cache_delete('picot_aio_optimizer_history_' . $post_id . '_' . $limit, 'picot_aio_optimizer');
+            }
+            foreach ($limits as $limit) {
+                wp_cache_delete('picot_aio_optimizer_history_all_' . $limit, 'picot_aio_optimizer');
+            }
         }
 
         return $wpdb->insert_id;

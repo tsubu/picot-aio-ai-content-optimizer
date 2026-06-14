@@ -17,3 +17,5 @@ composer.json
 composer.lock
 vendor/
 scratch/
+languages/glotpress-readme-ja.md
+languages/glotpress-readme-ja-strings.json

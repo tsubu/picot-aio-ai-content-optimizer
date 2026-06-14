@@ -10,6 +10,45 @@ class PicotAioOptimizer_REST_Handlers
 {
 
     /**
+     * REST permission check for routes that accept an optional post_id.
+     */
+    public static function can_edit_post_param($request)
+    {
+        $post_id = absint($request->get_param('post_id'));
+        if ($post_id > 0) {
+            return current_user_can('edit_post', $post_id);
+        }
+
+        return current_user_can('edit_posts');
+    }
+
+    /**
+     * History: post-specific logs require edit_post; global list requires manage_options.
+     */
+    public static function can_fetch_history($request)
+    {
+        $post_id = absint($request->get_param('post_id'));
+        if ($post_id > 0) {
+            return current_user_can('edit_post', $post_id);
+        }
+
+        return current_user_can('manage_options');
+    }
+
+    /**
+     * @param Throwable $e Exception or error.
+     * @param string    $context User-facing context label.
+     */
+    private static function sanitize_exception_message($e, $context)
+    {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            return $context . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
+        }
+
+        return $context;
+    }
+
+    /**
      * Analyze Content handler
      */
     public static function analyze_content($request)
@@ -89,7 +128,7 @@ class PicotAioOptimizer_REST_Handlers
                 )
             ));
         } catch (Throwable $e) {
-            return new WP_Error('fatal_error', 'PHP Fatal Error in Rewrite: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), array('status' => 500));
+            return new WP_Error('fatal_error', self::sanitize_exception_message($e, __('Rewrite failed.', 'picot-aio-ai-content-optimizer')), array('status' => 500));
         }
     }
 
@@ -206,7 +245,7 @@ class PicotAioOptimizer_REST_Handlers
                 'data'    => $data
             ));
         } catch (Throwable $e) {
-            return new WP_Error('fatal_error', 'PHP Fatal Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), array('status' => 500));
+            return new WP_Error('fatal_error', self::sanitize_exception_message($e, __('Image suggestion failed.', 'picot-aio-ai-content-optimizer')), array('status' => 500));
         }
     }
 
@@ -215,7 +254,15 @@ class PicotAioOptimizer_REST_Handlers
      */
     public static function generate_image($request)
     {
-        $prompt = $request->get_param('prompt');
+        if (!get_option('picot_aio_optimizer_enable_image_gen', 0)) {
+            return new WP_Error('disabled', __('Image generation is disabled in settings.', 'picot-aio-ai-content-optimizer'), array('status' => 403));
+        }
+
+        $prompt = sanitize_textarea_field((string) $request->get_param('prompt'));
+        if ($prompt === '') {
+            return new WP_Error('missing_prompt', __('Image prompt is required.', 'picot-aio-ai-content-optimizer'), array('status' => 400));
+        }
+
         $api_key = get_option('picot_aio_optimizer_api_key');
         $image_model = get_option('picot_aio_optimizer_image_model', 'gemini-2.0-flash-preview-image-generation');
 
@@ -248,10 +295,10 @@ class PicotAioOptimizer_REST_Handlers
      */
     public static function save_suggestions($request)
     {
-        $post_id = $request->get_param('post_id');
+        $post_id = absint($request->get_param('post_id'));
         $suggestions_raw = $request->get_param('suggestions');
 
-        if (empty($post_id)) {
+        if ($post_id <= 0) {
             return new WP_Error('missing_post_id', 'Post ID required', array('status' => 400));
         }
 
@@ -276,8 +323,8 @@ class PicotAioOptimizer_REST_Handlers
         }
 
         update_post_meta($post_id, '_picot_aio_optimizer_image_suggestions', wp_json_encode($suggestions));
-        update_post_meta($post_id, '_picot_aio_optimizer_featured_text', $featured_text);
-        update_post_meta($post_id, '_picot_aio_optimizer_featured_prompt', $featured_prompt);
+        update_post_meta($post_id, '_picot_aio_optimizer_featured_text', sanitize_text_field($featured_text));
+        update_post_meta($post_id, '_picot_aio_optimizer_featured_prompt', sanitize_textarea_field($featured_prompt));
         update_post_meta($post_id, '_picot_aio_optimizer_image_suggestions_updated', current_time('mysql'));
 
         return rest_ensure_response(array('success' => true));
@@ -288,8 +335,8 @@ class PicotAioOptimizer_REST_Handlers
      */
     public static function load_suggestions($request)
     {
-        $post_id = $request->get_param('post_id');
-        if (empty($post_id)) {
+        $post_id = absint($request->get_param('post_id'));
+        if ($post_id <= 0) {
             return new WP_Error('missing_post_id', 'Post ID is required', array('status' => 400));
         }
 

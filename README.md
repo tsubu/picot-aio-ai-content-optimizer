@@ -18,8 +18,8 @@ AI-powered content analysis and optimization plugin for WordPress using Google G
 
 ## Requirements
 
-- WordPress 6.0 or higher
-- PHP 7.4 or higher
+- WordPress 7.0 or higher
+- PHP 8.3 or higher
 - Google Gemini API key
 
 ## Installation

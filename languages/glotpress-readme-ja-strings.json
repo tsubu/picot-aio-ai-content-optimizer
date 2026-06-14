@@ -1,0 +1,247 @@
+{
+  "project": "https://translate.wordpress.org/projects/wp-plugins/picot-aio-ai-content-optimizer/",
+  "locale": "ja",
+  "plugin_page": "https://ja.wordpress.org/plugins/picot-aio-ai-content-optimizer/",
+  "strings": [
+    {
+      "context": "Plugin name (readme header)",
+      "original": "Picot AIO AI Content Optimizer",
+      "translation": "Picot AIO AI コンテンツ最適化"
+    },
+    {
+      "context": "Short description (readme line 12)",
+      "original": "AI-powered content analysis and optimization plugin using Google Gemini API. Provides SEO/AIO advice, one-button rewrite, and AI image generation.",
+      "translation": "Google Gemini API による AI コンテンツ分析・最適化プラグイン。SEO/AIO アドバイス、ワンボタンリライト、AI 画像生成に対応。"
+    },
+    {
+      "context": "Description — paragraph 1",
+      "original": "Picot AIO AI Content Optimizer is a powerful WordPress plugin developed by Toshifumi Tsuburaya (PICOT) and designed to elevate your content quality using the latest Gemini AI technology. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).",
+      "translation": "Picot AIO AI Content Optimizer は、坪良俊文（PICOT）が開発した WordPress プラグインです。最新の Gemini AI 技術でコンテンツ品質の向上を支援し、Google の検索品質評価ガイドライン（E-E-A-T）に基づく、実践的な SEO・AIO アドバイスを提供するパーソナルコンサルタントとして機能します。"
+    },
+    {
+      "context": "Description — heading",
+      "original": "Key Features",
+      "translation": "主な機能"
+    },
+    {
+      "context": "Description — feature",
+      "original": "E-E-A-T & Quality Guidelines Support",
+      "translation": "E-E-A-T・品質ガイドライン対応"
+    },
+    {
+      "context": "Description — feature detail",
+      "original": "Get precise advice to enhance your content's Experience, Expertise, Authoritativeness, and Trustworthiness.",
+      "translation": "経験・専門性・権威性・信頼性（E-E-A-T）を高めるための的確なアドバイスを取得できます。"
+    },
+    {
+      "context": "Description — feature",
+      "original": "One-Button SEO/AIO Analysis",
+      "translation": "ワンボタン SEO/AIO 分析"
+    },
+    {
+      "context": "Description — feature detail",
+      "original": "Analyze your existing articles and get structured optimization advice instantly.",
+      "translation": "既存記事を分析し、構造化された最適化アドバイスをすぐに取得できます。"
+    },
+    {
+      "context": "Description — feature",
+      "original": "One-Button Rewrite",
+      "translation": "ワンボタンリライト"
+    },
+    {
+      "context": "Description — feature detail",
+      "original": "Rewrite your articles with custom instructions using Gemini AI.",
+      "translation": "Gemini AI とカスタム指示で記事をリライトできます。"
+    },
+    {
+      "context": "Description — feature",
+      "original": "AI Image Generation",
+      "translation": "AI 画像生成"
+    },
+    {
+      "context": "Description — feature detail",
+      "original": "Generate and insert high-quality, relevant images for your posts.",
+      "translation": "投稿に適した高品質な画像を生成して挿入できます。"
+    },
+    {
+      "context": "Description — feature",
+      "original": "Dual Panel UI",
+      "translation": "デュアルパネル UI"
+    },
+    {
+      "context": "Description — feature detail",
+      "original": "Access the optimizer from the Gutenberg Document panel or the sidebar — always visible.",
+      "translation": "Gutenberg のドキュメントパネルまたはサイドバーから常にアクセスできます。"
+    },
+    {
+      "context": "Description — feature",
+      "original": "Analysis History",
+      "translation": "分析履歴"
+    },
+    {
+      "context": "Description — feature detail",
+      "original": "Review past analyses per post directly in the editor.",
+      "translation": "投稿ごとの過去の分析結果をエディター内で確認できます。"
+    },
+    {
+      "context": "Section heading",
+      "original": "External services",
+      "translation": "外部サービス"
+    },
+    {
+      "context": "External services — intro",
+      "original": "This plugin relies on the **Google Generative Language API (Gemini)** provided by Google LLC to provide AI-powered content analysis, text generation, and image generation features.",
+      "translation": "本プラグインは、Google LLC が提供する **Google Generative Language API（Gemini）** に依存し、AI によるコンテンツ分析、テキスト生成、画像生成機能を提供します。"
+    },
+    {
+      "context": "External services — label",
+      "original": "What the service is used for",
+      "translation": "サービスの利用目的"
+    },
+    {
+      "context": "External services — detail",
+      "original": "This plugin connects to the Google Gemini API to analyze post content for SEO/AIO advice, rewrite text based on user instructions, and generate relevant images based on article context.",
+      "translation": "Google Gemini API に接続し、投稿コンテンツの SEO/AIO 分析、ユーザー指示に基づくテキストのリライト、記事の文脈に沿った画像の生成を行います。"
+    },
+    {
+      "context": "External services — label",
+      "original": "What data is sent and when",
+      "translation": "送信されるデータとタイミング"
+    },
+    {
+      "context": "External services — detail",
+      "original": "The content of your post (title and body) and your custom AI prompts are sent to Google's API only when you manually trigger an analysis, rewrite, or image generation request by clicking the respective buttons. No data is sent automatically in the background.",
+      "translation": "投稿のタイトル・本文およびカスタム AI プロンプトは、分析・リライト・画像生成の各ボタンを手動でクリックしたときのみ Google の API に送信されます。バックグラウンドでの自動送信はありません。"
+    },
+    {
+      "context": "External services — label",
+      "original": "Legal Links",
+      "translation": "関連リンク"
+    },
+    {
+      "context": "External services",
+      "original": "Service Provider: Google LLC",
+      "translation": "サービス提供者: Google LLC"
+    },
+    {
+      "context": "External services",
+      "original": "Terms of Service: https://ai.google.dev/terms",
+      "translation": "利用規約: https://ai.google.dev/terms"
+    },
+    {
+      "context": "External services",
+      "original": "Privacy Policy: https://policies.google.com/privacy",
+      "translation": "プライバシーポリシー: https://policies.google.com/privacy"
+    },
+    {
+      "context": "Section heading",
+      "original": "Installation",
+      "translation": "インストール"
+    },
+    {
+      "context": "Installation — step 1",
+      "original": "Upload the `picot-aio-ai-content-optimizer` folder to the `/wp-content/plugins/` directory.",
+      "translation": "`picot-aio-ai-content-optimizer` フォルダを `/wp-content/plugins/` ディレクトリにアップロードします。"
+    },
+    {
+      "context": "Installation — step 2",
+      "original": "Activate the plugin through the 'Plugins' menu in WordPress.",
+      "translation": "WordPress の「プラグイン」メニューから有効化します。"
+    },
+    {
+      "context": "Installation — step 3",
+      "original": "Go to Settings > Picot AIO AI Content Optimizer and enter your Gemini API Key from Google AI Studio.",
+      "translation": "設定 > Picot AIO AI Content Optimizer を開き、Google AI Studio で取得した Gemini API キーを入力します。"
+    },
+    {
+      "context": "Installation — step 4",
+      "original": "Select your preferred AI model and optional image generation model.",
+      "translation": "使用する AI モデルと、必要に応じて画像生成モデルを選択します。"
+    },
+    {
+      "context": "FAQ — question",
+      "original": "Where do I get an API Key?",
+      "translation": "API キーはどこで取得できますか？"
+    },
+    {
+      "context": "FAQ — answer",
+      "original": "You can obtain a free Gemini API Key from [Google AI Studio](https://aistudio.google.com/).",
+      "translation": "[Google AI Studio](https://aistudio.google.com/) から無料の Gemini API キーを取得できます。"
+    },
+    {
+      "context": "FAQ — question",
+      "original": "Is it free to use?",
+      "translation": "無料で使えますか？"
+    },
+    {
+      "context": "FAQ — answer",
+      "original": "The plugin itself is free. Costs associated with the Gemini API depend on your usage and the plan you choose in Google AI Studio.",
+      "translation": "プラグイン本体は無料です。Gemini API の費用は利用量および Google AI Studio で選択するプランによって異なります。"
+    },
+    {
+      "context": "FAQ — question",
+      "original": "Does it work with the Classic Editor?",
+      "translation": "クラシックエディターでも使えますか？"
+    },
+    {
+      "context": "FAQ — answer",
+      "original": "Yes. When the Classic Editor is active, the plugin automatically shows a meta box in the post editor sidebar.",
+      "translation": "はい。クラシックエディター有効時は、投稿編集画面のサイドバーにメタボックスが自動表示されます。"
+    },
+    {
+      "context": "Screenshots — 1",
+      "original": "The Picot AIO panel in the Gutenberg post editor providing SEO/AIO advice.",
+      "translation": "Gutenberg 投稿エディターの Picot AIO パネルで SEO/AIO アドバイスを表示。"
+    },
+    {
+      "context": "Screenshots — 2",
+      "original": "The plugin sidebar accessible from the Gutenberg toolbar.",
+      "translation": "Gutenberg ツールバーから開けるプラグインサイドバー。"
+    },
+    {
+      "context": "Screenshots — 3",
+      "original": "Settings page where you configure the API Key and Model.",
+      "translation": "API キーとモデルを設定する設定画面。"
+    },
+    {
+      "context": "Section heading",
+      "original": "Changelog",
+      "translation": "変更履歴"
+    },
+    {
+      "context": "Changelog — 1.0.1",
+      "original": "Raised minimum requirements to WordPress 7.0 and PHP 8.3.",
+      "translation": "動作要件を WordPress 7.0 以上・PHP 8.3 以上に更新しました。"
+    },
+    {
+      "context": "Changelog — 1.0.1",
+      "original": "Fixed Classic Editor support for analyze, rewrite, and image suggestions.",
+      "translation": "クラシックエディタでの分析・リライト・画像提案を修正しました。"
+    },
+    {
+      "context": "Changelog — 1.0.1",
+      "original": "Improved script loading, REST API permissions, and image placement reliability.",
+      "translation": "スクリプト読み込み、REST API 権限、画像配置の信頼性を改善しました。"
+    },
+    {
+      "context": "Changelog — 1.0.0",
+      "original": "Initial release.",
+      "translation": "初回リリース。"
+    },
+    {
+      "context": "Section heading",
+      "original": "Upgrade Notice",
+      "translation": "アップグレード通知"
+    },
+    {
+      "context": "Upgrade Notice — 1.0.1",
+      "original": "Classic Editor fixes, security improvements, and WordPress 7.0 / PHP 8.3 requirement update.",
+      "translation": "クラシックエディタ修正、セキュリティ改善、WordPress 7.0 / PHP 8.3 要件更新を含みます。"
+    },
+    {
+      "context": "Upgrade Notice — 1.0.0",
+      "original": "Initial version.",
+      "translation": "初版。"
+    }
+  ]
+}

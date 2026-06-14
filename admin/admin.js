@@ -64,12 +64,112 @@
     }
 
     /**
+     * Classic Editor meta box is rendered only when the block editor is off.
+     * PHP passes is_block_editor; DOM check is a fallback.
+     */
+    function isClassicEditorMode() {
+        if (typeof picot_aio_optimizer.is_post_editor !== 'undefined' && !picot_aio_optimizer.is_post_editor) {
+            return false;
+        }
+        if (typeof picot_aio_optimizer.is_block_editor !== 'undefined') {
+            return !picot_aio_optimizer.is_block_editor;
+        }
+        return $('#picot_aio_optimizer-classic-results').length > 0;
+    }
+
+    function hasGutenbergEditor() {
+        return !isClassicEditorMode()
+            && typeof wp !== 'undefined'
+            && wp.data
+            && typeof wp.data.select === 'function'
+            && wp.data.select('core/editor');
+    }
+
+    function hasBlockEditorStore() {
+        return hasGutenbergEditor()
+            && typeof wp !== 'undefined'
+            && wp.data
+            && typeof wp.data.select === 'function'
+            && wp.data.select('core/block-editor');
+    }
+
+    function setFeaturedImage(attachmentId) {
+        if (!attachmentId) {
+            return;
+        }
+
+        if (isClassicEditorMode()) {
+            if (typeof wp !== 'undefined' && wp.media && wp.media.featuredImage) {
+                wp.media.featuredImage.set(attachmentId);
+            } else {
+                $('#_thumbnail_id').val(attachmentId);
+            }
+            return;
+        }
+
+        if (hasGutenbergEditor()) {
+            wp.data.dispatch('core/editor').editPost({ featured_media: attachmentId });
+        }
+    }
+
+    function getEditorPostId() {
+        if (isClassicEditorMode()) {
+            return $('#post_ID').val() || 0;
+        }
+        if (hasGutenbergEditor()) {
+            return wp.data.select('core/editor').getCurrentPostId() || ($('#post_ID').val() || 0);
+        }
+        return $('#post_ID').val() || 0;
+    }
+
+    function getEditorTitle() {
+        if (isClassicEditorMode()) {
+            return $('#title').val() || '';
+        }
+        if (hasGutenbergEditor()) {
+            return wp.data.select('core/editor').getEditedPostAttribute('title') || '';
+        }
+        return $('#title').val() || '';
+    }
+
+    function getEditorContent() {
+        if (isClassicEditorMode()) {
+            return getClassicEditorContent();
+        }
+
+        if (hasGutenbergEditor()) {
+            var postContent = wp.data.select('core/editor').getEditedPostContent();
+
+            // DOM fallback if Gutenberg API returns empty (iframe editor / page builders)
+            if (!postContent) {
+                var editorCanvas = document.querySelector('iframe[name="editor-canvas"]');
+                if (editorCanvas && editorCanvas.contentDocument) {
+                    postContent = editorCanvas.contentDocument.body.innerText || '';
+                } else {
+                    var wrapper = document.querySelector('.editor-styles-wrapper') || document.querySelector('.block-editor-block-list__layout');
+                    if (wrapper) {
+                        postContent = wrapper.innerText || '';
+                    }
+                }
+            }
+
+            return postContent || '';
+        }
+
+        return getClassicEditorContent();
+    }
+
+    /**
      * REGISTER PLUGIN SIDEBAR (React/Gutenberg Native)
      * This avoids the PHP add_meta_box 500 error.
      */
     var domReady = (typeof wp !== 'undefined' && wp.domReady) ? wp.domReady : $;
     
     domReady(function() {
+        if (isClassicEditorMode()) {
+            return;
+        }
+
         if (typeof wp !== 'undefined' && wp.plugins && (wp.editPost || wp.editor) && wp.element && wp.components) {
  //             console.log('Picot AIO Optimizer: Registering sidebar plugin...');
         
@@ -253,16 +353,19 @@
             var panel = document.getElementById('picot_aio_optimizer-result-panel');
             if (panel && panel.innerHTML === '' && window.PicotAioOptimizer && window.PicotAioOptimizer.imageSuggestions && window.PicotAioOptimizer.imageSuggestions.length > 0) {
                 // Re-render the suggestions
-                var title = '';
-                if (wp.data && wp.data.select('core/editor')) {
-                    title = wp.data.select('core/editor').getEditedPostAttribute('title') || '';
-                }
+                var title = getEditorTitle();
                 // Get the raw suggestions (without featured item which will be added by displayImageSuggestions)
                 var rawSuggestions = window.PicotAioOptimizer.imageSuggestions.filter(function(item) {
                     return !item.isFeatured;
                 });
                 if (rawSuggestions.length > 0) {
-                    displayImageSuggestions(rawSuggestions, title, window.PicotAioOptimizer.lastUpdated);
+                    displayImageSuggestions(
+                        rawSuggestions,
+                        title,
+                        window.PicotAioOptimizer.lastFeaturedText || null,
+                        window.PicotAioOptimizer.lastUpdated,
+                        window.PicotAioOptimizer.lastFeaturedPrompt || null
+                    );
                 }
             }
         }, 500);
@@ -282,18 +385,8 @@
 
     function rewrite_article(instructions) {
  //         console.log('Picot AIO Optimizer: rewrite_article() called');
-        var title = '';
-        var content = '';
-
-        if (typeof wp !== 'undefined' && wp.data && typeof wp.data.select === 'function' && wp.data.select('core/editor')) {
- //             console.log('Picot AIO Optimizer: Using Gutenberg for rewrite content');
-            title = wp.data.select('core/editor').getEditedPostAttribute('title');
-            content = wp.data.select('core/editor').getEditedPostContent();
-        } else {
- //             console.log('Picot AIO Optimizer: Using Classic Editor for rewrite content');
-            title = $('#title').val() || '';
-            content = getClassicEditorContent();
-        }
+        var title = getEditorTitle();
+        var content = getEditorContent();
 
         if (!content) {
  //             console.warn('Picot AIO Optimizer: No content found for rewrite');
@@ -307,8 +400,8 @@
             instructions: instructions || ''
         };
 
-        var btn = $('#picot_aio_optimizer-rewrite-btn');
-        var originalText = btn.text();
+        var btn = $('#picot_aio_optimizer-rewrite-btn, #picot_aio_optimizer-classic-rewrite');
+        var originalText = btn.length ? btn.first().text() : '';
         
         showOverlay(picot_aio_optimizer.strings.rewriting || 'Rewriting article...');
         btn.text(picot_aio_optimizer.strings.rewriting || 'Rewriting...').prop('disabled', true);
@@ -326,23 +419,31 @@
                 var data = response.data || response;
 
                 if (success) {
-                    // Update Title
-                    wp.data.dispatch('core/editor').editPost({ title: data.title });
+                    if (isClassicEditorMode()) {
+                        if (data.title) {
+                            $('#title').val(data.title);
+                        }
+                        setClassicEditorContent(data.content || '');
+                    } else if (hasBlockEditorStore()) {
+                        wp.data.dispatch('core/editor').editPost({ title: data.title });
 
-                    // Convert HTML content to Gutenberg blocks
-                    if (wp.blocks && wp.blocks.rawHandler) {
-                        var parsedBlocks = wp.blocks.rawHandler({ HTML: data.content });
-                        if (parsedBlocks && parsedBlocks.length > 0) {
-                            wp.data.dispatch('core/block-editor').resetBlocks(parsedBlocks);
+                        if (wp.blocks && wp.blocks.rawHandler) {
+                            var parsedBlocks = wp.blocks.rawHandler({ HTML: data.content });
+                            if (parsedBlocks && parsedBlocks.length > 0) {
+                                wp.data.dispatch('core/block-editor').resetBlocks(parsedBlocks);
+                            } else {
+                                wp.data.dispatch('core/editor').editPost({ content: data.content });
+                            }
                         } else {
-                            // Fallback if parsing fails
                             wp.data.dispatch('core/editor').editPost({ content: data.content });
                         }
                     } else {
-                        // Fallback for older environments
-                        wp.data.dispatch('core/editor').editPost({ content: data.content });
+                        if (data.title) {
+                            $('#title').val(data.title);
+                        }
+                        setClassicEditorContent(data.content || '');
                     }
-                    
+
                     alert(picot_aio_optimizer.strings.success_rewrite);
                 } else {
                     var errorMsg = picot_aio_optimizer.strings.error;
@@ -380,18 +481,8 @@
     // NEW: Discover Image Prompt Opportunities
     function discoverImagePrompts() {
  //         console.log('Picot AIO Optimizer: discoverImagePrompts() called');
-        var title = '';
-        var content = '';
-
-        if (typeof wp !== 'undefined' && wp.data && typeof wp.data.select === 'function' && wp.data.select('core/editor')) {
- //             console.log('Picot AIO Optimizer: Using Gutenberg for image discovery');
-            title = wp.data.select('core/editor').getEditedPostAttribute('title');
-            content = wp.data.select('core/editor').getEditedPostContent();
-        } else {
- //             console.log('Picot AIO Optimizer: Using Classic Editor for image discovery');
-            title = $('#title').val() || '';
-            content = getClassicEditorContent();
-        }
+        var title = getEditorTitle();
+        var content = getEditorContent();
 
         if (!content) {
  //             console.warn('Picot AIO Optimizer: No content found for image discovery');
@@ -441,12 +532,13 @@
                             saveImageSuggestions(filteredSuggestions, featuredText, response.data.featured_prompt);
                             
                             // Prepended list for UI (Featured + Suggestions)
-                            var title = wp.data.select('core/editor').getEditedPostAttribute('title');
+                            var title = getEditorTitle();
                             // Pass featuredText as 3rd arg, updatedDate as 4th (undefined here), featuredPrompt as 5th
                             displayImageSuggestions(filteredSuggestions, title, featuredText, null, response.data.featured_prompt); 
     
-                            // Distribute individual hidden markers at suggested locations
-                            autoEmbedSuggestionsAtLocations(window.PicotAioOptimizer.imageSuggestions);
+                            whenClassicEditorReady(function() {
+                                autoEmbedSuggestionsAtLocations(window.PicotAioOptimizer.imageSuggestions);
+                            });
                         } else {
                             updatePanels('<div class="notice notice-warning"><p>' + (picot_aio_optimizer.strings.no_suggestions_near || 'No placement opportunities found') + '</p></div>');
                         }
@@ -484,52 +576,21 @@
     }
 
     /**
-     * Find the index and offset of a block containing specific text
-     */
-    function findBlockIndexByText(blocks, targetText) {
-        if (!targetText) return null;
-
-        var cleanTarget = targetText.toLowerCase().replace(/[.,!?;:()\[\]「」""'' \n\t]/g, '').trim();
-        if (cleanTarget.length < 5) return null;
-
-        for (var i = 0; i < blocks.length; i++) {
-            var block = blocks[i];
-            
-            if (block.name === 'core/paragraph' || block.name === 'core/freeform' || block.name === 'core/heading') {
-                var rawContent = block.attributes.content || '';
-                var text = stripHtml(rawContent).toLowerCase().replace(/[.,!?;:()\[\]「」""'' \n\t]/g, '');
-                
-                var matchPos = text.indexOf(cleanTarget);
-                if (matchPos !== -1) {
-                    return { 
-                        clientId: block.clientId, 
-                        index: i,
-                        offset: matchPos
-                    };
-                }
-            }
-
-            if (block.innerBlocks && block.innerBlocks.length > 0) {
-                var nestedMatch = findBlockIndexByText(block.innerBlocks, targetText);
-                if (nestedMatch) {
-                    return {
-                        clientId: nestedMatch.clientId,
-                        index: i,
-                        rootClientId: block.clientId,
-                        offset: nestedMatch.offset
-                    };
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Filter suggestions to exclude locations near existing images and limit density
      */
     function filterSuggestionsNearImages(suggestions, includeFeatured) {
         try {
-            var blocks = (typeof wp !== 'undefined' && wp.data && wp.data.select('core/block-editor')) ? wp.data.select('core/block-editor').getBlocks() : [];
+            if (isClassicEditorMode()) {
+                return suggestions.filter(function(suggestion) {
+                    return !suggestion.isFeatured;
+                }).slice(0, 8);
+            }
+
+            if (!hasBlockEditorStore()) {
+                return suggestions;
+            }
+
+            var blocks = wp.data.select('core/block-editor').getBlocks();
             var imageBlockIndices = [];
             
             blocks.forEach(function(block, index) {
@@ -675,12 +736,27 @@
         debugLog('Cleaning up existing markers...');
         
         try {
-            // Gutenberg
-            if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/block-editor')) {
+            if (isClassicEditorMode() && typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
+                var classicContent = tinymce.activeEditor.getContent();
+                if (classicContent.indexOf('picot_aio_optimizer-suggestion-marker') !== -1) {
+                    var newClassicContent = classicContent.replace(/<div[^>]*class="picot_aio_optimizer-suggestion-marker"[^>]*><\/div>/g, '');
+                    tinymce.activeEditor.setContent(newClassicContent);
+                }
+                return;
+            }
+
+            if (isClassicEditorMode()) {
+                var textareaContent = getClassicEditorContent();
+                if (textareaContent.indexOf('picot_aio_optimizer-suggestion-marker') !== -1) {
+                    setClassicEditorContent(textareaContent.replace(/<div[^>]*class="picot_aio_optimizer-suggestion-marker"[^>]*><\/div>/g, ''));
+                }
+                return;
+            }
+
+            if (hasBlockEditorStore()) {
                 var editor = wp.data.dispatch('core/block-editor');
                 var select = wp.data.select('core/block-editor');
                 var blocks = select.getBlocks();
-                var changed = false;
 
                 blocks.forEach(function(block) {
                     if (block.name === 'core/freeform') {
@@ -689,26 +765,15 @@
                             var newHtml = html.replace(/<div[^>]*class="picot_aio_optimizer-suggestion-marker"[^>]*><\/div>/g, '');
                             if (newHtml !== html) {
                                 editor.updateBlockAttributes(block.clientId, { content: newHtml });
-                                changed = true;
                             }
                         }
                     } else if (block.name === 'core/html') {
-                        var html = block.attributes.content || '';
-                        if (html.indexOf('picot_aio_optimizer-suggestion-marker') !== -1) {
+                        var markerHtml = block.attributes.content || '';
+                        if (markerHtml.indexOf('picot_aio_optimizer-suggestion-marker') !== -1) {
                             editor.removeBlock(block.clientId);
-                            changed = true;
                         }
                     }
                 });
-            }
-
-            // Classic Editor (TinyMCE)
-            if (typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
-                var content = tinymce.activeEditor.getContent();
-                if (content.indexOf('picot_aio_optimizer-suggestion-marker') !== -1) {
-                    var newContent = content.replace(/<div[^>]*class="picot_aio_optimizer-suggestion-marker"[^>]*><\/div>/g, '');
-                    tinymce.activeEditor.setContent(newContent);
-                }
             }
         } catch (e) {
             debugLog('Failed to clean markers: ' + e.message, 'warn');
@@ -721,37 +786,41 @@
     function removeFeaturedImagePrompt() {
         debugLog('Cleaning up Featured Image Prompt...');
         try {
-            // Gutenberg
-            if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/block-editor')) {
+            if (isClassicEditorMode() && typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
+                var classicPromptContent = tinymce.activeEditor.getContent();
+                if (classicPromptContent.indexOf('background:#e6eeff') !== -1 && classicPromptContent.indexOf('border:2px solid #4d4dff') !== -1) {
+                    var cleanedClassicContent = classicPromptContent.replace(/<div[^>]*style="[^"]*background:#e6eeff[^>]*>[\s\S]*?<\/div>/i, '');
+                    tinymce.activeEditor.setContent(cleanedClassicContent);
+                }
+                return;
+            }
+
+            if (isClassicEditorMode()) {
+                var classicTextareaContent = getClassicEditorContent();
+                if (classicTextareaContent.indexOf('background:#e6eeff') !== -1 && classicTextareaContent.indexOf('border:2px solid #4d4dff') !== -1) {
+                    setClassicEditorContent(classicTextareaContent.replace(/<div[^>]*style="[^"]*background:#e6eeff[^>]*>[\s\S]*?<\/div>/i, ''));
+                }
+                return;
+            }
+
+            if (hasBlockEditorStore()) {
                 var editor = wp.data.dispatch('core/block-editor');
                 var select = wp.data.select('core/block-editor');
                 var blocks = select.getBlocks();
                 
                 blocks.forEach(function(block) {
-                    // It's usually a Custom HTML block or Classic block
                     if (block.name === 'core/html' || block.name === 'core/freeform') {
                         var html = block.attributes.content || '';
-                        // Look for the specific div style used for the thumbnail prompt
                         if (html.indexOf('background:#e6eeff') !== -1 && html.indexOf('border:2px solid #4d4dff') !== -1) {
                             if (block.name === 'core/html') {
                                 editor.removeBlock(block.clientId);
                             } else {
-                                // If inside Classic block, remove the div
                                 var newHtml = html.replace(/<div[^>]*style="[^"]*background:#e6eeff[^>]*>[\s\S]*?<\/div>/i, '');
                                 editor.updateBlockAttributes(block.clientId, { content: newHtml });
                             }
                         }
                     }
                 });
-            }
-
-            // Classic Editor (TinyMCE)
-            if (typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
-                var content = tinymce.activeEditor.getContent();
-                if (content.indexOf('background:#e6eeff') !== -1 && content.indexOf('border:2px solid #4d4dff') !== -1) {
-                    var newContent = content.replace(/<div[^>]*style="[^"]*background:#e6eeff[^>]*>[\s\S]*?<\/div>/i, '');
-                    tinymce.activeEditor.setContent(newContent);
-                }
             }
         } catch (e) {
             debugLog('Failed to clean Featured Image Prompt: ' + e.message, 'warn');
@@ -766,13 +835,27 @@
         removeAllMarkers();
         
         try {
-            var createBlock = wp.blocks.createBlock;
-            var editor = wp.data.dispatch('core/block-editor');
-            var select = wp.data.select('core/block-editor');
+            var createBlock = (typeof wp !== 'undefined' && wp.blocks) ? wp.blocks.createBlock : null;
+            var editor = hasBlockEditorStore() ? wp.data.dispatch('core/block-editor') : null;
+            var select = hasBlockEditorStore() ? wp.data.select('core/block-editor') : null;
             var embeddedCount = 0;
 
-            // 1. Gutenberg Case
-            if (editor && select) {
+            // 1. Classic Editor Case
+            if (isClassicEditorMode()) {
+                var classicEmbedContent = getClassicEditorContent();
+                suggestions.forEach(function(suggestion, index) {
+                    if (suggestion.isFeatured) return;
+                    var markerHtml = '<div class="picot_aio_optimizer-suggestion-marker" data-index="' + index + '" style="display:none;"><!-- PICOT_AIO_OPTIMIZER_MARKER:' + index + ' --></div>';
+                    classicEmbedContent = insertMarkerIntoHtmlString(classicEmbedContent, suggestion.location || suggestion.description, markerHtml);
+                    if (window.PicotAioOptimizer.imageSuggestions[index]) {
+                        window.PicotAioOptimizer.imageSuggestions[index].hasPlaceholder = true;
+                    }
+                    embeddedCount++;
+                });
+                setClassicEditorContent(classicEmbedContent);
+            }
+            // 2. Gutenberg Case
+            else if (editor && select && createBlock) {
                 var blocks = select.getBlocks();
                 // Remove any existing markers first
                 var existingMarkers = blocks.filter(function(b) {
@@ -809,20 +892,6 @@
                         embeddedCount++;
                     }
                 });
-            } 
-            // 2. Classic Editor Case
-            else if (typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
-                var content = tinymce.activeEditor.getContent();
-                suggestions.forEach(function(suggestion, index) {
-                    if (suggestion.isFeatured) return;
-                    var markerHtml = '<div class="picot_aio_optimizer-suggestion-marker" data-index="' + index + '" style="display:none;"><!-- PICOT_AIO_OPTIMIZER_MARKER:' + index + ' --></div>';
-                    content = insertMarkerIntoHtmlString(content, suggestion.location || suggestion.description, markerHtml);
-                    if (window.PicotAioOptimizer.imageSuggestions[index]) {
-                        window.PicotAioOptimizer.imageSuggestions[index].hasPlaceholder = true;
-                    }
-                    embeddedCount++;
-                });
-                tinymce.activeEditor.setContent(content);
             }
 
             debugLog('Auto-embedded ' + embeddedCount + ' markers');
@@ -865,13 +934,13 @@
     }
 
     // Helper to find block index by matching text content (robust smart matching)
-    function findBlockIndexByText(blocks, searchText) {
+    function findBlockIndexByText(blocks, searchText, parentIndex, parentClientId) {
         if (!searchText || !blocks || blocks.length === 0) return null;
+        parentIndex = (parentIndex === undefined) ? -1 : parentIndex;
         
         debugLog('--- Starting Block Search ---');
         debugLog('Search Text: ' + searchText);
 
-        // 1. Extract core target text: Try to find text within quotes first
         var coreTarget = '';
         var quoteMatch = searchText.match(/[「"'](.+?)[」"']/);
         if (quoteMatch && quoteMatch[1]) {
@@ -880,23 +949,19 @@
             coreTarget = searchText.replace(/(の(段落|セクション|リスト|テーブル|最後|直前|後|部分|メッセージ|テキスト|見出し)).*$/, '');
         }
 
-        // 2. Normalize target
         var cleanTarget = stripHtml(coreTarget).toLowerCase().replace(/[.,!?;:()\[\]「」""'' \n\t　、。！？」]/g, '').trim();
         debugLog('Clean Target: ' + cleanTarget);
         
         if (cleanTarget.length < 2) return null;
 
-        // Try fuzzy snippets
         var snippets = [
-            cleanTarget, // Full
-            cleanTarget.substring(0, 8), // Start
-            cleanTarget.length > 8 ? cleanTarget.substring(cleanTarget.length - 8) : cleanTarget // End
+            cleanTarget,
+            cleanTarget.substring(0, 8),
+            cleanTarget.length > 8 ? cleanTarget.substring(cleanTarget.length - 8) : cleanTarget
         ];
 
         for (var i = 0; i < blocks.length; i++) {
             var block = blocks[i];
-            
-            // Get content from common attributes
             var contentParts = [];
             if (block.attributes) {
                 var a = block.attributes;
@@ -909,32 +974,44 @@
             var rawContent = contentParts.join(' ');
             var cleanContent = stripHtml(rawContent).toLowerCase().replace(/[.,!?;:()\[\]「」""'' \n\t　、。！？」]/g, '').trim();
             
-            // LOG ALL BLOCKS (to identify why it fails)
             if (cleanContent.length > 0) {
                 debugLog('Checking Block ' + i + ' (' + block.name + '): ' + cleanContent.substring(0, 30) + '...');
             }
 
-            // 3-way fuzzy match
             var isMatch = false;
+            var matchOffset = 0;
             for (var s = 0; s < snippets.length; s++) {
-                if (snippets[s].length >= 3 && (cleanContent.indexOf(snippets[s]) !== -1 || snippets[s].indexOf(cleanContent) !== -1)) {
-                    isMatch = true;
-                    debugLog('>>> MATCH FOUND! Snippet: ' + snippets[s]);
-                    break;
+                if (snippets[s].length >= 3) {
+                    var pos = cleanContent.indexOf(snippets[s]);
+                    if (pos !== -1) {
+                        isMatch = true;
+                        matchOffset = pos;
+                        debugLog('>>> MATCH FOUND! Snippet: ' + snippets[s]);
+                        break;
+                    }
+                    if (snippets[s].indexOf(cleanContent) !== -1) {
+                        isMatch = true;
+                        matchOffset = 0;
+                        break;
+                    }
                 }
             }
 
             if (isMatch) {
+                var rootClientId = null;
+                if (hasBlockEditorStore()) {
+                    rootClientId = parentClientId || wp.data.select('core/block-editor').getBlockRootClientId(block.clientId);
+                }
                 return {
                     clientId: block.clientId,
-                    index: i,
-                    rootClientId: wp.data.select('core/block-editor').getBlockRootClientId(block.clientId)
+                    index: parentIndex >= 0 ? parentIndex : i,
+                    rootClientId: rootClientId,
+                    offset: matchOffset
                 };
             }
 
-            // Recurse
             if (block.innerBlocks && block.innerBlocks.length > 0) {
-                var found = findBlockIndexByText(block.innerBlocks, searchText);
+                var found = findBlockIndexByText(block.innerBlocks, searchText, i, block.clientId);
                 if (found) return found;
             }
         }
@@ -970,11 +1047,14 @@
                     }
                     
                     if (data && data.suggestions) {
-                        var title = wp.data.select('core/editor').getEditedPostAttribute('title');
+                        var title = getEditorTitle();
                         displayImageSuggestions(data.suggestions, title, data.featured_text, response.updated, data.featured_prompt);
+                        whenClassicEditorReady(function() {
+                            autoEmbedSuggestionsAtLocations(window.PicotAioOptimizer.imageSuggestions);
+                        });
                     } else if (Array.isArray(data) && data.length > 0) {
                         // Compatibility for old format
-                        var title = wp.data.select('core/editor').getEditedPostAttribute('title');
+                        var title = getEditorTitle();
                         displayImageSuggestions(data, title, null, response.updated);
                     }
                 }
@@ -995,12 +1075,15 @@
             location: picot_aio_optimizer.strings.featured_image || 'Featured Image',
             prompt: finalFeaturedPrompt,
             description: picot_aio_optimizer.strings.featured_image_prompt || 'Generate featured image',
+            featured_text: featuredText || '',
             isFeatured: true
         };
 
         var allSuggestions = [featuredItem].concat(suggestions);
         window.PicotAioOptimizer.imageSuggestions = allSuggestions;
         window.PicotAioOptimizer.lastUpdated = updatedDate || null;
+        window.PicotAioOptimizer.lastFeaturedText = featuredText || '';
+        window.PicotAioOptimizer.lastFeaturedPrompt = featuredPrompt || finalFeaturedPrompt;
 
         var html = '<div style="font-size:13px; color:#1d2327;">';
         html += '<h3 style="margin-top:0; margin-bottom:15px; padding-bottom:8px; border-bottom:1px solid #ccd0d4; font-size:14px;">🖼️ ' + (picot_aio_optimizer.strings.discover_images_btn || 'Image Opportunities') + '</h3>';
@@ -1072,29 +1155,36 @@
                     var imageUrl = response.data.url;
                     var attachmentId = response.data.attachment_id || response.data.id;
 
+                    var placed = false;
+
                     if (suggestion.isFeatured && attachmentId) {
-                        // 1. Set as WordPress Featured Media
-                        wp.data.dispatch('core/editor').editPost({ featured_media: attachmentId });
-                        // 2. ALSO insert into content at the top
-                        insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', 'START_OF_POST');
-                        removeFeaturedImagePrompt();
+                        setFeaturedImage(attachmentId);
+                        placed = insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', 'START_OF_POST');
+                        if (placed) {
+                            removeFeaturedImagePrompt();
+                        }
                     } else {
-                        // First try to replace a placeholder, then fall back to smart insertion
                         var replaced = replacePlaceholderWithImage(index, attachmentId, imageUrl, suggestion.description || '');
-                        if (!replaced) {
+                        if (replaced) {
+                            placed = true;
+                        } else {
                             var targetText = suggestion.location || suggestion.description || '';
-                            insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', targetText);
+                            placed = insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', targetText);
                         }
                     }
 
-                    // Remove from suggestions array and refresh UI
+                    if (!placed) {
+                        alert(picot_aio_optimizer.strings.insert_failed || 'Failed to insert image.');
+                        return;
+                    }
+
                     window.PicotAioOptimizer.imageSuggestions.splice(index, 1);
                     
                     var cleanSuggestions = window.PicotAioOptimizer.imageSuggestions.filter(function(s) { return !s.isFeatured; });
                     var feat = window.PicotAioOptimizer.imageSuggestions.find(function(s) { return s.isFeatured; });
                     saveImageSuggestions(cleanSuggestions, feat ? feat.featured_text : null, feat ? feat.prompt : null);
                     
-                    var title = wp.data.select('core/editor').getEditedPostAttribute('title');
+                    var title = getEditorTitle();
                     displayImageSuggestions(cleanSuggestions, title, feat ? feat.featured_text : null, null, feat ? feat.prompt : null);
                 } else {
                     alert('Generation failed: ' + (response.message || 'Unknown error'));
@@ -1119,8 +1209,23 @@
         var imgHtml = '\n<figure class="wp-block-image size-large"><img src="' + imageUrl + '" alt="' + (altText || '') + '" class="wp-image-' + attachmentId + '"/></figure>\n';
         
         try {
-            // --- CASE 1: Gutenberg (Block Editor) ---
-            if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/block-editor')) {
+            if (isClassicEditorMode()) {
+                var classicContent = getClassicEditorContent();
+                var updatedClassicContent = '';
+                if (targetText === 'START_OF_POST') {
+                    var trimmedClassic = classicContent.trim();
+                    if (trimmedClassic.indexOf('<img') === 0 || trimmedClassic.indexOf('<figure') === 0 || trimmedClassic.indexOf('<div class="wp-block-image') === 0) {
+                        return false;
+                    }
+                    updatedClassicContent = imgHtml + classicContent;
+                } else {
+                    updatedClassicContent = insertImageIntoHtmlString(classicContent, targetText, imageUrl, altText, attachmentId);
+                }
+                setClassicEditorContent(updatedClassicContent);
+                return true;
+            }
+
+            if (hasBlockEditorStore()) {
                 var editor = wp.data.dispatch('core/block-editor');
                 var select = wp.data.select('core/block-editor');
                 var blocks = select.getBlocks();
@@ -1128,8 +1233,7 @@
                 if (targetText === 'START_OF_POST') {
                     debugLog('Checking for existing image at start of post...');
                     if (blocks.length > 0 && (blocks[0].name === 'core/image' || blocks[0].name === 'core/cover')) {
-                        debugLog('Image already exists at the start of post. Skipping insertion to avoid duplication.');
-                        return;
+                        return false;
                     }
                     
                     debugLog('Inserting image at the start of post.');
@@ -1139,7 +1243,7 @@
                         alt: altText || ''
                     });
                     editor.insertBlock(imageBlock, 0, undefined, false);
-                    return;
+                    return true;
                 }
 
                 debugLog('Gutenberg detected. Searching for: ' + targetText);
@@ -1148,55 +1252,35 @@
                 if (matchInfo) {
                     var targetBlock = select.getBlock(matchInfo.clientId);
                     
-                    // IF CLASSIC BLOCK: Insert INSIDE the block HTML
                     if (targetBlock && targetBlock.name === 'core/freeform') {
                         debugLog('Target is a Classic Block. Injecting into HTML content.');
                         var oldHtml = targetBlock.attributes.content || '';
                         var newHtml = insertImageIntoHtmlString(oldHtml, targetText, imageUrl, altText, attachmentId);
                         editor.updateBlockAttributes(matchInfo.clientId, { content: newHtml });
-                        return;
+                        return true;
                     }
 
-                    // NORMAL BLOCK: Insert after the block
-                    var currentIndex = select.getBlockIndex(matchInfo.clientId);
+                    var currentIndex = select.getBlockIndex(matchInfo.clientId, matchInfo.rootClientId);
                     var imageBlock = wp.blocks.createBlock('core/image', {
                         id: attachmentId,
                         url: imageUrl,
                         alt: altText || ''
                     });
                     editor.insertBlock(imageBlock, currentIndex + 1, matchInfo.rootClientId, false);
-                    return;
+                    return true;
                 }
             }
 
-            // --- CASE 2: Classic Editor (TinyMCE) ---
-            if (typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
-                debugLog('Classic Editor detected. Injecting into TinyMCE.');
-                var content = tinymce.activeEditor.getContent();
-                var updatedContent = '';
-                if (targetText === 'START_OF_POST') {
-                    var trimmed = content.trim();
-                    if (trimmed.indexOf('<img') === 0 || trimmed.indexOf('<figure') === 0 || trimmed.indexOf('<div class="wp-block-image') === 0) {
-                        debugLog('Image already exists at the start of post (Classic). Skipping.');
-                        return;
-                    }
-                    updatedContent = imgHtml + content;
-                } else {
-                    updatedContent = insertImageIntoHtmlString(content, targetText, imageUrl, altText, attachmentId);
-                }
-                tinymce.activeEditor.setContent(updatedContent);
-                return;
-            }
-
-            // --- FALLBACK: Just append or insert at cursor if possible ---
-            if (typeof wp !== 'undefined' && wp.data && wp.data.dispatch('core/block-editor')) {
-                wp.data.dispatch('core/block-editor').insertBlock(wp.blocks.createBlock('core/image', { id: attachmentId, url: imageUrl, alt: altText }), undefined, undefined, false);
-            } else if (window.send_to_editor) {
+            if (window.send_to_editor) {
                 window.send_to_editor(imgHtml);
+                return true;
             }
+
+            return false;
 
         } catch (e) {
             debugLog('Insertion failed: ' + e.message, 'error');
+            return false;
         }
     }
 
@@ -1237,6 +1321,21 @@
     // Find and replace a hidden marker with an image
     function replacePlaceholderWithImage(index, attachmentId, imageUrl, altText) {
         try {
+            if (isClassicEditorMode()) {
+                var classicContent = getClassicEditorContent();
+                var markerPattern = new RegExp('<div[^>]*class="picot_aio_optimizer-suggestion-marker"[^>]*data-index=["\']' + index + '["\'][^>]*>[\\s\\S]*?</div>', 'i');
+                var imageFigure = '<figure class="wp-block-image size-large"><img src="' + imageUrl + '" alt="' + (altText || '') + '" class="wp-image-' + attachmentId + '"/></figure>';
+
+                if (markerPattern.test(classicContent)) {
+                    setClassicEditorContent(classicContent.replace(markerPattern, imageFigure));
+                    return true;
+                }
+            }
+
+            if (!hasBlockEditorStore()) {
+                return false;
+            }
+
             var blocks = wp.data.select('core/block-editor').getBlocks();
             var regexMarker = new RegExp('<!--\\s*PICOT_AIO_OPTIMIZER_MARKER:' + index + '\\s*-->', 'i');
             var regexDataIndex = new RegExp('data-index=["\']' + index + '["\']', 'i');
@@ -1300,6 +1399,8 @@
 
         var totalCount = indicesToProcess.length;
         var currentIndex = 0;
+        var successCount = 0;
+        var completedIndices = [];
         var $btn = $('#picot_aio_optimizer-generate-all');
         var originalBtnText = $btn.text();
         
@@ -1329,32 +1430,53 @@
                     if (response.success && response.data) {
                         var attachmentId = response.data.attachment_id || response.data.id;
                         var imageUrl = response.data.url;
+                        var placed = false;
                         
                         if (suggestion.isFeatured && attachmentId) {
-                            // Set as featured media AND insert at top
-                            wp.data.dispatch('core/editor').editPost({ featured_media: attachmentId });
-                            insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', 'START_OF_POST');
-                            removeFeaturedImagePrompt();
-                        } else {
-                            // Try to replace placeholder first
-                            var replaced = replacePlaceholderWithImage(idx, attachmentId, imageUrl, suggestion.description);
-                            if (!replaced) {
-                                // Fallback to smart insertion
-                                var targetText = suggestion.location || suggestion.description || '';
-                                insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', targetText);
+                            setFeaturedImage(attachmentId);
+                            placed = insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', 'START_OF_POST');
+                            if (placed) {
+                                removeFeaturedImagePrompt();
                             }
+                        } else {
+                            var replaced = replacePlaceholderWithImage(idx, attachmentId, imageUrl, suggestion.description);
+                            if (replaced) {
+                                placed = true;
+                            } else {
+                                var targetText = suggestion.location || suggestion.description || '';
+                                placed = insertImageBlockAtCursor(attachmentId, imageUrl, suggestion.description || '', targetText);
+                            }
+                        }
+
+                        if (placed) {
+                            successCount++;
+                            completedIndices.push(idx);
                         }
                     }
                 },
                 complete: function() {
                     currentIndex++;
                     if (currentIndex >= indicesToProcess.length) {
-                        // FINISHED ALL
                         $btn.text(originalBtnText).prop('disabled', false);
                         hideOverlay();
-                        clearImageSuggestions(); // Clear meta and UI
+
+                        if (successCount === totalCount) {
+                            clearImageSuggestions();
+                        } else if (successCount > 0) {
+                            completedIndices.sort(function(a, b) { return b - a; }).forEach(function(removeIdx) {
+                                window.PicotAioOptimizer.imageSuggestions.splice(removeIdx, 1);
+                            });
+
+                            var title = getEditorTitle();
+                            var feat = window.PicotAioOptimizer.imageSuggestions.find(function(s) { return s.isFeatured; });
+                            var cleanSuggestions = window.PicotAioOptimizer.imageSuggestions.filter(function(s) { return !s.isFeatured; });
+                            saveImageSuggestions(cleanSuggestions, feat ? feat.featured_text : null, feat ? feat.prompt : null);
+                            displayImageSuggestions(cleanSuggestions, title, feat ? feat.featured_text : null, window.PicotAioOptimizer.lastUpdated, feat ? feat.prompt : null);
+                            alert((picot_aio_optimizer.strings.batch_progress || 'Generating... ') + successCount + '/' + totalCount + ' ' + (picot_aio_optimizer.strings.batch_done || 'Done!'));
+                        } else {
+                            alert(picot_aio_optimizer.strings.error || 'Error occurred.');
+                        }
                     } else {
-                        // Continue
                         setTimeout(processNext, 500);
                     }
                 }
@@ -1387,7 +1509,7 @@
     }
 
     function fetchPostHistory(autoLoadLatest) {
-        var postId = wp.data.select("core/editor") ? wp.data.select("core/editor").getCurrentPostId() : 0;
+        var postId = getEditorPostId();
         if (!postId) return;
         
         autoLoadLatest = (autoLoadLatest === true);
@@ -1525,36 +1647,13 @@
 
     function analyzeContent() {
  //         console.log('Picot AIO Optimizer: analyzeContent() called');
-        var postContent = '';
-        var postId = 0;
-
-        if (typeof wp !== 'undefined' && wp.data && typeof wp.data.select === 'function' && wp.data.select("core/editor")) {
- //             console.log('Picot AIO Optimizer: Using Gutenberg to get content');
-            postContent = wp.data.select("core/editor").getEditedPostContent();
-            postId = wp.data.select("core/editor").getCurrentPostId();
-            
-            // DOM Fallback if Gutenberg API returns empty (iframe editor / page builders)
-            if (!postContent) {
- //                 console.log('Picot AIO Optimizer: Gutenberg API returned empty, falling back to DOM extraction...');
-                var editorCanvas = document.querySelector('iframe[name="editor-canvas"]');
-                if (editorCanvas && editorCanvas.contentDocument) {
-                    postContent = editorCanvas.contentDocument.body.innerText || '';
-                } else {
-                    var wrapper = document.querySelector('.editor-styles-wrapper') || document.querySelector('.block-editor-block-list__layout');
-                    if (wrapper) {
-                        postContent = wrapper.innerText || '';
-                    }
-                }
-            }
-        } else {
- //             console.log('Picot AIO Optimizer: Falling back to Classic Editor content');
-            postContent = getClassicEditorContent();
-            postId = $('#post_ID').val() || 0;
-        }
+        var postContent = getEditorContent();
+        var postId = getEditorPostId();
 
         if (!postContent) {
              var diagMsg = 'Diagnostics:\n';
-             diagMsg += '- Gutenberg available: ' + (wp.data && wp.data.select("core/editor") ? 'Yes' : 'No') + '\n';
+             diagMsg += '- Classic Editor mode: ' + (isClassicEditorMode() ? 'Yes' : 'No') + '\n';
+             diagMsg += '- Gutenberg available: ' + (hasGutenbergEditor() ? 'Yes' : 'No') + '\n';
              diagMsg += '- Classic Editor available: ' + (typeof tinymce !== 'undefined' && tinymce.activeEditor ? 'Yes' : 'No') + '\n';
              diagMsg += 'If you have text in the editor, your page builder might not be supported.';
              
@@ -1861,8 +1960,7 @@
     
     // Check if we're in Classic Editor (no block editor available)
     $(document).ready(function() {
-        // Only run if the classic editor's result box exists
-        if ($('#picot_aio_optimizer-classic-results').length > 0) {
+        if (isClassicEditorMode()) {
             setTimeout(function() {
                 fetchPostHistory(true);
                 loadSavedImageSuggestions();
@@ -1889,54 +1987,8 @@
      * Classic Editor Rewrite Trigger
      */
     function classicTriggerRewrite() {
-        // If Gutenberg is actually active, use its content even if this button was clicked
-        if (typeof wp !== 'undefined' && wp.data && typeof wp.data.select === 'function' && wp.data.select("core/editor")) {
-            var instructions = $('#picot_aio_optimizer-classic-instructions').val() || '';
-            triggerRewrite(instructions);
-            return;
-        }
-
-        var content = getClassicEditorContent();
         var instructions = $('#picot_aio_optimizer-classic-instructions').val() || '';
-        
-        if (!content) {
-            alert(picot_aio_optimizer.strings.no_content || 'No content found.');
-            return;
-        }
-
-        if (!confirm(picot_aio_optimizer.strings.confirm_rewrite || 'Are you sure you want to rewrite content?')) {
-            return;
-        }
-
-        showOverlay(picot_aio_optimizer.strings.rewriting || 'Rewriting...');
-
-        $.ajax({
-            url: picot_aio_optimizer.rest_url_rewrite,
-            type: 'POST',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', picot_aio_optimizer.rest_nonce);
-            },
-            data: {
-                post_id: $('#post_ID').val(),
-                content: content,
-                gen_img: picot_aio_optimizer.enable_image_gen ? 1 : 0,
-                instructions: instructions
-            },
-            success: function(response) {
-                if (response && response.content) {
-                    setClassicEditorContent(response.content);
-                    alert(picot_aio_optimizer.strings.success_rewrite || 'Rewrite Success!');
-                } else {
-                    alert(picot_aio_optimizer.strings.error || 'Rewrite failed.');
-                }
-            },
-            error: function(xhr) {
-                alert(handleAjaxError(xhr, 'Rewrite'));
-            },
-            complete: function() {
-                hideOverlay();
-            }
-        });
+        triggerRewrite(instructions);
     }
 
     // Classic Editor: Get content from TinyMCE or textarea
@@ -1970,229 +2022,45 @@
         return $('#title').val() || '';
     }
 
+    function whenClassicEditorReady(callback) {
+        if (!isClassicEditorMode()) {
+            callback();
+            return;
+        }
+
+        if (typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
+            callback();
+            return;
+        }
+
+        if (typeof tinymce !== 'undefined' && typeof tinymce.on === 'function') {
+            var completed = false;
+            var runOnce = function() {
+                if (completed) {
+                    return;
+                }
+                completed = true;
+                callback();
+            };
+
+            tinymce.on('AddEditor', function() {
+                setTimeout(runOnce, 100);
+            });
+            setTimeout(runOnce, 1500);
+            return;
+        }
+
+        callback();
+    }
+
     // Classic Editor: Analyze content
     function classicAnalyzeContent() {
-        // If Gutenberg is actually active, use its content even if this button was clicked
-        if (typeof wp !== 'undefined' && wp.data && typeof wp.data.select === 'function' && wp.data.select("core/editor")) {
-            analyzeContent();
-            return;
-        }
-
-        var content = getClassicEditorContent();
-        var title = getClassicEditorTitle();
-        var resultDiv = $('#picot_aio_optimizer-classic-results');
-
-        if (!content) {
-            alert(picot_aio_optimizer.strings.no_content || 'No content found.');
-            return;
-        }
-
-        resultDiv.html('<p><em>' + (picot_aio_optimizer.strings.analyzing || 'Analyzing...') + '</em></p>');
-
-        showOverlay(picot_aio_optimizer.strings.analyzing || 'Analyzing...');
-
-        $.ajax({
-            url: picot_aio_optimizer.rest_url_analyze,
-            type: 'POST',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', picot_aio_optimizer.rest_nonce);
-            },
-            data: "content=" + encodeURIComponent(content) + "&title=" + encodeURIComponent(title) + "&post_id=" + $('#post_ID').val(),
-            success: function(response) {
-                if (response && !response.code) {
-                    displayResultsInternal(response, resultDiv);
-                } else {
-                    resultDiv.html('<div class="notice notice-error"><p>Error: ' + (response.message || 'Unknown error') + '</p></div>');
-                }
-            },
-            error: function(xhr) {
-                var errorMsg = picot_aio_optimizer.strings.error || 'Error occurred';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                }
-                resultDiv.html('<div class="notice notice-error"><p>' + errorMsg + '</p></div>');
-            },
-            complete: function() {
-                hideOverlay();
-            }
-        });
+        analyzeContent();
     }
 
     // Classic Editor: Discover image opportunities
     function classicDiscoverImages() {
-        // If Gutenberg is actually active, use its content even if this button was clicked
-        if (typeof wp !== 'undefined' && wp.data && typeof wp.data.select === 'function' && wp.data.select("core/editor")) {
-            discoverImagePrompts();
-            return;
-        }
-
-        var content = getClassicEditorContent();
-        var title = getClassicEditorTitle();
-        var resultDiv = $('#picot_aio_optimizer-classic-results');
-
-        if (!content) {
-            alert(picot_aio_optimizer.strings.no_content || 'No content found.');
-            return;
-        }
-
-        resultDiv.html('<p><em>' + (picot_aio_optimizer.strings.discovering_images || 'Discovering image opportunities...') + '</em></p>');
-
-        showOverlay(picot_aio_optimizer.strings.discovering || 'Discovering image opportunities...');
-        
-        $.ajax({
-            url: picot_aio_optimizer.rest_url_suggest_images,
-            type: 'POST',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', picot_aio_optimizer.rest_nonce);
-            },
-            data: "title=" + encodeURIComponent(title) + "&content=" + encodeURIComponent(content),
-            success: function(response) {
-                if (response.success && response.data) {
-                    var suggestions = [];
-                    var featuredText = '';
-                    
-                    if (response.data.suggestions) {
-                        suggestions = response.data.suggestions;
-                        featuredText = response.data.featured_text || '';
-                    } else if (Array.isArray(response.data)) {
-                        suggestions = response.data;
-                    }
-
-                    if (suggestions.length > 0) {
-                        displayClassicImageSuggestions(suggestions, title, resultDiv, featuredText, response.data.featured_prompt || null);
-                    } else {
-                        resultDiv.html('<div class="notice notice-warning"><p>' + (picot_aio_optimizer.strings.no_suggestions || 'No suggestions found') + '</p></div>');
-                    }
-                } else {
-                    resultDiv.html('<div class="notice notice-warning"><p>' + (picot_aio_optimizer.strings.no_suggestions || 'No suggestions found') + '</p></div>');
-                }
-            },
-            error: function(xhr) {
-                var errorMsg = picot_aio_optimizer.strings.error || 'Error occurred';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                }
-                resultDiv.html('<div class="notice notice-error"><p>' + errorMsg + '</p></div>');
-            },
-            complete: function() {
-                hideOverlay();
-            }
-        });
-    }
-
-    // Classic Editor: Display image suggestions
-    function displayClassicImageSuggestions(suggestions, postTitle, resultDiv, featuredText, featuredPrompt) {
-        var featuredPromptText = featuredText ? featuredText : (postTitle || 'Blog Post');
-        
-        var finalFeaturedPrompt = featuredPrompt ? featuredPrompt : 
-                                  'A professional blog featured image (thumbnail). STYLE: Modern Typography Design. ACTION: Render the text "' + featuredPromptText + '" in large, clear, bold characters that EXACTLY MATCH THE LANGUAGE of the article title. Use the same script and language as the title text - do not translate or convert. BACKGROUND: Minimal.';
-
-        var featuredItem = {
-            location: picot_aio_optimizer.strings.featured_image || 'Featured Image',
-            prompt: finalFeaturedPrompt,
-            description: picot_aio_optimizer.strings.featured_image_prompt || 'Generate featured image',
-            isFeatured: true
-        };
-
-        var allSuggestions = [featuredItem].concat(suggestions);
-        window.PicotAioOptimizer.classicImageSuggestions = allSuggestions;
-
-        var html = '<div style="background:#fff; border:1px solid #ccd0d4; padding:10px; border-radius:4px; font-size:12px;">';
-        html += '<strong>🖼️ ' + (picot_aio_optimizer.strings.discover_images_btn || 'Image Opportunities') + '</strong>';
-
-        allSuggestions.forEach(function(item, index) {
-            var bgColor = item.isFeatured ? '#fff3cd' : '#f9f9f9';
-            html += '<div style="background:' + bgColor + '; padding:8px; margin-top:8px; border-radius:3px;">';
-            html += '<div style="font-weight:bold; font-size:11px;">' + (item.isFeatured ? '⭐ ' : '📍 ') + escapeHtml(item.location) + '</div>';
-            html += '<button type="button" class="button button-small picot_aio_optimizer-classic-gen-btn" data-index="' + index + '" style="margin-top:5px;">' + (picot_aio_optimizer.strings.generate_btn || 'Generate') + '</button>';
-            html += '</div>';
-        });
-
-        html += '</div>';
-        resultDiv.html(html);
-
-        // Bind event handlers
-        $('.picot_aio_optimizer-classic-gen-btn').on('click', function() {
-            var idx = $(this).data('index');
-            generateClassicImage(idx, $(this));
-        });
-    }
-
-    // Classic Editor: Generate single image
-    function generateClassicImage(index, $btn) {
-        var suggestion = window.PicotAioOptimizer.classicImageSuggestions[index];
-        if (!suggestion) return;
-
-        var originalText = $btn.text();
-        showOverlay(picot_aio_optimizer.strings.generating || 'Generating image...');
-        $btn.text(picot_aio_optimizer.strings.generating || 'Generating...').prop('disabled', true);
-
-        $.ajax({
-            url: picot_aio_optimizer.rest_url_generate_image,
-            type: 'POST',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', picot_aio_optimizer.rest_nonce);
-            },
-            data: { prompt: suggestion.prompt },
-            success: function(response) {
-                if (response.success && response.data) {
-                    var imageUrl = response.data.url;
-                    var attachmentId = response.data.attachment_id;
-
-                    if (suggestion.isFeatured && attachmentId) {
-                        // Set as featured image
-                        if (typeof wp.media !== 'undefined' && wp.media.featuredImage) {
-                            wp.media.featuredImage.set(attachmentId);
-                        }
-                        alert(picot_aio_optimizer.strings.featured_set || 'Featured image set!');
-                    } else {
-                        // Insert into TinyMCE editor
-                        insertImageIntoClassicEditor(imageUrl, suggestion.description || '');
-                    }
-
-                    $btn.text('✅ ' + originalText);
-                } else {
-                    alert('Generation failed: ' + (response.message || 'Unknown error'));
-                }
-            },
-            error: function(xhr) {
-                var errorMsg = 'Generation failed';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                }
-                alert(errorMsg);
-            },
-            complete: function() {
-                $btn.text(originalText).prop('disabled', false);
-                hideOverlay();
-            }
-        });
-    }
-
-    // Classic Editor: Insert image into TinyMCE
-    function insertImageIntoClassicEditor(imageUrl, altText) {
-        var imgHtml = '<img src="' + imageUrl + '" alt="' + escapeHtml(altText) + '" />';
-        
-        // Check if TinyMCE is active
-        if (typeof tinymce !== 'undefined' && tinymce.activeEditor && !tinymce.activeEditor.isHidden()) {
-            tinymce.activeEditor.execCommand('mceInsertContent', false, imgHtml);
-            alert(picot_aio_optimizer.strings.image_inserted || 'Image inserted!');
-        } else {
-            // Fall back to textarea - insert at cursor position
-            var textarea = document.getElementById('content');
-            if (textarea) {
-                var start = textarea.selectionStart;
-                var end = textarea.selectionEnd;
-                var text = textarea.value;
-                textarea.value = text.substring(0, start) + imgHtml + text.substring(end);
-                textarea.selectionStart = textarea.selectionEnd = start + imgHtml.length;
-                alert(picot_aio_optimizer.strings.image_inserted || 'Image inserted!');
-            } else {
-                alert(picot_aio_optimizer.strings.insert_failed || 'Failed to insert image.');
-            }
-        }
+        discoverImagePrompts();
     }
 
     /**

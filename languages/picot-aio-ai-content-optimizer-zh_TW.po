@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Picot AIO AI Content Optimizer 1.0.0\n"
+"Project-Id-Version: Picot AIO AI Content Optimizer 1.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/picot-aio-ai-content-optimizer/\n"
 "POT-Creation-Date: 2026-05-20 02:33+0000\n"
 "PO-Revision-Date: 2026-05-20 02:33+0000\n"
