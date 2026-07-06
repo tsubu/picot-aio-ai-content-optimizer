@@ -3,8 +3,8 @@
 /**
  * Plugin Name: Picot AIO AI Content Optimizer
  * Plugin URI: https://github.com/tsubu/picot-aio-ai-content-optimizer
- * Description: AI-powered content analysis and optimization plugin using Google Gemini API. Provides SEO advice, content recommendations, and automated image generation for WordPress posts and pages.
- * Version: 1.0.1
+ * Description: AI-powered content analysis and optimization using Google Gemini via the WordPress AI Client. Provides SEO advice, content recommendations, and automated image generation for WordPress posts and pages.
+ * Version: 1.1.0
  * Requires at least: 7.0
  * Requires PHP: 8.3
  * Author: tsubu
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 
 // Define plugin constants
-define('PICOT_AIO_OPTIMIZER_VERSION', '1.0.1');
+define('PICOT_AIO_OPTIMIZER_VERSION', '1.1.0');
 define('PICOT_AIO_OPTIMIZER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PICOT_AIO_OPTIMIZER_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -31,9 +31,12 @@ define('PICOT_AIO_OPTIMIZER_FILENAME_MAX_LENGTH', 50);        // int - Maximum l
 define('PICOT_AIO_OPTIMIZER_IMAGE_DENSITY_THRESHOLD', 500);   // int - Reserved for future use
 define('PICOT_AIO_OPTIMIZER_API_TIMEOUT', 120);               // int - Timeout in seconds for text generation API calls
 define('PICOT_AIO_OPTIMIZER_IMAGE_API_TIMEOUT', 90);          // int - Timeout in seconds for image generation API calls
+define('PICOT_AIO_OPTIMIZER_REWRITE_MAX_TOKENS', 65536);      // int - Max output tokens for rewrite (long articles)
 define('PICOT_AIO_OPTIMIZER_LOG_RETENTION_DAYS', 90);         // int - Number of days to retain analysis logs before auto-deletion
 
 // Modular Includes
+require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/ai-client-helper.php';
+require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/model-manager.php';
 require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/gemini-client.php';
 require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/database.php';
 require_once PICOT_AIO_OPTIMIZER_PLUGIN_PATH . 'includes/admin-views.php';
@@ -48,6 +51,7 @@ class PicotAioOptimizer
     public function __construct()
     {
         // Hooks
+        add_action('init', array($this, 'load_textdomain'));
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'admin_init'));
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_settings_link'));
@@ -62,6 +66,15 @@ class PicotAioOptimizer
         PicotAioOptimizer_Database::gar_init_db();
     }
 
+    public function load_textdomain()
+    {
+        load_plugin_textdomain(
+            'picot-aio-ai-content-optimizer',
+            false,
+            dirname(plugin_basename(__FILE__)) . '/languages'
+        );
+    }
+
     public function admin_init()
     {
         // Manual Settings Save Handler
@@ -74,11 +87,13 @@ class PicotAioOptimizer
             }
 
             // Save Inputs
-            if (isset($_POST['picot_aio_optimizer_api_key'])) {
-                update_option('picot_aio_optimizer_api_key', sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_api_key'])));
-            }
             if (isset($_POST['picot_aio_optimizer_model'])) {
-                update_option('picot_aio_optimizer_model', sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_model'])));
+                $model = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec(
+                    sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_model']))
+                );
+                if ($model !== '') {
+                    update_option('picot_aio_optimizer_model', $model);
+                }
             }
             // Checkbox handling: if not set, it's 0
             $enable_gen = isset($_POST['picot_aio_optimizer_enable_image_gen']) ? 1 : 0;
@@ -88,7 +103,12 @@ class PicotAioOptimizer
                 update_option('picot_aio_optimizer_image_style', sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_image_style'])));
             }
             if (isset($_POST['picot_aio_optimizer_image_model'])) {
-                update_option('picot_aio_optimizer_image_model', sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_image_model'])));
+                $image_model = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec(
+                    sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_image_model']))
+                );
+                if ($image_model !== '') {
+                    update_option('picot_aio_optimizer_image_model', $image_model);
+                }
             }
 
             // Force Table Check on Save (just to be safe)
@@ -100,7 +120,6 @@ class PicotAioOptimizer
             exit;
         }
 
-        register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_api_key', array('sanitize_callback' => 'sanitize_text_field'));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_model', array('sanitize_callback' => 'sanitize_text_field'));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_enable_image_gen', array('sanitize_callback' => 'absint'));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_image_style', array('sanitize_callback' => 'sanitize_text_field'));

@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Picot AIO AI Content Optimizer 1.0.1\n"
+"Project-Id-Version: Picot AIO AI Content Optimizer 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/picot-aio-ai-content-optimizer/\n"
-"POT-Creation-Date: 2026-05-20 02:33+0000\n"
-"PO-Revision-Date: 2026-05-20 02:33+0000\n"
+"POT-Creation-Date: 2026-07-06 21:34+0000\n"
+"PO-Revision-Date: 2026-07-06 21:34+0000\n"
 "Last-Translator: Picot\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -34,9 +34,6 @@ msgstr "API-Fehler aufgetreten."
 msgid "Action"
 msgstr "Aktion"
 
-msgid "After saving the API key, click the button above to add the latest available models to the list."
-msgstr "Nach dem Speichern des API-Schlüssels können Sie die neuesten verfügbaren Modelle über die Schaltfläche oben zum Dropdown-Menü hinzufügen."
-
 msgid "All image generation completed!"
 msgstr "Alle Bildgenerierungen abgeschlossen!"
 
@@ -62,7 +59,7 @@ msgid "Analyzing..."
 msgstr "Analysiere..."
 
 msgid "Anime"
-msgstr "Anime"
+msgstr "일본 만화 영화"
 
 msgid "Are you sure you want to rewrite content? The current title and content will be overwritten."
 msgstr "Sind Sie sicher, dass Sie den Inhalt umschreiben möchten? Der aktuelle Titel und Inhalt werden überschrieben."
@@ -98,7 +95,7 @@ msgid "Copy"
 msgstr "Kopieren"
 
 msgid "Cyberpunk"
-msgstr "Cyberpunk"
+msgstr "사이버펑크"
 
 msgid "Date"
 msgstr "Datum"
@@ -130,6 +127,9 @@ msgstr "Ein Fehler ist aufgetreten."
 msgid "Expand"
 msgstr "확대"
 
+msgid "Failed to fetch Gemini models. Check the Google Gemini connector API key."
+msgstr "Gemini 모델을 가져오지 못했습니다. Google Gemini 커넥터 API 키를 확인하세요."
+
 msgid "Failed to insert image."
 msgstr "Bild konnte nicht eingefügt werden. Es wurde in die Mediathek gespeichert."
 
@@ -141,9 +141,6 @@ msgstr "Beitragsbild"
 
 msgid "Featured image set successfully!"
 msgstr "Beitragsbild erfolgreich gesetzt!"
-
-msgid "Fetch Latest Model List"
-msgstr "Neueste Modellliste abrufen"
 
 msgid "Fetching..."
 msgstr "Rufe ab..."
@@ -175,8 +172,14 @@ msgstr "Geometrisch"
 msgid "Glassmorphism"
 msgstr "Glassmorphismus"
 
-msgid "Google Gemini API Key"
-msgstr "Google Gemini API-Schlüssel"
+msgid "Google Gemini connector is connected and text generation is available."
+msgstr "Google Gemini 커넥터가 연결되어 텍스트 생성이 가능합니다."
+
+msgid "Google Gemini connector is not configured or does not support text generation."
+msgstr "Google Gemini 커넥터가 구성되지 않았거나 텍스트 생성을 지원하지 않습니다."
+
+msgid "Google Gemini integration"
+msgstr "Google Gemini 통합"
 
 msgid "Gradient Mesh"
 msgstr "Verlaufsnetz"
@@ -193,8 +196,20 @@ msgstr "Bild-Prompt-Modell"
 msgid "Image Style"
 msgstr "Bildstil"
 
+msgid "Image generation is disabled in settings."
+msgstr "설정에서 이미지 생성이 비활성화되어 있습니다."
+
 msgid "Image inserted successfully!"
 msgstr "Bild erfolgreich eingefügt!"
+
+msgid "Image model is not set. Choose one on the settings screen."
+msgstr "이미지 모델이 설정되지 않았습니다. 설정 화면에서 하나를 선택하세요."
+
+msgid "Image prompt is required."
+msgstr "이미지 프롬프트가 필요합니다."
+
+msgid "Image suggestion failed."
+msgstr "이미지 제안에 실패했습니다."
 
 msgid "Infographic"
 msgstr "Infografik"
@@ -223,11 +238,17 @@ msgstr "Neon-3D"
 msgid "Network error. Please check your connection."
 msgstr "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung."
 
+msgid "No Gemini models were found. Check the Google Gemini connector connection."
+msgstr "Gemini 모델을 찾을 수 없습니다. Google Gemini 커넥터 연결을 확인하세요."
+
 msgid "No content found."
 msgstr "Kein Inhalt gefunden."
 
 msgid "No history found for this post."
 msgstr "Kein Verlauf für diesen Beitrag gefunden."
+
+msgid "No image data was returned."
+msgstr "이미지 데이터가 반환되지 않았습니다."
 
 msgid "No image suggestions found"
 msgstr "Keine Bildvorschläge gefunden"
@@ -240,6 +261,9 @@ msgstr "Keine (nur Prompt)"
 
 msgid "Oil Painting"
 msgstr "Ölgemälde"
+
+msgid "Open AI connector settings"
+msgstr "AI 커넥터 설정 열기"
 
 msgid "Paper Cut"
 msgstr "Papierschnitt"
@@ -274,11 +298,20 @@ msgstr "Professionell (Foto)"
 msgid "Recommended Content"
 msgstr "Empfohlener Inhalt"
 
+msgid "Refresh model list"
+msgstr "모델 목록 새로 고침"
+
+msgid "Refresh the model list after connecting the Google Gemini connector."
+msgstr "Google Gemini 커넥터를 연결한 후 모델 목록을 새로 고치세요."
+
 msgid "Rewrite Instructions"
 msgstr "다시 쓰기 지침"
 
 msgid "Rewrite completed successfully!"
 msgstr "Umschreiben erfolgreich!"
+
+msgid "Rewrite failed."
+msgstr "다시 쓰기에 실패했습니다."
 
 msgid "Rewriting..."
 msgstr "Schreibe um..."
@@ -328,6 +361,21 @@ msgstr "Bildmöglichkeiten entdecken"
 msgid "Summary"
 msgstr "Zusammenfassung"
 
+msgid "Text model is not set. Choose one on the settings screen."
+msgstr "텍스트 모델이 설정되지 않았습니다. 설정 화면에서 하나를 선택하세요."
+
+msgid "The prompt is empty."
+msgstr "프롬프트가 비어 있습니다."
+
+msgid "The selected Gemini model does not support image generation. Check the Google Gemini connector settings."
+msgstr "선택한 Gemini 모델은 이미지 생성을 지원하지 않습니다. Google Gemini 커넥터 설정을 확인하세요."
+
+msgid "The selected Gemini model does not support text generation. Check the Google Gemini connector settings."
+msgstr "선택한 Gemini 모델은 텍스트 생성을 지원하지 않습니다. Google Gemini 커넥터 설정을 확인하세요."
+
+msgid "This plugin uses the Google Gemini connector. Manage API keys under Settings → Connectors. Requests are sent through the WordPress AI Client."
+msgstr "이 플러그인은 Google Gemini 커넥터를 사용합니다. 설정 → 커넥터에서 API 키를 관리하세요. 요청은 WordPress AI 클라이언트를 통해 전송됩니다."
+
 msgid "Thumbnail Prompt"
 msgstr "Vorschaubild-Prompt"
 
@@ -346,8 +394,8 @@ msgstr "Vintage"
 msgid "Watercolor"
 msgstr "Aquarell"
 
-msgid "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above."
-msgstr "Google AI Studio에서 무료 API 키를 받을 수 있습니다. <a href=\"%s\" target=\"_blank\">여기에서 키를 생성</a>한 후 위 필드에 붙여넣으세요."
+msgid "WordPress AI Client is not available. Install and configure the Google Gemini connector under Settings → Connectors."
+msgstr "WordPress AI 클라이언트를 사용할 수 없습니다. 설정 → 커넥터에서 Google Gemini 커넥터를 설치하고 구성합니다."
 
 msgid "You do not have permission to change these options."
 msgstr "이 옵션을 변경할 권한이 없습니다."

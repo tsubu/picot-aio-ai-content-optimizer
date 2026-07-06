@@ -167,12 +167,18 @@ class PicotAioOptimizer_Admin_Views
      */
     public static function admin_page()
     {
-        $api_key          = get_option('picot_aio_optimizer_api_key', '');
-        $model            = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
-        $image_model      = get_option('picot_aio_optimizer_image_model', 'gemini-2.0-flash-preview-image-generation');
+        $model            = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec(
+            get_option('picot_aio_optimizer_model', PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL)
+        );
+        $image_model      = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec(
+            get_option('picot_aio_optimizer_image_model', PicotAioOptimizer_Client::DEFAULT_IMAGE_MODEL)
+        );
         $enable_image_gen = get_option('picot_aio_optimizer_enable_image_gen', 0);
         $image_style      = get_option('picot_aio_optimizer_image_style', 'none');
-        $available_models = get_option('picot_aio_optimizer_available_models', array());
+        $available_models = PicotAioOptimizer_Ai_Client_Helper::get_model_list_option('picot_aio_optimizer_available_models');
+        $available_image_models = PicotAioOptimizer_Ai_Client_Helper::get_model_list_option('picot_aio_optimizer_available_image_models');
+        $ai_configured = PicotAioOptimizer_Ai_Client_Helper::supports_text_generation();
+        $ai_settings_url = PicotAioOptimizer_Ai_Client_Helper::get_settings_url();
     ?>
         <div class="wrap picot-aio-optimizer-settings-wrap">
             <h1><?php esc_html_e('Picot AIO AI Content Optimizer Settings', 'picot-aio-ai-content-optimizer'); ?></h1>
@@ -186,20 +192,18 @@ class PicotAioOptimizer_Admin_Views
                 <input type="hidden" name="picot_aio_optimizer_manual_save" value="1">
 
                 <div class="picot-settings-row">
-                    <div class="picot-settings-label"><?php esc_html_e('Google Gemini API Key', 'picot-aio-ai-content-optimizer'); ?></div>
+                    <div class="picot-settings-label"><?php esc_html_e('Google Gemini integration', 'picot-aio-ai-content-optimizer'); ?></div>
                     <div class="picot-settings-field">
-                        <input type="password" name="picot_aio_optimizer_api_key" value="<?php echo esc_attr($api_key); ?>" class="regular-text" autocomplete="off">
+                        <?php if ($ai_configured) : ?>
+                            <p style="margin: 0 0 10px; color: #155724;"><?php esc_html_e('Google Gemini connector is connected and text generation is available.', 'picot-aio-ai-content-optimizer'); ?></p>
+                        <?php else : ?>
+                            <p style="margin: 0 0 10px; color: #856404;"><?php esc_html_e('Google Gemini connector is not configured or does not support text generation.', 'picot-aio-ai-content-optimizer'); ?></p>
+                        <?php endif; ?>
+                        <a href="<?php echo esc_url($ai_settings_url); ?>" class="button">
+                            <?php esc_html_e('Open AI connector settings', 'picot-aio-ai-content-optimizer'); ?>
+                        </a>
                         <p class="description">
-                            <?php
-                            echo wp_kses(
-                                sprintf(
-                                    /* translators: %s: URL to Google AI Studio */
-                                    __('You can get a free API key from Google AI Studio. <a href="%s" target="_blank">Create your key here</a> and paste it into the field above.', 'picot-aio-ai-content-optimizer'),
-                                    'https://aistudio.google.com/app/apikey'
-                                ),
-                                array('a' => array('href' => array(), 'target' => array()))
-                            );
-                            ?>
+                            <?php esc_html_e('This plugin uses the Google Gemini connector. Manage API keys under Settings → Connectors. Requests are sent through the WordPress AI Client.', 'picot-aio-ai-content-optimizer'); ?>
                         </p>
                     </div>
                 </div>
@@ -208,29 +212,20 @@ class PicotAioOptimizer_Admin_Views
                     <div class="picot-settings-label"><?php esc_html_e('Analysis Model', 'picot-aio-ai-content-optimizer'); ?></div>
                     <div class="picot-settings-field">
                         <select name="picot_aio_optimizer_model" id="picot_aio_optimizer_model">
-                            <?php if (empty($available_models)) : ?>
-                                <option value="gemini-1.5-flash" <?php selected($model, 'gemini-1.5-flash'); ?>>Gemini 1.5 Flash</option>
-                                <option value="gemini-1.5-pro" <?php selected($model, 'gemini-1.5-pro'); ?>>Gemini 1.5 Pro</option>
-                                <option value="gemini-1.5-flash-8b" <?php selected($model, 'gemini-1.5-flash-8b'); ?>>Gemini 1.5 Flash-8B</option>
-                                <option value="gemini-2.0-flash-exp" <?php selected($model, 'gemini-2.0-flash-exp'); ?>>Gemini 2.0 Flash Exp</option>
-                                <option value="gemini-exp-1206" <?php selected($model, 'gemini-exp-1206'); ?>>Gemini Exp 1206</option>
-                                <option value="gemini-2.0-flash-thinking-exp-1219" <?php selected($model, 'gemini-2.0-flash-thinking-exp-1219'); ?>>Gemini 2.0 Flash Thinking Exp</option>
+                            <?php if (!empty($available_models) && is_array($available_models)) : ?>
+                                <?php foreach ($available_models as $model_id => $model_name) : ?>
+                                    <option value="<?php echo esc_attr($model_id); ?>" <?php selected($model, $model_id); ?>><?php echo esc_html($model_name); ?></option>
+                                <?php endforeach; ?>
                             <?php else : ?>
-                                <?php foreach ($available_models as $m) :
-                                    $m_id    = str_replace('models/', '', $m['name']);
-                                    $m_name  = $m['displayName'] . ' (' . $m_id . ')';
-                                    $m_methods = isset($m['supportedGenerationMethods']) ? $m['supportedGenerationMethods'] : array();
-                                    if (in_array('generateContent', $m_methods) && strpos($m_id, 'image') === false && strpos(strtolower($m_id), 'banana') === false) :
-                                ?>
-                                        <option value="<?php echo esc_attr($m_id); ?>" <?php selected($model, $m_id); ?>><?php echo esc_html($m_name); ?></option>
-                                <?php endif;
-                                endforeach; ?>
+                                <option value="<?php echo esc_attr(PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL); ?>" <?php selected($model, PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL); ?>>
+                                    <?php echo esc_html(PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL); ?>
+                                </option>
                             <?php endif; ?>
                         </select>
-                        <button type="button" class="button" id="picot_aio_optimizer_fetch_models"><?php esc_html_e('Fetch Latest Model List', 'picot-aio-ai-content-optimizer'); ?></button>
+                        <button type="button" class="button" id="picot_aio_optimizer_fetch_models"><?php esc_html_e('Refresh model list', 'picot-aio-ai-content-optimizer'); ?></button>
                         <span id="picot_aio_optimizer_fetch_status" style="margin-left: 10px;"></span>
                         <p class="description">
-                            <?php esc_html_e('After saving the API key, click the button above to add the latest available models to the list.', 'picot-aio-ai-content-optimizer'); ?>
+                            <?php esc_html_e('Refresh the model list after connecting the Google Gemini connector.', 'picot-aio-ai-content-optimizer'); ?>
                         </p>
                     </div>
                 </div>
@@ -252,20 +247,14 @@ class PicotAioOptimizer_Admin_Views
                     <div class="picot-settings-label"><?php esc_html_e('Image Generation Model', 'picot-aio-ai-content-optimizer'); ?></div>
                     <div class="picot-settings-field">
                         <select name="picot_aio_optimizer_image_model" id="picot_aio_optimizer_image_model">
-                            <?php if (empty($available_models)) : ?>
-                                <option value="imagen-3.0-generate-001" <?php selected($image_model, 'imagen-3.0-generate-001'); ?>>Imagen 3.0 Generate</option>
-                                <option value="imagen-3.0-fast-generate-001" <?php selected($image_model, 'imagen-3.0-fast-generate-001'); ?>>Imagen 3.0 Fast Generate</option>
-                                <option value="gemini-2.0-flash-preview-image-generation" <?php selected($image_model, 'gemini-2.0-flash-preview-image-generation'); ?>>Gemini 2.0 Flash (Image Generation)</option>
+                            <?php if (!empty($available_image_models) && is_array($available_image_models)) : ?>
+                                <?php foreach ($available_image_models as $model_id => $model_name) : ?>
+                                    <option value="<?php echo esc_attr($model_id); ?>" <?php selected($image_model, $model_id); ?>><?php echo esc_html($model_name); ?></option>
+                                <?php endforeach; ?>
                             <?php else : ?>
-                                <?php foreach ($available_models as $m) :
-                                    $m_id    = str_replace('models/', '', $m['name']);
-                                    $m_name  = $m['displayName'] . ' (' . $m_id . ')';
-                                    $m_methods = isset($m['supportedGenerationMethods']) ? $m['supportedGenerationMethods'] : array();
-                                    if (in_array('imageGeneration', $m_methods) || strpos($m_id, 'image') !== false || strpos(strtolower($m_id), 'banana') !== false) :
-                                ?>
-                                        <option value="<?php echo esc_attr($m_id); ?>" <?php selected($image_model, $m_id); ?>><?php echo esc_html($m_name); ?></option>
-                                <?php endif;
-                                endforeach; ?>
+                                <option value="<?php echo esc_attr(PicotAioOptimizer_Client::DEFAULT_IMAGE_MODEL); ?>" <?php selected($image_model, PicotAioOptimizer_Client::DEFAULT_IMAGE_MODEL); ?>>
+                                    <?php echo esc_html(PicotAioOptimizer_Client::DEFAULT_IMAGE_MODEL); ?>
+                                </option>
                             <?php endif; ?>
                         </select>
                     </div>

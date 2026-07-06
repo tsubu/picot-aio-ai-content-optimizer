@@ -3,95 +3,281 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use WordPress\AiClient\Files\Enums\FileTypeEnum;
+use WordPress\AiClient\Providers\Http\DTO\RequestOptions;
+
 /**
- * PicotAioOptimizer Client Class for API interactions
+ * PicotAioOptimizer Client Class for AI interactions via WordPress AI Client.
  */
 class PicotAioOptimizer_Client
 {
-    /**
-     * Get model name mapping
-     * Centralizes model ID transformations
-     * 
-     * @return array Associative array of model mappings
-     */
-    private static function get_model_mapping()
-    {
-        return array(
-            'gemini-1.5-flash' => 'gemini-flash-latest',
-            'gemini-1.5-pro' => 'gemini-pro-latest',
-        );
-    }
+    public const DEFAULT_TEXT_MODEL = 'google/gemini-2.5-flash';
+    public const DEFAULT_IMAGE_MODEL = 'google/gemini-2.5-flash-image';
 
     /**
-     * Apply model mapping to a given model ID
-     * 
-     * @param string $model The model ID to map
-     * @return string Mapped model ID or original if no mapping exists
-     */
-    private static function map_model_name($model)
-    {
-        $map = self::get_model_mapping();
-        return isset($map[$model]) ? $map[$model] : $model;
-    }
-
-    /**
-     * Validate HTTP status and decode a Gemini API JSON response body.
+     * Call Gemini API for Analysis.
      *
-     * @param array|WP_Error $response  wp_remote_* response.
-     * @param string         $context   Label used in error messages.
-     * @return array|WP_Error Decoded JSON array or WP_Error on failure.
+     * @param string $content Content to analyze.
+     * @param string $model   Provider/model spec.
+     * @return array|WP_Error
      */
-    private static function decode_api_json_response($response, $context = 'API')
+    public static function call_gemini_api($content, $model)
     {
+        $model = self::resolve_text_model($model);
+        $system_instruction = self::get_analysis_system_instruction();
+
+        $response = self::generate_text(
+            $model,
+            $system_instruction . "\n\n" . $content,
+            array(
+                'temperature' => 0.7,
+                'response_mime_type' => 'application/json',
+            ),
+            PICOT_AIO_OPTIMIZER_API_TIMEOUT
+        );
+
         if (is_wp_error($response)) {
             return $response;
         }
 
-        $code = wp_remote_retrieve_response_code($response);
-        $body_str = wp_remote_retrieve_body($response);
-
-        if ($code !== 200) {
-            $data = json_decode($body_str, true);
-            $msg = (is_array($data) && isset($data['error']['message']))
-                ? $data['error']['message']
-                : 'Unknown API Error';
-            return new WP_Error('api_error', "{$context} Failed ({$code}): {$msg}");
+        if (!isset($response['candidates'][0]['content']['parts'][0]['text'])) {
+            return new WP_Error('api_error', 'Invalid API response structure');
         }
 
-        if ($body_str === '') {
-            return new WP_Error('api_error', 'Empty API response');
+        $text = $response['candidates'][0]['content']['parts'][0]['text'];
+        $text = preg_replace('/^```json\s*|\s*```$/i', '', trim($text));
+        $text = preg_replace('/^```\s*|\s*```$/i', '', trim($text));
+        $clean_text = preg_replace('/,\s*([\]\}])/', '$1', $text);
+
+        $json_data = json_decode($clean_text, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $json_data;
         }
 
-        $data = json_decode($body_str, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return new WP_Error('api_error', 'Invalid JSON from API: ' . json_last_error_msg());
+        $json_data = json_decode($text, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $json_data;
         }
 
-        return $data;
+        return new WP_Error('json_error', 'Failed to parse JSON response: ' . $text);
     }
 
     /**
-     * Call Gemini API for Analysis
-     * Analyzes content and returns structured feedback
-     * 
-     * @param string $content The content to analyze
-     * @param string $api_key Google Gemini API key
-     * @param string $model Model ID to use
-     * @return array|WP_Error Analysis result array or WP_Error on failure
+     * Rewrite content via Gemini.
+     *
+     * @param string $content      Prompt content.
+     * @param string $model_id     Provider/model spec.
+     * @param int    $gen_img      Whether to include image prompt instructions.
+     * @param string $instructions Optional rewrite instructions.
+     * @return array|WP_Error
      */
-    public static function call_gemini_api($content, $api_key, $model)
+    public static function gar_call_gemini_api_rewrite($content, $model_id, $gen_img, $instructions = '')
     {
-        $model = self::map_model_name($model);
+        $system_instruction = self::build_rewrite_system_instruction((bool) $gen_img, $instructions);
+        return self::gar_perform_gemini_request($model_id, $system_instruction, $content);
+    }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$api_key}";
+    /**
+     * Perform a text generation request.
+     *
+     * @param string $model_id           Provider/model spec.
+     * @param string $system_instruction System prompt.
+     * @param string $content            User content.
+     * @return array|WP_Error
+     */
+    public static function gar_perform_gemini_request($model_id, $system_instruction, $content)
+    {
+        $model_id = self::resolve_text_model($model_id);
 
-        // System prompts are fundamentally different between languages
+        $response = self::generate_text(
+            $model_id,
+            $system_instruction . "\n\n" . $content,
+            array(
+                'temperature' => 0.7,
+                'max_tokens'  => PICOT_AIO_OPTIMIZER_REWRITE_MAX_TOKENS,
+            ),
+            PICOT_AIO_OPTIMIZER_API_TIMEOUT
+        );
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        $text = PicotAioOptimizer_Ai_Client_Helper::extract_text_from_legacy_response($response);
+        if ($text === '') {
+            return new WP_Error('api_error', 'Unexpected API response structure');
+        }
+
+        $text = preg_replace('/^```html\s*|\s*```$/i', '', trim($text));
+
+        return array('content' => $text);
+    }
+
+    /**
+     * Generate image bytes via WordPress AI Client.
+     *
+     * @param string $prompt   Image prompt.
+     * @param string $model_id Provider/model spec.
+     * @return string|WP_Error Base64 image data.
+     */
+    public static function gar_generate_image_via_api($prompt, $model_id = '')
+    {
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_available()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message());
+        }
+
+        $model_id = self::resolve_image_model($model_id);
+        [$provider, $model_name] = PicotAioOptimizer_Ai_Client_Helper::parse_model_spec($model_id);
+
+        if ($provider === '' || $model_name === '') {
+            return new WP_Error('missing_model', __('Image model is not set. Choose one on the settings screen.', 'picot-aio-ai-content-optimizer'));
+        }
+
+        $style_desc = PicotAioOptimizer_Admin_Views::get_selected_image_style_desc();
+        $final_prompt = $prompt;
+        if ($style_desc !== '') {
+            $final_prompt .= ', ' . $style_desc;
+        }
+
+        $request_options = new RequestOptions();
+        $request_options->setTimeout((float) PICOT_AIO_OPTIMIZER_IMAGE_API_TIMEOUT);
+
+        $builder = wp_ai_client_prompt($final_prompt)
+            ->using_provider($provider)
+            ->using_model_preference($provider, $model_name)
+            ->using_request_options($request_options)
+            ->as_output_file_type(FileTypeEnum::inline());
+
+        if (!$builder->is_supported_for_image_generation()) {
+            return new WP_Error(
+                'unsupported_model',
+                __('The selected Gemini model does not support image generation. Check the Google Gemini connector settings.', 'picot-aio-ai-content-optimizer')
+            );
+        }
+
+        try {
+            $result = $builder->generate_image_result();
+            if (is_wp_error($result)) {
+                return $result;
+            }
+
+            $image_file = $result->toImageFile();
+            $base64 = sanitize_text_field(trim($image_file->getBase64Data() ?? ''));
+            if ($base64 === '') {
+                return new WP_Error('api_error', __('No image data was returned.', 'picot-aio-ai-content-optimizer'));
+            }
+
+            return $base64;
+        } catch (Throwable $e) {
+            return new WP_Error('api_error', $e->getMessage());
+        }
+    }
+
+    /**
+     * @param string $model  Provider/model spec.
+     * @param string $prompt Prompt text.
+     * @param array  $options Generation options.
+     * @param int    $timeout Request timeout.
+     * @return array|WP_Error
+     */
+    private static function generate_text($model, $prompt, $options = array(), $timeout = PICOT_AIO_OPTIMIZER_API_TIMEOUT)
+    {
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_available()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message());
+        }
+
+        $model = self::resolve_text_model($model);
+        [$provider, $model_id] = PicotAioOptimizer_Ai_Client_Helper::parse_model_spec($model);
+
+        if ($provider === '' || $model_id === '') {
+            return new WP_Error('missing_model', __('Text model is not set. Choose one on the settings screen.', 'picot-aio-ai-content-optimizer'));
+        }
+
+        if ($prompt === '') {
+            return new WP_Error('empty_prompt', __('The prompt is empty.', 'picot-aio-ai-content-optimizer'));
+        }
+
+        $request_options = new RequestOptions();
+        $request_options->setTimeout((float) $timeout);
+
+        $builder = wp_ai_client_prompt($prompt)
+            ->using_provider($provider)
+            ->using_model_preference($provider, $model_id)
+            ->using_max_tokens((int) ($options['max_tokens'] ?? 8192))
+            ->using_temperature((float) ($options['temperature'] ?? 0.7))
+            ->using_request_options($request_options);
+
+        if (!empty($options['response_mime_type']) && $options['response_mime_type'] === 'application/json') {
+            $builder->as_json_response();
+        }
+
+        if (!$builder->is_supported_for_text_generation()) {
+            return new WP_Error(
+                'unsupported_model',
+                __('The selected Gemini model does not support text generation. Check the Google Gemini connector settings.', 'picot-aio-ai-content-optimizer')
+            );
+        }
+
+        try {
+            $result = $builder->generate_text_result();
+            if (is_wp_error($result)) {
+                return $result;
+            }
+
+            if (method_exists($result, 'toText')) {
+                $text = $result->toText();
+                if ($text !== '') {
+                    return array(
+                        'candidates' => array(
+                            array(
+                                'content' => array(
+                                    'parts' => array(
+                                        array('text' => $text),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    );
+                }
+            }
+
+            return PicotAioOptimizer_Ai_Client_Helper::result_to_legacy_response($result);
+        } catch (Throwable $e) {
+            return new WP_Error('api_error', $e->getMessage());
+        }
+    }
+
+    /**
+     * @param string $model Stored model option.
+     * @return string
+     */
+    private static function resolve_text_model($model)
+    {
+        $model = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec($model);
+        return $model !== '' ? $model : self::DEFAULT_TEXT_MODEL;
+    }
+
+    /**
+     * @param string $model Stored model option.
+     * @return string
+     */
+    private static function resolve_image_model($model)
+    {
+        $model = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec($model);
+        return $model !== '' ? $model : self::DEFAULT_IMAGE_MODEL;
+    }
+
+    /**
+     * @return string
+     */
+    private static function get_analysis_system_instruction()
+    {
         $locale = get_locale();
         $lang_code = substr($locale, 0, 2);
 
         if ($lang_code === 'ja') {
-            $system_instruction = 'あなたは熟練のSEOスペシャリスト兼WordPress編集者です。以下のブログ記事のコンテンツを分析し、構造化されたフィードバックを提供してください。
-            
+            return 'あなたは熟練のSEOスペシャリスト兼WordPress編集者です。以下のブログ記事のコンテンツを分析し、構造化されたフィードバックを提供してください。
+
             以下のキーを持つ有効なJSONフォーマットのみで回答してください：
             - "summary": 記事の簡潔な要約（最大200文字）。
             - "structure_analysis": 見出し（H2, H3）や論理構成を評価する文字列の配列。
@@ -105,8 +291,10 @@ class PicotAioOptimizer_Client
             【重要】
             - 回答はすべて「日本語」で行ってください。
             - 必ずJSONオブジェクトのみを返してください。Markdownフォーマット（```json ... ```）は含めないでください。';
-        } elseif ($lang_code === 'zh') {
-            $system_instruction = '您是熟練的 SEO 專家和 WordPress 編輯。請分析以下部落格文章內容，並提供結構化的意見回饋。
+        }
+
+        if ($lang_code === 'zh') {
+            return '您是熟練的 SEO 專家和 WordPress 編輯。請分析以下部落格文章內容，並提供結構化的意見回饋。
 
             請僅以包含以下鍵的有效 JSON 格式進行回答：
             - "summary": 文章的簡潔摘要（最多200字）。
@@ -121,14 +309,19 @@ class PicotAioOptimizer_Client
             【重要】
             - 所有回答必須用「繁體中文」編寫。
             - 務必僅返回 JSON 對象。請勿包含 Markdown 格式（```json ... ```）。';
-        } else {
-            $lang_name = 'English';
-            if ($lang_code === 'fr') $lang_name = 'French';
-            elseif ($lang_code === 'de') $lang_name = 'German';
-            elseif ($lang_code === 'es') $lang_name = 'Spanish';
+        }
 
-            $system_instruction = "You are an expert SEO specialist and WordPress editor. Analyze the following blog post content and provide structured feedback.
-            
+        $lang_name = 'English';
+        if ($lang_code === 'fr') {
+            $lang_name = 'French';
+        } elseif ($lang_code === 'de') {
+            $lang_name = 'German';
+        } elseif ($lang_code === 'es') {
+            $lang_name = 'Spanish';
+        }
+
+        return "You are an expert SEO specialist and WordPress editor. Analyze the following blog post content and provide structured feedback.
+
             Return the response strictly in valid JSON format with the following keys:
             - \"summary\": A concise summary of the article (max 200 chars).
             - \"structure_analysis\": Array of strings evaluating headings (H2, H3) and logical flow.
@@ -138,73 +331,16 @@ class PicotAioOptimizer_Client
             - \"seo_title_ideas\": Array of 3 SEO-friendly title suggestions.
             - \"meta_description_suggestions\": Array of 3 meta description suggestions.
             - \"recommended_content\": Array of 3-5 subtopics or sections that should be added to make the article more comprehensive.
-            
+
             IMPORTANT: All answers must be in $lang_name. Return ONLY the JSON object. Do not include markdown formatting (```json ... ```).";
-        }
-
-        $body = array(
-            'contents' => array(
-                array(
-                    'parts' => array(
-                        array('text' => $system_instruction . "\n\n" . $content)
-                    )
-                )
-            ),
-            'generationConfig' => array(
-                'temperature' => 0.7,
-                'responseMimeType' => 'application/json'
-            )
-        );
-
-        $json_body = wp_json_encode($body);
-        if ($json_body === false) {
-            $body['contents'][0]['parts'][0]['text'] = mb_convert_encoding($system_instruction . "\n\n" . $content, 'UTF-8', 'UTF-8');
-            $json_body = wp_json_encode($body);
-        }
-
-        $response = wp_remote_post($url, array(
-            'headers' => array('Content-Type' => 'application/json'),
-            'body' => $json_body,
-            'timeout' => PICOT_AIO_OPTIMIZER_API_TIMEOUT
-        ));
-
-        $data = self::decode_api_json_response($response, 'Analysis');
-        if (is_wp_error($data)) {
-            return $data;
-        }
-
-        if (empty($data) || isset($data['error'])) {
-            return new WP_Error('api_error', isset($data['error']['message']) ? $data['error']['message'] : 'Unknown API Error');
-        }
-
-        if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-            $text = $data['candidates'][0]['content']['parts'][0]['text'];
-            $text = preg_replace('/^```json\s*|\s*```$/i', '', trim($text));
-            $text = preg_replace('/^```\s*|\s*```$/i', '', trim($text));
-
-            // Clean trailing commas which are invalid in standard JSON
-            $clean_text = preg_replace('/,\s*([\]\}])/', '$1', $text);
-
-            $json_data = json_decode($clean_text, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $json_data;
-            } else {
-                // Second attempt: original text if clean failed
-                $json_data = json_decode($text, true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    return $json_data;
-                }
-                return new WP_Error('json_error', 'Failed to parse JSON response: ' . $text);
-            }
-        } else {
-            return new WP_Error('api_error', 'Invalid API response structure');
-        }
     }
 
     /**
-     * Helper for Rewrite API
+     * @param bool   $gen_img      Whether image prompts should be generated.
+     * @param string $instructions Optional rewrite instructions.
+     * @return string
      */
-    public static function gar_call_gemini_api_rewrite($content, $api_key, $model_id, $gen_img, $instructions = '')
+    private static function build_rewrite_system_instruction($gen_img, $instructions = '')
     {
         $locale = get_locale();
         $lang_code = substr($locale, 0, 2);
@@ -228,8 +364,7 @@ class PicotAioOptimizer_Client
                 - **アイキャッチ**: 出力の最上部に「アイキャッチ画像のプロンプト」（記事と同じ言語で）を作成し、`<div style=\"background:#e6eeff;padding:15px;border:2px solid #4d4dff;margin-bottom:20px;\"><strong>{{THUMBNAIL_LABEL}}:</strong><br>...</div>` で囲んでください。
                 - **挿入画像**: 画像があると良いセクションには、`[画像プロンプト: 画像の説明]` を使ってインラインでプロンプトを挿入してください。画像が存在すると仮定せず、プロンプトのみを記述してください。";
 
-            $image_prompt_off_text = "               - この行より上の画像プロンプトルールは無視してください。画像プロンプトを生成しないでください。";
-
+            $image_prompt_off_text = '               - この行より上の画像プロンプトルールは無視してください。画像プロンプトを生成しないでください。';
             $additional_label = '追加の指示: ';
         } elseif ($lang_code === 'zh') {
             $base_instruction = '您是專業的 WordPress 編輯。請在保持其核心訊息的同時，重寫以下部落格文章內容以提高其品質、流暢度和視覺吸引力。
@@ -250,174 +385,40 @@ class PicotAioOptimizer_Client
                 - **縮略圖**：在輸出的最頂部創建一個「縮略圖圖片提示詞」（與文章使用相同語言），並包裝在 `<div style=\"background:#e6eeff;padding:15px;border:2px solid #4d4dff;margin-bottom:20px;\"><strong>{{THUMBNAIL_LABEL}}:</strong><br>...</div>` 中。
                 - **內嵌圖片**：如果某個章節配上圖片效果更好，請使用以下格式插入提示詞：`[圖片提示詞：圖片描述]`。不要假設圖片已存在；只需寫下提示詞。";
 
-            $image_prompt_off_text = "               - 忽略與此行相關的圖片提示詞規則。不要生成圖片提示詞。";
-
+            $image_prompt_off_text = '               - 忽略與此行相關的圖片提示詞規則。不要生成圖片提示詞。';
             $additional_label = '額外指示: ';
         } else {
             $base_instruction = 'You are a professional WordPress editor. Rewrite the following blog post content to improve its quality, flow, and visual appeal while maintaining its core message.
             Format the output in valid HTML suitable for the WordPress Block Editor.
-            
+
             Follow these rules:
             - **Content Enhancement**: Improve the vocabulary, sentence structure, and clarity.
             - **HTML Tags**: Use proper semantic HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>).
             - **PRESERVE IMAGES & BLOCKS**: You MUST keep all existing <img> and <figure> tags. ALSO, preserve all WordPress block comments like <!-- wp:image -->, <!-- wp:paragraph -->, etc. DO NOT delete or modify these comments.
             - **No Head/Body**: Return ONLY the inner HTML content of the article. Do not include <html>, <head>, or <body> tags.
             - **No Markdown**: Do not wrap the response in markdown code blocks (```html).
-            
+
             {{IMAGE_PROMPT_INSTRUCTION}}
-            
+
             Return ONLY the rewritten HTML content.';
 
             $image_prompt_on_text = "               - **IMPORTANT**: You MUST generate Image Prompts:
                 - **Thumbnail**: Create a \"Thumbnail Image Prompt\" (in the SAME LANGUAGE as the article) at the VERY TOP of the output, wrapped in `<div style=\"background:#e6eeff;padding:15px;border:2px solid #4d4dff;margin-bottom:20px;\"><strong>{{THUMBNAIL_LABEL}}:</strong><br>...</div>`.
                 - **Inline Images**: If a section works better with an image, insert a prompt inline using: `[Image Prompt: description of the image]`. Do not assume the image exists; just write the prompt.";
 
-            $image_prompt_off_text = "               - Ignore the image prompt rules relative to this line. Do NOT generate image prompts.";
-
+            $image_prompt_off_text = '               - Ignore the image prompt rules relative to this line. Do NOT generate image prompts.';
             $additional_label = 'Additional Instructions: ';
         }
 
         $replacement = $gen_img ? $image_prompt_on_text : $image_prompt_off_text;
         $system_instruction = str_replace('{{IMAGE_PROMPT_INSTRUCTION}}', $replacement, $base_instruction);
-
-        // Localize Thumbnail Prompt Label
         $thumb_label = __('Thumbnail Prompt', 'picot-aio-ai-content-optimizer');
         $system_instruction = str_replace('{{THUMBNAIL_LABEL}}', $thumb_label, $system_instruction);
 
-        // Add custom instructions if provided
         if (!empty($instructions)) {
             $system_instruction .= "\n\n" . $additional_label . $instructions;
         }
 
-        return self::gar_perform_gemini_request($model_id, $api_key, $system_instruction, $content);
-    }
-
-    /**
-     * Perform Gemini Request
-     */
-    public static function gar_perform_gemini_request($model_id, $api_key, $system_instruction, $content)
-    {
-        $model_id = self::map_model_name($model_id);
-
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key={$api_key}";
-
-        $body = array(
-            'contents' => array(
-                array(
-                    'parts' => array(
-                        array('text' => $system_instruction . "\n\n" . $content)
-                    )
-                )
-            ),
-            'generationConfig' => array(
-                'temperature' => 0.7,
-            )
-        );
-
-        $json_body = wp_json_encode($body);
-        if ($json_body === false) {
-            // Fallback for invalid UTF-8
-            $body['contents'][0]['parts'][0]['text'] = mb_convert_encoding($system_instruction . "\n\n" . $content, 'UTF-8', 'UTF-8');
-            $json_body = wp_json_encode($body);
-        }
-
-        $response = wp_remote_post($url, array(
-            'headers' => array('Content-Type' => 'application/json'),
-            'body' => $json_body,
-            'timeout' => PICOT_AIO_OPTIMIZER_API_TIMEOUT
-        ));
-
-        $data = self::decode_api_json_response($response, 'Rewrite');
-        if (is_wp_error($data)) {
-            return $data;
-        }
-
-        if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-            $text = $data['candidates'][0]['content']['parts'][0]['text'];
-            $text = preg_replace('/^```html\s*|\s*```$/i', '', trim($text));
-            return array('content' => $text);
-        }
-
-        if (isset($data['error'])) {
-            return new WP_Error('api_error', 'Gemini API Error: ' . (isset($data['error']['message']) ? $data['error']['message'] : 'Unknown error'));
-        }
-
-        return new WP_Error('api_error', 'Unexpected API response structure');
-    }
-
-    /**
-     * Generate Image via Gemini
-     */
-    public static function gar_generate_image_via_api($prompt, $api_key, $model_id = '')
-    {
-        if (empty($model_id)) {
-            $model_id = 'imagen-3.0-generate-001';
-        }
-
-        $is_imagen = (strpos($model_id, 'imagen') !== false);
-
-        if ($is_imagen) {
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:predict?key={$api_key}";
-            $body = array(
-                'instances' => array(
-                    array('prompt' => $prompt)
-                ),
-                'parameters' => array(
-                    'sampleCount' => 1,
-                )
-            );
-        } else {
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key={$api_key}";
-            $body = array(
-                'contents' => array(
-                    array(
-                        'parts' => array(
-                            array('text' => 'Generate an image based on this description: ' . $prompt)
-                        )
-                    )
-                ),
-                'generationConfig' => array(
-                    'responseModalities' => array('TEXT', 'IMAGE')
-                )
-            );
-        }
-
-        $json_body = wp_json_encode($body);
-        if ($json_body === false) {
-            $text_val = $is_imagen ? $prompt : 'Generate an image based on this description: ' . $prompt;
-            if ($is_imagen) {
-                $body['instances'][0]['prompt'] = mb_convert_encoding($text_val, 'UTF-8', 'UTF-8');
-            } else {
-                $body['contents'][0]['parts'][0]['text'] = mb_convert_encoding($text_val, 'UTF-8', 'UTF-8');
-            }
-            $json_body = wp_json_encode($body);
-        }
-
-        $response = wp_remote_post($url, array(
-            'headers' => array('Content-Type' => 'application/json'),
-            'body' => $json_body,
-            'timeout' => PICOT_AIO_OPTIMIZER_IMAGE_API_TIMEOUT
-        ));
-
-        $data = self::decode_api_json_response($response, 'Image Gen');
-        if (is_wp_error($data)) {
-            return $data;
-        }
-
-        if ($is_imagen) {
-            if (isset($data['predictions'][0]['bytesBase64Encoded'])) {
-                return $data['predictions'][0]['bytesBase64Encoded'];
-            }
-        } else {
-            if (isset($data['candidates'][0]['content']['parts'])) {
-                foreach ($data['candidates'][0]['content']['parts'] as $part) {
-                    if (isset($part['inlineData']['data'])) {
-                        return $part['inlineData']['data'];
-                    }
-                }
-            }
-        }
-
-        return new WP_Error('api_error', 'No image data in response');
+        return $system_instruction;
     }
 }

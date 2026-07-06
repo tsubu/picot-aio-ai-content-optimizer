@@ -58,15 +58,13 @@ class PicotAioOptimizer_REST_Handlers
         $content = $request->get_param('content');
         $post_id = $request->get_param('post_id');
 
-
-        $api_key = get_option('picot_aio_optimizer_api_key');
-        $model = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
-
-        if (empty($api_key)) {
-            return new WP_Error('missing_api_key', 'Google Gemini API Key is not set in settings', array('status' => 400));
+        if (!PicotAioOptimizer_Ai_Client_Helper::supports_text_generation()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
         }
 
-        $result = PicotAioOptimizer_Client::call_gemini_api($content, $api_key, $model);
+        $model = get_option('picot_aio_optimizer_model', PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL);
+
+        $result = PicotAioOptimizer_Client::call_gemini_api($content, $model);
 
         if (is_wp_error($result)) {
             return $result;
@@ -96,14 +94,12 @@ class PicotAioOptimizer_REST_Handlers
             $content = isset($params['content']) ? $params['content'] : $request->get_param('content');
             $instructions = isset($params['instructions']) ? $params['instructions'] : $request->get_param('instructions', '');
 
-            $api_key = get_option('picot_aio_optimizer_api_key');
-            $model_id = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
-            $gen_img = get_option('picot_aio_optimizer_enable_image_gen', 0);
-
-
-            if (empty($api_key)) {
-                return new WP_Error('missing_api_key', 'API Key not set', array('status' => 400));
+            if (!PicotAioOptimizer_Ai_Client_Helper::supports_text_generation()) {
+                return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
             }
+
+            $model_id = get_option('picot_aio_optimizer_model', PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL);
+            $gen_img = get_option('picot_aio_optimizer_enable_image_gen', 0);
 
             // UTF-8 Sanitization
             if (function_exists('mb_convert_encoding')) {
@@ -113,7 +109,7 @@ class PicotAioOptimizer_REST_Handlers
             }
 
             $full_prompt = "Title: {$title}\n\nContent: {$content}";
-            $result = PicotAioOptimizer_Client::gar_call_gemini_api_rewrite($full_prompt, $api_key, $model_id, $gen_img, $instructions);
+            $result = PicotAioOptimizer_Client::gar_call_gemini_api_rewrite($full_prompt, $model_id, $gen_img, $instructions);
 
             if (is_wp_error($result)) {
                 return $result;
@@ -144,13 +140,11 @@ class PicotAioOptimizer_REST_Handlers
             $title = isset($params['title']) ? $params['title'] : $request->get_param('title');
             $content = isset($params['content']) ? $params['content'] : $request->get_param('content');
 
-            $api_key = get_option('picot_aio_optimizer_api_key');
-            $model_id = get_option('picot_aio_optimizer_model', 'gemini-1.5-flash');
-
-
-            if (empty($api_key)) {
-                return new WP_Error('missing_api_key', 'API Key not set', array('status' => 400));
+            if (!PicotAioOptimizer_Ai_Client_Helper::supports_text_generation()) {
+                return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
             }
+
+            $model_id = get_option('picot_aio_optimizer_model', PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL);
 
             // UTF-8 Sanitization to prevent json_encode crashes (if mbstring is available)
             if (function_exists('mb_convert_encoding')) {
@@ -215,7 +209,7 @@ class PicotAioOptimizer_REST_Handlers
             $full_text = "Title: {$title}\n\nContent: {$content}";
 
             // We use the rewrite helper logic but with different instruction
-            $result = PicotAioOptimizer_Client::gar_perform_gemini_request($model_id, $api_key, $system_instruction, $full_text);
+            $result = PicotAioOptimizer_Client::gar_perform_gemini_request($model_id, $system_instruction, $full_text);
 
             if (is_wp_error($result)) {
                 return $result;
@@ -263,15 +257,13 @@ class PicotAioOptimizer_REST_Handlers
             return new WP_Error('missing_prompt', __('Image prompt is required.', 'picot-aio-ai-content-optimizer'), array('status' => 400));
         }
 
-        $api_key = get_option('picot_aio_optimizer_api_key');
-        $image_model = get_option('picot_aio_optimizer_image_model', 'gemini-2.0-flash-preview-image-generation');
-
-        if (empty($api_key)) {
-            return new WP_Error('missing_api_key', 'API Key not set', array('status' => 400));
+        if (!PicotAioOptimizer_Ai_Client_Helper::supports_image_generation()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
         }
 
+        $image_model = get_option('picot_aio_optimizer_image_model', PicotAioOptimizer_Client::DEFAULT_IMAGE_MODEL);
 
-        $image_data = PicotAioOptimizer_Client::gar_generate_image_via_api($prompt, $api_key, $image_model);
+        $image_data = PicotAioOptimizer_Client::gar_generate_image_via_api($prompt, $image_model);
 
         if (is_wp_error($image_data)) {
             return $image_data;
@@ -416,49 +408,45 @@ class PicotAioOptimizer_REST_Handlers
      */
     public static function fetch_models($request)
     {
-        $api_key = get_option('picot_aio_optimizer_api_key');
-        if (empty($api_key)) {
-            return new WP_Error('missing_api_key', 'API Key not set', array('status' => 400));
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_available()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models?key={$api_key}";
-        $response = wp_remote_get($url, array(
-            'timeout' => 30,
-        ));
-
-        if (is_wp_error($response)) {
-            return $response;
+        try {
+            $manager = new PicotAioOptimizer_Model_Manager();
+            $text_items = $manager->list_models();
+            $image_items = $manager->list_image_models();
+        } catch (Throwable $e) {
+            return new WP_Error('api_error', $e->getMessage(), array('status' => 500));
         }
 
-        $code = wp_remote_retrieve_response_code($response);
-        $body = wp_remote_retrieve_body($response);
-
-        if ($code !== 200) {
-            $data = json_decode($body, true);
-            $msg = (is_array($data) && isset($data['error']['message']))
-                ? $data['error']['message']
-                : 'Unknown API Error';
-            return new WP_Error('api_error', "Models Failed ({$code}): {$msg}", array('status' => $code));
+        $text_models = array();
+        foreach ($text_items as $item) {
+            $text_models[$item['id']] = $item['name'];
         }
 
-        if ($body === '') {
-            return new WP_Error('api_error', 'Empty API response', array('status' => 502));
+        $image_models = array();
+        foreach ($image_items as $item) {
+            $image_models[$item['id']] = $item['name'];
         }
 
-        $data = json_decode($body, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return new WP_Error('api_error', 'Invalid JSON from API: ' . json_last_error_msg(), array('status' => 502));
+        if (empty($text_models) && empty($image_models)) {
+            return new WP_Error(
+                'no_models',
+                __('No Gemini models were found. Check the Google Gemini connector connection.', 'picot-aio-ai-content-optimizer'),
+                array('status' => 400)
+            );
         }
 
-        $models = isset($data['models']) ? $data['models'] : array();
-
-        if (!empty($models)) {
-            update_option('picot_aio_optimizer_available_models', $models);
-        }
+        update_option('picot_aio_optimizer_available_models', $text_models);
+        update_option('picot_aio_optimizer_available_image_models', $image_models);
 
         return rest_ensure_response(array(
             'success' => true,
-            'data' => $models
+            'data' => array(
+                'text_models' => $text_models,
+                'image_models' => $image_models,
+            ),
         ));
     }
 }

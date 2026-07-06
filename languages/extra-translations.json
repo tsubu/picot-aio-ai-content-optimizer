@@ -10,8 +10,12 @@
     "Generating... ": "生成中... ",
     "Picot AIO AI Content Optimizer": "Picot AIO AI コンテンツ最適化",
     "Save Settings": "設定を保存",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Google AI StudioからAPIキーを無料で取得できます。<a href=\"%s\" target=\"_blank\">こちらからキーを作成</a>して、上のフィールドに貼り付けてください。",
-    "You do not have permission to change these options.": "これらのオプションを変更する権限がありません。"
+    "You do not have permission to change these options.": "これらのオプションを変更する権限がありません。",
+    "Image generation is disabled in settings.": "設定で画像生成が無効になっています。",
+    "Image prompt is required.": "画像プロンプトは必須です。",
+    "Image suggestion failed.": "画像の提案に失敗しました。",
+    "Rewrite failed.": "書き換えに失敗しました。",
+    "Refresh the model list after connecting the Google Gemini connector.": "Google Gemini コネクターを接続したあと、モデル一覧を更新してください。"
   },
   "de_DE": {
     "Picot AIO AI Content Optimizer Settings": "Picot AIO AI Content Optimizer – Einstellungen",
@@ -23,8 +27,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Umschreib-Anweisungen eingeben (z. B. freundlicher formulieren, kürzer zusammenfassen usw.)",
     "Generating... ": "Generiere... ",
     "Save Settings": "Einstellungen speichern",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Sie können einen kostenlosen API-Schlüssel von Google AI Studio erhalten. <a href=\"%s\" target=\"_blank\">Erstellen Sie hier Ihren Schlüssel</a> und fügen Sie ihn oben ein.",
-    "You do not have permission to change these options.": "Sie haben keine Berechtigung, diese Optionen zu ändern."
+    "You do not have permission to change these options.": "Sie haben keine Berechtigung, diese Optionen zu ändern.",
+    "Image generation is disabled in settings.": "Die Bildgenerierung ist in den Einstellungen deaktiviert.",
+    "Image prompt is required.": "Ein Bild-Prompt ist erforderlich.",
+    "Image suggestion failed.": "Bildvorschlag fehlgeschlagen.",
+    "Rewrite failed.": "Umschreiben fehlgeschlagen.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Aktualisieren Sie die Modellliste, nachdem Sie den Google Gemini-Konnektor verbunden haben."
   },
   "fr_FR": {
     "Picot AIO AI Content Optimizer Settings": "Réglages Picot AIO AI Content Optimizer",
@@ -36,8 +44,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Saisissez les instructions de réécriture (ex. : plus convivial, résumé plus court, etc.)",
     "Generating... ": "Génération... ",
     "Save Settings": "Enregistrer les paramètres",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Vous pouvez obtenir une clé API gratuite sur Google AI Studio. <a href=\"%s\" target=\"_blank\">Créez votre clé ici</a> et collez-la dans le champ ci-dessus.",
-    "You do not have permission to change these options.": "Vous n'avez pas l'autorisation de modifier ces options."
+    "You do not have permission to change these options.": "Vous n'avez pas l'autorisation de modifier ces options.",
+    "Image generation is disabled in settings.": "La génération d'images est désactivée dans les réglages.",
+    "Image prompt is required.": "Le prompt d'image est obligatoire.",
+    "Image suggestion failed.": "Échec de la suggestion d'images.",
+    "Rewrite failed.": "Échec de la réécriture.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Actualisez la liste des modèles après avoir connecté le connecteur Google Gemini."
   },
   "es_ES": {
     "Picot AIO AI Content Optimizer Settings": "Ajustes de Picot AIO AI Content Optimizer",
@@ -49,8 +61,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Introduce instrucciones de reescritura (p. ej., más amigable, resumir más brevemente, etc.)",
     "Generating... ": "Generando... ",
     "Save Settings": "Guardar ajustes",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Puedes obtener una clave API gratuita en Google AI Studio. <a href=\"%s\" target=\"_blank\">Crea tu clave aquí</a> y pégala en el campo de arriba.",
-    "You do not have permission to change these options.": "No tienes permiso para cambiar estas opciones."
+    "You do not have permission to change these options.": "No tienes permiso para cambiar estas opciones.",
+    "Image generation is disabled in settings.": "La generación de imágenes está desactivada en los ajustes.",
+    "Image prompt is required.": "El prompt de imagen es obligatorio.",
+    "Image suggestion failed.": "Error al sugerir imágenes.",
+    "Rewrite failed.": "Error al reescribir.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Actualiza la lista de modelos después de conectar el conector de Google Gemini."
   },
   "zh_TW": {
     "Picot AIO AI Content Optimizer Settings": "Picot AIO AI 內容最佳化 設定",
@@ -63,8 +79,12 @@
     "Generating... ": "產生中... ",
     "Picot AIO AI Content Optimizer": "Picot AIO AI 內容最佳化",
     "Save Settings": "儲存設定",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "您可從 Google AI Studio 免費取得 API 金鑰。<a href=\"%s\" target=\"_blank\">在此建立金鑰</a>並貼到上方欄位。",
-    "You do not have permission to change these options.": "您沒有變更這些選項的權限。"
+    "You do not have permission to change these options.": "您沒有變更這些選項的權限。",
+    "Image generation is disabled in settings.": "設定中已停用圖片產生功能。",
+    "Image prompt is required.": "必須提供圖片提示詞。",
+    "Image suggestion failed.": "圖片建議失敗。",
+    "Rewrite failed.": "改寫失敗。",
+    "Refresh the model list after connecting the Google Gemini connector.": "連接 Google Gemini 連接器後，請重新整理模型清單。"
   },
   "it_IT": {
     "Picot AIO AI Content Optimizer Settings": "Impostazioni Picot AIO AI Content Optimizer",
@@ -76,8 +96,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Inserisci le istruzioni di riscrittura (es. più amichevole, riassunto più breve, ecc.)",
     "Generating... ": "Generazione... ",
     "Save Settings": "Salva impostazioni",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Puoi ottenere una chiave API gratuita da Google AI Studio. <a href=\"%s\" target=\"_blank\">Crea la chiave qui</a> e incollala nel campo sopra.",
-    "You do not have permission to change these options.": "Non hai l'autorizzazione per modificare queste opzioni."
+    "You do not have permission to change these options.": "Non hai l'autorizzazione per modificare queste opzioni.",
+    "Image generation is disabled in settings.": "La generazione di immagini è disabilitata nelle impostazioni.",
+    "Image prompt is required.": "Il prompt immagine è obbligatorio.",
+    "Image suggestion failed.": "Suggerimento immagini non riuscito.",
+    "Rewrite failed.": "Riscrittura non riuscita.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Aggiorna l'elenco dei modelli dopo aver collegato il connettore Google Gemini."
   },
   "pt_BR": {
     "Picot AIO AI Content Optimizer Settings": "Configurações do Picot AIO AI Content Optimizer",
@@ -89,8 +113,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Digite instruções de reescrita (ex.: mais amigável, resumir de forma mais curta, etc.)",
     "Generating... ": "Gerando... ",
     "Save Settings": "Salvar configurações",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Você pode obter uma chave de API gratuita no Google AI Studio. <a href=\"%s\" target=\"_blank\">Crie sua chave aqui</a> e cole no campo acima.",
-    "You do not have permission to change these options.": "Você não tem permissão para alterar estas opções."
+    "You do not have permission to change these options.": "Você não tem permissão para alterar estas opções.",
+    "Image generation is disabled in settings.": "A geração de imagens está desativada nas configurações.",
+    "Image prompt is required.": "O prompt de imagem é obrigatório.",
+    "Image suggestion failed.": "Falha na sugestão de imagens.",
+    "Rewrite failed.": "Falha na reescrita.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Atualize a lista de modelos após conectar o conector do Google Gemini."
   },
   "nl_NL": {
     "Picot AIO AI Content Optimizer Settings": "Picot AIO AI Content Optimizer-instellingen",
@@ -102,8 +130,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Voer herschrijfinstructies in (bijv. vriendelijker, korter samenvatten, enz.)",
     "Generating... ": "Genereren... ",
     "Save Settings": "Instellingen opslaan",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Je kunt een gratis API-sleutel krijgen via Google AI Studio. <a href=\"%s\" target=\"_blank\">Maak hier je sleutel</a> en plak deze in het veld hierboven.",
-    "You do not have permission to change these options.": "Je hebt geen toestemming om deze opties te wijzigen."
+    "You do not have permission to change these options.": "Je hebt geen toestemming om deze opties te wijzigen.",
+    "Image generation is disabled in settings.": "Afbeeldinggeneratie is uitgeschakeld in de instellingen.",
+    "Image prompt is required.": "Afbeeldingsprompt is verplicht.",
+    "Image suggestion failed.": "Afbeeldingssuggestie mislukt.",
+    "Rewrite failed.": "Herschrijven mislukt.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Vernieuw de modellenlijst nadat je de Google Gemini-connector hebt gekoppeld."
   },
   "ko_KR": {
     "Picot AIO AI Content Optimizer Settings": "Picot AIO AI 콘텐츠 최적화 설정",
@@ -116,8 +148,12 @@
     "Generating... ": "생성 중... ",
     "Picot AIO AI Content Optimizer": "Picot AIO AI 콘텐츠 최적화",
     "Save Settings": "설정 저장",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Google AI Studio에서 무료 API 키를 받을 수 있습니다. <a href=\"%s\" target=\"_blank\">여기에서 키를 생성</a>한 후 위 필드에 붙여넣으세요.",
-    "You do not have permission to change these options.": "이 옵션을 변경할 권한이 없습니다."
+    "You do not have permission to change these options.": "이 옵션을 변경할 권한이 없습니다.",
+    "Image generation is disabled in settings.": "설정에서 이미지 생성이 비활성화되어 있습니다.",
+    "Image prompt is required.": "이미지 프롬프트가 필요합니다.",
+    "Image suggestion failed.": "이미지 제안에 실패했습니다.",
+    "Rewrite failed.": "다시 쓰기에 실패했습니다.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Google Gemini 커넥터를 연결한 후 모델 목록을 새로 고치세요."
   },
   "pl_PL": {
     "Picot AIO AI Content Optimizer Settings": "Ustawienia Picot AIO AI Content Optimizer",
@@ -129,8 +165,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Wpisz instrukcje przepisywania (np. bardziej przyjazny ton, krótsze podsumowanie itd.)",
     "Generating... ": "Generowanie... ",
     "Save Settings": "Zapisz ustawienia",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Możesz uzyskać darmowy klucz API w Google AI Studio. <a href=\"%s\" target=\"_blank\">Utwórz klucz tutaj</a> i wklej go w pole powyżej.",
-    "You do not have permission to change these options.": "Nie masz uprawnień do zmiany tych opcji."
+    "You do not have permission to change these options.": "Nie masz uprawnień do zmiany tych opcji.",
+    "Image generation is disabled in settings.": "Generowanie obrazów jest wyłączone w ustawieniach.",
+    "Image prompt is required.": "Wymagany jest prompt obrazu.",
+    "Image suggestion failed.": "Nie udało się zasugerować obrazów.",
+    "Rewrite failed.": "Przepisywanie nie powiodło się.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Odśwież listę modeli po podłączeniu łącznika Google Gemini."
   },
   "ru_RU": {
     "Picot AIO AI Content Optimizer Settings": "Настройки Picot AIO AI Content Optimizer",
@@ -142,8 +182,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Введите инструкции для переписывания (например, сделать дружелюбнее, сократить и т. д.)",
     "Generating... ": "Генерация... ",
     "Save Settings": "Сохранить настройки",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Вы можете получить бесплатный API-ключ в Google AI Studio. <a href=\"%s\" target=\"_blank\">Создайте ключ здесь</a> и вставьте его в поле выше.",
-    "You do not have permission to change these options.": "У вас нет прав на изменение этих параметров."
+    "You do not have permission to change these options.": "У вас нет прав на изменение этих параметров.",
+    "Image generation is disabled in settings.": "Генерация изображений отключена в настройках.",
+    "Image prompt is required.": "Требуется промпт для изображения.",
+    "Image suggestion failed.": "Не удалось предложить изображения.",
+    "Rewrite failed.": "Не удалось выполнить переписывание.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Обновите список моделей после подключения коннектора Google Gemini."
   },
   "id_ID": {
     "Picot AIO AI Content Optimizer Settings": "Pengaturan Picot AIO AI Content Optimizer",
@@ -155,8 +199,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Masukkan instruksi penulisan ulang (mis. lebih ramah, ringkas lebih pendek, dll.)",
     "Generating... ": "Menghasilkan... ",
     "Save Settings": "Simpan pengaturan",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Anda bisa mendapatkan kunci API gratis dari Google AI Studio. <a href=\"%s\" target=\"_blank\">Buat kunci di sini</a> lalu tempelkan ke kolom di atas.",
-    "You do not have permission to change these options.": "Anda tidak memiliki izin untuk mengubah opsi ini."
+    "You do not have permission to change these options.": "Anda tidak memiliki izin untuk mengubah opsi ini.",
+    "Image generation is disabled in settings.": "Pembuatan gambar dinonaktifkan di pengaturan.",
+    "Image prompt is required.": "Prompt gambar wajib diisi.",
+    "Image suggestion failed.": "Saran gambar gagal.",
+    "Rewrite failed.": "Penulisan ulang gagal.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Segarkan daftar model setelah menghubungkan konektor Google Gemini."
   },
   "vi": {
     "Picot AIO AI Content Optimizer Settings": "Cài đặt Picot AIO AI Content Optimizer",
@@ -168,8 +216,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Nhập hướng dẫn viết lại (ví dụ: thân thiện hơn, tóm tắt ngắn hơn, v.v.)",
     "Generating... ": "Đang tạo... ",
     "Save Settings": "Lưu cài đặt",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Bạn có thể lấy khóa API miễn phí từ Google AI Studio. <a href=\"%s\" target=\"_blank\">Tạo khóa tại đây</a> và dán vào ô phía trên.",
-    "You do not have permission to change these options.": "Bạn không có quyền thay đổi các tùy chọn này."
+    "You do not have permission to change these options.": "Bạn không có quyền thay đổi các tùy chọn này.",
+    "Image generation is disabled in settings.": "Tạo hình ảnh đã bị tắt trong cài đặt.",
+    "Image prompt is required.": "Cần có prompt hình ảnh.",
+    "Image suggestion failed.": "Gợi ý hình ảnh thất bại.",
+    "Rewrite failed.": "Viết lại thất bại.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Làm mới danh sách mô hình sau khi kết nối trình kết nối Google Gemini."
   },
   "tr_TR": {
     "Picot AIO AI Content Optimizer Settings": "Picot AIO AI Content Optimizer Ayarları",
@@ -181,8 +233,12 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "Yeniden yazma talimatlarını girin (ör. daha samimi, daha kısa özetleme vb.)",
     "Generating... ": "Oluşturuluyor... ",
     "Save Settings": "Ayarları kaydet",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "Google AI Studio'dan ücretsiz bir API anahtarı alabilirsiniz. <a href=\"%s\" target=\"_blank\">Anahtarınızı burada oluşturun</a> ve yukarıdaki alana yapıştırın.",
-    "You do not have permission to change these options.": "Bu seçenekleri değiştirme izniniz yok."
+    "You do not have permission to change these options.": "Bu seçenekleri değiştirme izniniz yok.",
+    "Image generation is disabled in settings.": "Görüntü oluşturma ayarlarda devre dışı.",
+    "Image prompt is required.": "Görüntü istemi gereklidir.",
+    "Image suggestion failed.": "Görüntü önerisi başarısız oldu.",
+    "Rewrite failed.": "Yeniden yazma başarısız oldu.",
+    "Refresh the model list after connecting the Google Gemini connector.": "Google Gemini bağlayıcısını bağladıktan sonra model listesini yenileyin."
   },
   "th": {
     "Picot AIO AI Content Optimizer Settings": "การตั้งค่า Picot AIO AI Content Optimizer",
@@ -194,7 +250,11 @@
     "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)": "ป้อนคำแนะนำการเขียนใหม่ (เช่น เป็นกันเองมากขึ้น สรุปให้สั้นลง ฯลฯ)",
     "Generating... ": "กำลังสร้าง... ",
     "Save Settings": "บันทึกการตั้งค่า",
-    "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above.": "คุณสามารถรับคีย์ API ฟรีจาก Google AI Studio ได้ <a href=\"%s\" target=\"_blank\">สร้างคีย์ที่นี่</a> แล้ววางในช่องด้านบน",
-    "You do not have permission to change these options.": "คุณไม่มีสิทธิ์เปลี่ยนตัวเลือกเหล่านี้"
+    "You do not have permission to change these options.": "คุณไม่มีสิทธิ์เปลี่ยนตัวเลือกเหล่านี้",
+    "Image generation is disabled in settings.": "การสร้างภาพถูกปิดใช้งานในการตั้งค่า",
+    "Image prompt is required.": "จำเป็นต้องมีพรอมต์ภาพ",
+    "Image suggestion failed.": "การแนะนำภาพล้มเหลว",
+    "Rewrite failed.": "การเขียนใหม่ล้มเหลว",
+    "Refresh the model list after connecting the Google Gemini connector.": "รีเฟรชรายการโมเดลหลังจากเชื่อมต่อตัวเชื่อมต่อ Google Gemini"
   }
 }

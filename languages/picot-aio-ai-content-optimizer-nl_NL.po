@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Picot AIO AI Content Optimizer 1.0.1\n"
+"Project-Id-Version: Picot AIO AI Content Optimizer 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/picot-aio-ai-content-optimizer/\n"
-"POT-Creation-Date: 2026-05-20 02:33+0000\n"
-"PO-Revision-Date: 2026-05-20 02:33+0000\n"
+"POT-Creation-Date: 2026-07-06 21:34+0000\n"
+"PO-Revision-Date: 2026-07-06 21:34+0000\n"
 "Last-Translator: Picot\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -34,9 +34,6 @@ msgstr "API-Fehler aufgetreten."
 msgid "Action"
 msgstr "Aktion"
 
-msgid "After saving the API key, click the button above to add the latest available models to the list."
-msgstr "Nach dem Speichern des API-Schlüssels können Sie die neuesten verfügbaren Modelle über die Schaltfläche oben zum Dropdown-Menü hinzufügen."
-
 msgid "All image generation completed!"
 msgstr "Alle Bildgenerierungen abgeschlossen!"
 
@@ -62,7 +59,7 @@ msgid "Analyzing..."
 msgstr "Analysiere..."
 
 msgid "Anime"
-msgstr "Anime"
+msgstr "Beheerlabel voor WordPress-plug-ins: Anime"
 
 msgid "Are you sure you want to rewrite content? The current title and content will be overwritten."
 msgstr "Sind Sie sicher, dass Sie den Inhalt umschreiben möchten? Der aktuelle Titel und Inhalt werden überschrieben."
@@ -98,7 +95,7 @@ msgid "Copy"
 msgstr "Kopieren"
 
 msgid "Cyberpunk"
-msgstr "Cyberpunk"
+msgstr "Beheerlabel voor WordPress-plug-ins: Cyberpunk"
 
 msgid "Date"
 msgstr "Datum"
@@ -130,6 +127,9 @@ msgstr "Ein Fehler ist aufgetreten."
 msgid "Expand"
 msgstr "Uitvouwen"
 
+msgid "Failed to fetch Gemini models. Check the Google Gemini connector API key."
+msgstr "Kan Gemini-modellen niet ophalen. Controleer de API-sleutel van de Google Gemini-connector."
+
 msgid "Failed to insert image."
 msgstr "Bild konnte nicht eingefügt werden. Es wurde in die Mediathek gespeichert."
 
@@ -141,9 +141,6 @@ msgstr "Beitragsbild"
 
 msgid "Featured image set successfully!"
 msgstr "Beitragsbild erfolgreich gesetzt!"
-
-msgid "Fetch Latest Model List"
-msgstr "Neueste Modellliste abrufen"
 
 msgid "Fetching..."
 msgstr "Rufe ab..."
@@ -175,8 +172,14 @@ msgstr "Geometrisch"
 msgid "Glassmorphism"
 msgstr "Glassmorphismus"
 
-msgid "Google Gemini API Key"
-msgstr "Google Gemini API-Schlüssel"
+msgid "Google Gemini connector is connected and text generation is available."
+msgstr "De Google Gemini-connector is aangesloten en tekstgeneratie is beschikbaar."
+
+msgid "Google Gemini connector is not configured or does not support text generation."
+msgstr "De Google Gemini-connector is niet geconfigureerd of ondersteunt het genereren van tekst niet."
+
+msgid "Google Gemini integration"
+msgstr "Google Gemini-integratie"
 
 msgid "Gradient Mesh"
 msgstr "Verlaufsnetz"
@@ -193,8 +196,20 @@ msgstr "Bild-Prompt-Modell"
 msgid "Image Style"
 msgstr "Bildstil"
 
+msgid "Image generation is disabled in settings."
+msgstr "Afbeeldinggeneratie is uitgeschakeld in de instellingen."
+
 msgid "Image inserted successfully!"
 msgstr "Bild erfolgreich eingefügt!"
+
+msgid "Image model is not set. Choose one on the settings screen."
+msgstr "Afbeeldingsmodel is niet ingesteld. Kies er een op het instellingenscherm."
+
+msgid "Image prompt is required."
+msgstr "Afbeeldingsprompt is verplicht."
+
+msgid "Image suggestion failed."
+msgstr "Afbeeldingssuggestie mislukt."
 
 msgid "Infographic"
 msgstr "Infografik"
@@ -223,11 +238,17 @@ msgstr "Neon-3D"
 msgid "Network error. Please check your connection."
 msgstr "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung."
 
+msgid "No Gemini models were found. Check the Google Gemini connector connection."
+msgstr "Er zijn geen Gemini-modellen gevonden. Controleer de verbinding van de Google Gemini-connector."
+
 msgid "No content found."
 msgstr "Kein Inhalt gefunden."
 
 msgid "No history found for this post."
 msgstr "Kein Verlauf für diesen Beitrag gefunden."
+
+msgid "No image data was returned."
+msgstr "Er zijn geen afbeeldingsgegevens geretourneerd."
 
 msgid "No image suggestions found"
 msgstr "Keine Bildvorschläge gefunden"
@@ -240,6 +261,9 @@ msgstr "Keine (nur Prompt)"
 
 msgid "Oil Painting"
 msgstr "Ölgemälde"
+
+msgid "Open AI connector settings"
+msgstr "Open AI-connectorinstellingen"
 
 msgid "Paper Cut"
 msgstr "Papierschnitt"
@@ -274,11 +298,20 @@ msgstr "Professionell (Foto)"
 msgid "Recommended Content"
 msgstr "Empfohlener Inhalt"
 
+msgid "Refresh model list"
+msgstr "Modellijst vernieuwen"
+
+msgid "Refresh the model list after connecting the Google Gemini connector."
+msgstr "Vernieuw de modellenlijst nadat je de Google Gemini-connector hebt gekoppeld."
+
 msgid "Rewrite Instructions"
 msgstr "Herschrijfinstructies"
 
 msgid "Rewrite completed successfully!"
 msgstr "Umschreiben erfolgreich!"
+
+msgid "Rewrite failed."
+msgstr "Herschrijven mislukt."
 
 msgid "Rewriting..."
 msgstr "Schreibe um..."
@@ -328,6 +361,21 @@ msgstr "Bildmöglichkeiten entdecken"
 msgid "Summary"
 msgstr "Zusammenfassung"
 
+msgid "Text model is not set. Choose one on the settings screen."
+msgstr "Tekstmodel is niet ingesteld. Kies er een op het instellingenscherm."
+
+msgid "The prompt is empty."
+msgstr "De prompt is leeg."
+
+msgid "The selected Gemini model does not support image generation. Check the Google Gemini connector settings."
+msgstr "Het geselecteerde Gemini-model ondersteunt het genereren van afbeeldingen niet. Controleer de instellingen van de Google Gemini-connector."
+
+msgid "The selected Gemini model does not support text generation. Check the Google Gemini connector settings."
+msgstr "Het geselecteerde Gemini-model ondersteunt geen tekstgeneratie. Controleer de instellingen van de Google Gemini-connector."
+
+msgid "This plugin uses the Google Gemini connector. Manage API keys under Settings → Connectors. Requests are sent through the WordPress AI Client."
+msgstr "Deze plug-in maakt gebruik van de Google Gemini-connector. Beheer API-sleutels onder Instellingen → Connectors. Verzoeken worden verzonden via de WordPress AI Client."
+
 msgid "Thumbnail Prompt"
 msgstr "Vorschaubild-Prompt"
 
@@ -346,8 +394,8 @@ msgstr "Vintage"
 msgid "Watercolor"
 msgstr "Aquarell"
 
-msgid "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above."
-msgstr "Je kunt een gratis API-sleutel krijgen via Google AI Studio. <a href=\"%s\" target=\"_blank\">Maak hier je sleutel</a> en plak deze in het veld hierboven."
+msgid "WordPress AI Client is not available. Install and configure the Google Gemini connector under Settings → Connectors."
+msgstr "WordPress AI-client is niet beschikbaar. Installeer en configureer de Google Gemini-connector onder Instellingen → Connectors."
 
 msgid "You do not have permission to change these options."
 msgstr "Je hebt geen toestemming om deze opties te wijzigen."

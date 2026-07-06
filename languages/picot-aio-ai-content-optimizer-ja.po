@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Picot AIO AI Content Optimizer 1.0.1\n"
+"Project-Id-Version: Picot AIO AI Content Optimizer 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/picot-aio-ai-content-optimizer/\n"
-"POT-Creation-Date: 2026-05-20 02:33+0000\n"
-"PO-Revision-Date: 2026-05-20 02:33+0000\n"
+"POT-Creation-Date: 2026-07-06 21:34+0000\n"
+"PO-Revision-Date: 2026-07-06 21:34+0000\n"
 "Last-Translator: Picot\n"
 "Language-Team: Japanese\n"
 "Language: ja\n"
@@ -33,9 +33,6 @@ msgstr "APIエラーが発生しました。"
 
 msgid "Action"
 msgstr "操作"
-
-msgid "After saving the API key, click the button above to add the latest available models to the list."
-msgstr "APIキーを保存した後、上のボタンを使用して最新の利用可能なモデルをドロップダウンに追加できます。"
 
 msgid "All image generation completed!"
 msgstr "すべての画像生成が完了しました！"
@@ -130,6 +127,9 @@ msgstr "エラーが発生しました。"
 msgid "Expand"
 msgstr "拡大表示"
 
+msgid "Failed to fetch Gemini models. Check the Google Gemini connector API key."
+msgstr "Gemini モデル一覧の取得に失敗しました。Google Gemini コネクターの API キーを確認してください。"
+
 msgid "Failed to insert image."
 msgstr "画像の挿入に失敗しました。メディアライブラリには保存されています。"
 
@@ -141,9 +141,6 @@ msgstr "アイキャッチ画像"
 
 msgid "Featured image set successfully!"
 msgstr "アイキャッチ画像を設定しました！"
-
-msgid "Fetch Latest Model List"
-msgstr "最新のモデルリストを取得"
 
 msgid "Fetching..."
 msgstr "読み込み中..."
@@ -175,8 +172,14 @@ msgstr "ジオメトリック"
 msgid "Glassmorphism"
 msgstr "グラスモーフィズム"
 
-msgid "Google Gemini API Key"
-msgstr "Google Gemini APIキー"
+msgid "Google Gemini connector is connected and text generation is available."
+msgstr "Google Gemini コネクターが接続され、テキスト生成が利用可能です。"
+
+msgid "Google Gemini connector is not configured or does not support text generation."
+msgstr "Google Gemini コネクターが未設定、またはテキスト生成に対応していません。"
+
+msgid "Google Gemini integration"
+msgstr "Google Gemini 連携"
 
 msgid "Gradient Mesh"
 msgstr "グラデーションメッシュ"
@@ -193,8 +196,20 @@ msgstr "画像プロンプト用モデル"
 msgid "Image Style"
 msgstr "画像スタイル"
 
+msgid "Image generation is disabled in settings."
+msgstr "設定で画像生成が無効になっています。"
+
 msgid "Image inserted successfully!"
 msgstr "画像を正常に挿入しました！"
+
+msgid "Image model is not set. Choose one on the settings screen."
+msgstr "画像モデルが設定されていません。設定画面でモデルを選択してください。"
+
+msgid "Image prompt is required."
+msgstr "画像プロンプトは必須です。"
+
+msgid "Image suggestion failed."
+msgstr "画像の提案に失敗しました。"
 
 msgid "Infographic"
 msgstr "インフォグラフィック"
@@ -223,11 +238,17 @@ msgstr "ネオン3D"
 msgid "Network error. Please check your connection."
 msgstr "ネットワークエラーが発生しました。接続を確認してください。"
 
+msgid "No Gemini models were found. Check the Google Gemini connector connection."
+msgstr "利用可能な Gemini モデルが見つかりませんでした。Google Gemini コネクターの接続を確認してください。"
+
 msgid "No content found."
 msgstr "記事の内容がありません。"
 
 msgid "No history found for this post."
 msgstr "この投稿の履歴はありません。"
+
+msgid "No image data was returned."
+msgstr "画像データが返されませんでした。"
 
 msgid "No image suggestions found"
 msgstr "画像案が見つかりませんでした"
@@ -240,6 +261,9 @@ msgstr "なし（プロンプトのみ）"
 
 msgid "Oil Painting"
 msgstr "油彩画風"
+
+msgid "Open AI connector settings"
+msgstr "AI コネクター設定を開く"
 
 msgid "Paper Cut"
 msgstr "ペーパーカット"
@@ -274,11 +298,20 @@ msgstr "写真風（プロフェッショナル）"
 msgid "Recommended Content"
 msgstr "推奨追加コンテンツ"
 
+msgid "Refresh model list"
+msgstr "モデル一覧を更新"
+
+msgid "Refresh the model list after connecting the Google Gemini connector."
+msgstr "Google Gemini コネクターを接続したあと、モデル一覧を更新してください。"
+
 msgid "Rewrite Instructions"
 msgstr "リライト指示"
 
 msgid "Rewrite completed successfully!"
 msgstr "リライトに成功しました！"
+
+msgid "Rewrite failed."
+msgstr "書き換えに失敗しました。"
 
 msgid "Rewriting..."
 msgstr "リライト中..."
@@ -328,6 +361,21 @@ msgstr "画像挿入ポイントを探索"
 msgid "Summary"
 msgstr "要約"
 
+msgid "Text model is not set. Choose one on the settings screen."
+msgstr "テキストモデルが設定されていません。設定画面でモデルを選択してください。"
+
+msgid "The prompt is empty."
+msgstr "プロンプトが空です。"
+
+msgid "The selected Gemini model does not support image generation. Check the Google Gemini connector settings."
+msgstr "選択した Gemini モデルは画像生成に対応していません。Google Gemini コネクターの接続設定を確認してください。"
+
+msgid "The selected Gemini model does not support text generation. Check the Google Gemini connector settings."
+msgstr "選択した Gemini モデルはテキスト生成に対応していません。Google Gemini コネクターの接続設定を確認してください。"
+
+msgid "This plugin uses the Google Gemini connector. Manage API keys under Settings → Connectors. Requests are sent through the WordPress AI Client."
+msgstr "このプラグインは Google Gemini コネクターを使用します。API キーは設定 → コネクターで管理してください。リクエストは WordPress AI Client 経由で送信されます。"
+
 msgid "Thumbnail Prompt"
 msgstr "サムネイル用プロンプト"
 
@@ -346,8 +394,8 @@ msgstr "ヴィンテージ"
 msgid "Watercolor"
 msgstr "水彩画風"
 
-msgid "You can get a free API key from Google AI Studio. <a href=\"%s\" target=\"_blank\">Create your key here</a> and paste it into the field above."
-msgstr "Google AI StudioからAPIキーを無料で取得できます。<a href=\"%s\" target=\"_blank\">こちらからキーを作成</a>して、上のフィールドに貼り付けてください。"
+msgid "WordPress AI Client is not available. Install and configure the Google Gemini connector under Settings → Connectors."
+msgstr "WordPress AI Client が利用できません。設定 → コネクターで Google Gemini コネクターをインストールしてください。"
 
 msgid "You do not have permission to change these options."
 msgstr "これらのオプションを変更する権限がありません。"

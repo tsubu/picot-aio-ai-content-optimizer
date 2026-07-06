@@ -2086,27 +2086,28 @@
                             var currentImgModel = $('#picot_aio_optimizer_image_model').val();
                             var $modelSelect = $('#picot_aio_optimizer_model');
                             var $imgModelSelect = $('#picot_aio_optimizer_image_model');
+                            var textModels = response.data.text_models || {};
+                            var imageModels = response.data.image_models || {};
+
                             $modelSelect.empty();
                             $imgModelSelect.empty();
-                            
-                            $.each(response.data, function(i, m) {
-                                var modelId = m.name.replace('models/', '');
-                                var displayName = m.displayName + ' (' + modelId + ')';
-                                var methods = m.supportedGenerationMethods || [];
-                                var lowerId = modelId.toLowerCase();
-                                var isImage = (methods.indexOf('imageGeneration') !== -1 || modelId.indexOf('image') !== -1 || lowerId.indexOf('banana') !== -1);
-                                if (methods.indexOf('generateContent') !== -1 && !isImage) {
-                                    $modelSelect.append($('<option>', { value: modelId, text: displayName }));
-                                }
-                                if (isImage) {
-                                    $imgModelSelect.append($('<option>', { value: modelId, text: displayName }));
-                                }
+
+                            $.each(textModels, function(modelId, displayName) {
+                                $modelSelect.append($('<option>', { value: modelId, text: displayName }));
                             });
-                            $modelSelect.val(currentModel);
-                            $imgModelSelect.val(currentImgModel);
-                            $status.text(picot_aio_optimizer.strings.done || 'Done');
+                            $.each(imageModels, function(modelId, displayName) {
+                                $imgModelSelect.append($('<option>', { value: modelId, text: displayName }));
+                            });
+
+                            if (currentModel) {
+                                $modelSelect.val(currentModel);
+                            }
+                            if (currentImgModel) {
+                                $imgModelSelect.val(currentImgModel);
+                            }
+                            $status.text(picot_aio_optimizer.strings.fetch_models_done || 'Done');
                         } else {
-                            $status.text(picot_aio_optimizer.strings.error || 'Error');
+                            $status.text(picot_aio_optimizer.strings.fetch_models_error || 'Error');
                         }
                     },
                     error: function() {
