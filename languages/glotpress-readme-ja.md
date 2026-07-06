@@ -61,12 +61,12 @@
 
 **原文:**
 ```
-AI-powered content analysis and optimization using Google Gemini via the WordPress AI Client. SEO/AIO advice, one-button rewrite, and AI image generation.
+AI-powered content optimization using Google Gemini via WordPress AI Client. SEO/AIO advice, one-button rewrite, and AI image generation.
 ```
 
 **日本語:**
 ```
-WordPress AI Client 経由で Google Gemini を利用する AI コンテンツ分析・最適化。SEO/AIO アドバイス、ワンボタンリライト、AI 画像生成に対応。
+WordPress AI Client 経由の Google Gemini による AI コンテンツ最適化。SEO/AIO アドバイス、ワンボタンリライト、AI 画像生成に対応。
 ```
 
 ---

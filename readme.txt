@@ -9,7 +9,7 @@ Requires PHP: 8.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-AI-powered content analysis and optimization using Google Gemini via the WordPress AI Client. SEO/AIO advice, one-button rewrite, and AI image generation.
+AI-powered content optimization using Google Gemini via WordPress AI Client. SEO/AIO advice, one-button rewrite, and AI image generation.
 
 == Description ==
 
