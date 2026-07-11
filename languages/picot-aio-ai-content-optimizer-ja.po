@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Picot AIO AI Content Optimizer 1.1.0\n"
@@ -61,11 +62,13 @@ msgstr "分析中..."
 msgid "Anime"
 msgstr "アニメ風"
 
-msgid "Are you sure you want to rewrite content? The current title and content will be overwritten."
+msgid ""
+"Are you sure you want to rewrite content? The current title and content will"
+" be overwritten."
 msgstr "コンテンツをリライトしてもよろしいですか？現在のタイトルと本文が上書きされます。"
 
 msgid "Batch Generate and Place"
-msgstr "🚀 一括生成して配置"
+msgstr "一括生成して配置"
 
 msgid "Brutalist"
 msgstr "ブルータリスト"
@@ -107,19 +110,21 @@ msgid "Discovering images..."
 msgstr "画像挿入ポイントを探索中..."
 
 msgid "Done"
-msgstr "✅ 完了"
+msgstr "完了"
 
 msgid "Done!"
-msgstr "✅ 完了！"
+msgstr "完了しました。"
 
 msgid "Enable"
 msgstr "有効にする"
 
-msgid "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)"
+msgid ""
+"Enter rewrite instructions (e.g., make it friendlier, summarize shorter, "
+"etc.)"
 msgstr "リライトの指示を入力（例：もっと親しみやすく、短く要約して、など）"
 
 msgid "Error"
-msgstr "❌ エラー"
+msgstr "エラー"
 
 msgid "Error occurred."
 msgstr "エラーが発生しました。"
@@ -127,7 +132,8 @@ msgstr "エラーが発生しました。"
 msgid "Expand"
 msgstr "拡大表示"
 
-msgid "Failed to fetch Gemini models. Check the Google Gemini connector API key."
+msgid ""
+"Failed to fetch Gemini models. Check the Google Gemini connector API key."
 msgstr "Gemini モデル一覧の取得に失敗しました。Google Gemini コネクターの API キーを確認してください。"
 
 msgid "Failed to insert image."
@@ -152,7 +158,7 @@ msgid "Generate"
 msgstr "生成"
 
 msgid "Generate and Place"
-msgstr "🚀 生成して配置"
+msgstr "生成して配置"
 
 msgid "Generate featured image for the article"
 msgstr "記事のアイキャッチ画像を生成する"
@@ -175,7 +181,9 @@ msgstr "グラスモーフィズム"
 msgid "Google Gemini connector is connected and text generation is available."
 msgstr "Google Gemini コネクターが接続され、テキスト生成が利用可能です。"
 
-msgid "Google Gemini connector is not configured or does not support text generation."
+msgid ""
+"Google Gemini connector is not configured or does not support text "
+"generation."
 msgstr "Google Gemini コネクターが未設定、またはテキスト生成に対応していません。"
 
 msgid "Google Gemini integration"
@@ -238,7 +246,8 @@ msgstr "ネオン3D"
 msgid "Network error. Please check your connection."
 msgstr "ネットワークエラーが発生しました。接続を確認してください。"
 
-msgid "No Gemini models were found. Check the Google Gemini connector connection."
+msgid ""
+"No Gemini models were found. Check the Google Gemini connector connection."
 msgstr "利用可能な Gemini モデルが見つかりませんでした。Google Gemini コネクターの接続を確認してください。"
 
 msgid "No content found."
@@ -334,7 +343,9 @@ msgstr "💾 保存済み: "
 msgid "Security check failed"
 msgstr "セキュリティチェックに失敗しました"
 
-msgid "Select the style for generated images. It will be automatically added to the prompt."
+msgid ""
+"Select the style for generated images. It will be automatically added to the"
+" prompt."
 msgstr "生成される画像のスタイルを選択します。これは自動的にプロンプトに追加されます。"
 
 msgid "Server error. Please check the error log."
@@ -346,7 +357,9 @@ msgstr "設定"
 msgid "Settings saved."
 msgstr "設定を保存しました。"
 
-msgid "Showing the last 20 analysis records. Click a post ID to open the editor, or use Expand to view results in a centered modal."
+msgid ""
+"Showing the last 20 analysis records. Click a post ID to open the editor, or"
+" use Expand to view results in a centered modal."
 msgstr "最新の分析結果20件を表示しています。レコードをクリックすると詳細を表示します。"
 
 msgid "Sketch"
@@ -367,14 +380,22 @@ msgstr "テキストモデルが設定されていません。設定画面でモ
 msgid "The prompt is empty."
 msgstr "プロンプトが空です。"
 
-msgid "The selected Gemini model does not support image generation. Check the Google Gemini connector settings."
+msgid ""
+"The selected Gemini model does not support image generation. Check the "
+"Google Gemini connector settings."
 msgstr "選択した Gemini モデルは画像生成に対応していません。Google Gemini コネクターの接続設定を確認してください。"
 
-msgid "The selected Gemini model does not support text generation. Check the Google Gemini connector settings."
+msgid ""
+"The selected Gemini model does not support text generation. Check the Google"
+" Gemini connector settings."
 msgstr "選択した Gemini モデルはテキスト生成に対応していません。Google Gemini コネクターの接続設定を確認してください。"
 
-msgid "This plugin uses the Google Gemini connector. Manage API keys under Settings → Connectors. Requests are sent through the WordPress AI Client."
-msgstr "このプラグインは Google Gemini コネクターを使用します。API キーは設定 → コネクターで管理してください。リクエストは WordPress AI Client 経由で送信されます。"
+msgid ""
+"This plugin uses the Google Gemini connector. Manage API keys under Settings"
+" → Connectors. Requests are sent through the WordPress AI Client."
+msgstr ""
+"このプラグインは Google Gemini コネクターを使用します。API キーは設定 → コネクターで管理してください。リクエストは "
+"WordPress AI Client 経由で送信されます。"
 
 msgid "Thumbnail Prompt"
 msgstr "サムネイル用プロンプト"
@@ -394,8 +415,11 @@ msgstr "ヴィンテージ"
 msgid "Watercolor"
 msgstr "水彩画風"
 
-msgid "WordPress AI Client is not available. Install and configure the Google Gemini connector under Settings → Connectors."
-msgstr "WordPress AI Client が利用できません。設定 → コネクターで Google Gemini コネクターをインストールしてください。"
+msgid ""
+"WordPress AI Client is not available. Install and configure the Google "
+"Gemini connector under Settings → Connectors."
+msgstr ""
+"WordPress AI Client が利用できません。設定 → コネクターで Google Gemini コネクターをインストールしてください。"
 
 msgid "You do not have permission to change these options."
 msgstr "これらのオプションを変更する権限がありません。"

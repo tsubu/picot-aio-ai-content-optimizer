@@ -13,7 +13,7 @@ AI-powered content optimization using Google Gemini via WordPress AI Client. SEO
 
 == Description ==
 
-Picot AIO AI Content Optimizer is a WordPress plugin developed by Toshifumi Tsuburaya (PICOT) that elevates your content quality using Google Gemini through the **WordPress AI Client**. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).
+Picot AIO AI Content Optimizer is a WordPress plugin developed by Tsubu (Picot) that elevates your content quality using Google Gemini through the **WordPress AI Client**. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).
 
 = Key Features =
 

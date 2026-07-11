@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Picot AIO AI Content Optimizer 1.1.0\n"
@@ -61,11 +62,13 @@ msgstr "分析中..."
 msgid "Anime"
 msgstr "動漫"
 
-msgid "Are you sure you want to rewrite content? The current title and content will be overwritten."
+msgid ""
+"Are you sure you want to rewrite content? The current title and content will"
+" be overwritten."
 msgstr "您確定要重寫內容嗎？目前的標題和內容將被覆蓋。"
 
 msgid "Batch Generate and Place"
-msgstr "🚀 批次生成並放置"
+msgstr "批次生成並放置"
 
 msgid "Brutalist"
 msgstr "粗獷主義"
@@ -107,19 +110,21 @@ msgid "Discovering images..."
 msgstr "正在尋找圖片插入點..."
 
 msgid "Done"
-msgstr "✅ 完成"
+msgstr "完成"
 
 msgid "Done!"
-msgstr "✅ 完成！"
+msgstr "完成！"
 
 msgid "Enable"
 msgstr "啟用"
 
-msgid "Enter rewrite instructions (e.g., make it friendlier, summarize shorter, etc.)"
+msgid ""
+"Enter rewrite instructions (e.g., make it friendlier, summarize shorter, "
+"etc.)"
 msgstr "輸入改寫指示（例如：更親切、縮短摘要等）"
 
 msgid "Error"
-msgstr "❌ 錯誤"
+msgstr "錯誤"
 
 msgid "Error occurred."
 msgstr "發生錯誤。"
@@ -127,7 +132,8 @@ msgstr "發生錯誤。"
 msgid "Expand"
 msgstr "放大顯示"
 
-msgid "Failed to fetch Gemini models. Check the Google Gemini connector API key."
+msgid ""
+"Failed to fetch Gemini models. Check the Google Gemini connector API key."
 msgstr "無法取得 Gemini 模型。检查 Google Gemini 连接器 API 密钥。"
 
 msgid "Failed to insert image."
@@ -152,7 +158,7 @@ msgid "Generate"
 msgstr "生成"
 
 msgid "Generate and Place"
-msgstr "🚀 生成並放置"
+msgstr "生成並放置"
 
 msgid "Generate featured image for the article"
 msgstr "為文章生成特色圖片"
@@ -175,7 +181,9 @@ msgstr "玻璃擬態"
 msgid "Google Gemini connector is connected and text generation is available."
 msgstr "Google Gemini 連接器已連接並且可以產生文字。"
 
-msgid "Google Gemini connector is not configured or does not support text generation."
+msgid ""
+"Google Gemini connector is not configured or does not support text "
+"generation."
 msgstr "Google Gemini 連接器未配置或不支援文字產生。"
 
 msgid "Google Gemini integration"
@@ -238,7 +246,8 @@ msgstr "霓虹 3D"
 msgid "Network error. Please check your connection."
 msgstr "網絡錯誤。請檢查您的連線。"
 
-msgid "No Gemini models were found. Check the Google Gemini connector connection."
+msgid ""
+"No Gemini models were found. Check the Google Gemini connector connection."
 msgstr "沒有找到 Gemini 模型。檢查 Google Gemini 連接器連接。"
 
 msgid "No content found."
@@ -334,7 +343,9 @@ msgstr "💾 已儲存： "
 msgid "Security check failed"
 msgstr "安全性檢查失敗"
 
-msgid "Select the style for generated images. It will be automatically added to the prompt."
+msgid ""
+"Select the style for generated images. It will be automatically added to the"
+" prompt."
 msgstr "選擇生成的圖片風格。這將自動添加到提示詞中。"
 
 msgid "Server error. Please check the error log."
@@ -346,7 +357,9 @@ msgstr "設定"
 msgid "Settings saved."
 msgstr "設定已儲存。"
 
-msgid "Showing the last 20 analysis records. Click a post ID to open the editor, or use Expand to view results in a centered modal."
+msgid ""
+"Showing the last 20 analysis records. Click a post ID to open the editor, or"
+" use Expand to view results in a centered modal."
 msgstr "顯示最近 20 筆分析記錄。點擊行以查看詳情。"
 
 msgid "Sketch"
@@ -367,14 +380,21 @@ msgstr "未設定文字模型。在設定畫面上選擇一項。"
 msgid "The prompt is empty."
 msgstr "提示為空。"
 
-msgid "The selected Gemini model does not support image generation. Check the Google Gemini connector settings."
+msgid ""
+"The selected Gemini model does not support image generation. Check the "
+"Google Gemini connector settings."
 msgstr "所選的 Gemini 型號不支援影像生成。檢查 Google Gemini 連接器設定。"
 
-msgid "The selected Gemini model does not support text generation. Check the Google Gemini connector settings."
+msgid ""
+"The selected Gemini model does not support text generation. Check the Google"
+" Gemini connector settings."
 msgstr "所選的 Gemini 模型不支援文字生成。檢查 Google Gemini 連接器設定。"
 
-msgid "This plugin uses the Google Gemini connector. Manage API keys under Settings → Connectors. Requests are sent through the WordPress AI Client."
-msgstr "該插件使用 Google Gemini 連接器。在「設定」→「連接器」下管理 API 金鑰。請求透過 WordPress AI 用戶端發送。"
+msgid ""
+"This plugin uses the Google Gemini connector. Manage API keys under Settings"
+" → Connectors. Requests are sent through the WordPress AI Client."
+msgstr ""
+"該插件使用 Google Gemini 連接器。在「設定」→「連接器」下管理 API 金鑰。請求透過 WordPress AI 用戶端發送。"
 
 msgid "Thumbnail Prompt"
 msgstr "縮略圖提示詞"
@@ -394,7 +414,9 @@ msgstr "復古"
 msgid "Watercolor"
 msgstr "水彩"
 
-msgid "WordPress AI Client is not available. Install and configure the Google Gemini connector under Settings → Connectors."
+msgid ""
+"WordPress AI Client is not available. Install and configure the Google "
+"Gemini connector under Settings → Connectors."
 msgstr "WordPress AI 用戶端不可用。在「設定」→「連接器」下安裝並設定 Google Gemini 連接器。"
 
 msgid "You do not have permission to change these options."
