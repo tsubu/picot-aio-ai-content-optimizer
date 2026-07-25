@@ -113,13 +113,24 @@
     }
 
     function getEditorPostId() {
+        var raw = 0;
         if (isClassicEditorMode()) {
-            return $('#post_ID').val() || 0;
+            raw = $('#post_ID').val() || 0;
+        } else if (hasGutenbergEditor()) {
+            raw = wp.data.select('core/editor').getCurrentPostId() || ($('#post_ID').val() || 0);
+        } else {
+            raw = $('#post_ID').val() || 0;
         }
-        if (hasGutenbergEditor()) {
-            return wp.data.select('core/editor').getCurrentPostId() || ($('#post_ID').val() || 0);
+        return parseInt(raw, 10) || 0;
+    }
+
+    function requireEditorPostId() {
+        var postId = getEditorPostId();
+        if (!postId) {
+            alert(picot_aio_optimizer.strings.post_id_required || 'Save or wait until the post draft is available, then try again.');
+            return 0;
         }
-        return $('#post_ID').val() || 0;
+        return postId;
     }
 
     function getEditorTitle() {
@@ -348,6 +359,10 @@
 
     // Setup observer to detect when panel content is cleared and re-render
     function setupPanelObserver() {
+        // 二重起動を防ぐ（既存インターバルがあればそのまま使う）。
+        if (window.PicotAioOptimizer && window.PicotAioOptimizer.panelObserverInterval) {
+            return;
+        }
         // Observe for panel being emptied by React re-renders
         var checkInterval = setInterval(function() {
             var panel = document.getElementById('picot_aio_optimizer-result-panel');
@@ -394,10 +409,16 @@
             return;
         }
 
+        var postId = requireEditorPostId();
+        if (!postId) {
+            return;
+        }
+
         var payload = {
             title: title || '',
             content: content || '',
-            instructions: instructions || ''
+            instructions: instructions || '',
+            post_id: postId
         };
 
         var btn = $('#picot_aio_optimizer-rewrite-btn, #picot_aio_optimizer-classic-rewrite');
@@ -492,14 +513,18 @@
 
         var updatePanels = function(htmlStr) { getAllResultPanels().html(htmlStr); };
 
-        var postId = $('#post_ID').val();
+        var postId = requireEditorPostId();
+        if (!postId) {
+            return;
+        }
 
         showOverlay(picot_aio_optimizer.strings.discovering || 'Discovering image opportunities...');
         updatePanels('<div class="picot_aio_optimizer-loading"><p>' + (picot_aio_optimizer.strings.processing || 'Processing...') + '</p></div>');
 
         var payload = {
             title: title || '',
-            content: content || ''
+            content: content || '',
+            post_id: postId
         };
 
         $.ajax({
@@ -567,7 +592,7 @@
                         }
                     }
                 }
-                updatePanels('<div class="notice notice-error"><p>' + handleAjaxError(xhr, 'Discover Images') + '</p></div>');
+                updatePanels('<div class="notice notice-error"><p>' + escapeHtml(handleAjaxError(xhr, 'Discover Images')) + '</p></div>');
             },
             complete: function() {
                 hideOverlay();
@@ -678,8 +703,8 @@
                           '<div class="picot-spinner-inner" style="position:absolute; top:15px; left:15px; width:70px; height:70px; border:4px solid transparent; border-top-color:#60a5fa; border-radius:50%; animation:picot-spin-reverse 1s linear infinite;"></div>' +
                           '<div class="picot-spinner-center" style="position:absolute; top:35px; left:35px; width:30px; height:30px; background:#3b82f6; border-radius:50%; box-shadow:0 0 20px #3b82f6; animation:picot-pulse 2s ease-in-out infinite;"></div>' +
                           '</div>' +
-                          '<div style="font-size:24px; font-weight:600; letter-spacing:-0.025em; margin-bottom:10px; text-align:center;">' + msg + '</div>' +
-                          '<div style="font-size:14px; color:rgba(255,255,255,0.6); font-weight:400;">Please wait while AI processes your content...</div>' +
+                          '<div style="font-size:24px; font-weight:600; letter-spacing:-0.025em; margin-bottom:10px; text-align:center;">' + escapeHtml(msg) + '</div>' +
+                          '<div style="font-size:14px; color:rgba(255,255,255,0.6); font-weight:400;">' + escapeHtml(picot_aio_optimizer.strings.overlay_submessage || 'Please wait while AI processes your content...') + '</div>' +
                           '</div>';
         
         var $overlay = $(overlayHtml);
@@ -707,7 +732,7 @@
 
     // Save image suggestions for later use
     function saveImageSuggestions(suggestions, featuredText, featuredPrompt) {
-        var postId = $('#post_ID').val();
+        var postId = getEditorPostId();
         if (!postId) return;
 
         var payload = {
@@ -928,9 +953,14 @@
     // Utility to strip HTML tags from a string
     function stripHtml(html) {
         if (!html) return '';
-        var tmp = document.createElement("DIV");
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || "";
+        // innerHTML はパース時に onerror 等を発火させ得るため使わない。
+        // DOMParser で解析し、テキストのみ取り出す（スクリプトは実行されない）。
+        try {
+            var doc = new DOMParser().parseFromString(String(html), 'text/html');
+            return (doc.body && (doc.body.textContent || '')) || '';
+        } catch (e) {
+            return String(html).replace(/<[^>]*>/g, '');
+        }
     }
 
     // Helper to find block index by matching text content (robust smart matching)
@@ -1090,26 +1120,34 @@
         
         // Show saved date if available
         if (updatedDate) {
-            html += '<p style="font-size:11px; color:#646970; margin-top:-5px; margin-bottom:15px;">' + (picot_aio_optimizer.strings.save_date || 'Saved: ') + updatedDate + '</p>';
+            html += '<p style="font-size:11px; color:#646970; margin-top:-5px; margin-bottom:15px;">' + (picot_aio_optimizer.strings.save_date || 'Saved: ') + escapeHtml(updatedDate) + '</p>';
         }
+
+        // 画像生成が無効なら生成ボタンは出さず、プロンプトの提示のみに留める。
+        var imageGenEnabled = !!picot_aio_optimizer.enable_image_gen;
 
         allSuggestions.forEach(function(item, index) {
             var borderColor = item.isFeatured ? '#f56e28' : '#2271b1';
             html += '<div style="margin-bottom:20px; padding-left:10px; border-left:3px solid ' + borderColor + ';">';
             html += '<strong style="display:block; margin-bottom:5px; font-size:13px; color:' + borderColor + ';">' + (item.isFeatured ? '⭐ ' : '📍 ') + escapeHtml(item.location || item.description) + '</strong>';
             html += '<div style="line-height:1.5; margin-bottom:8px;">' + escapeHtml(item.description || '') + '</div>';
-            html += '<div style="display:flex; gap:8px; flex-wrap:wrap;">';
-            
-            // Single combined button: Generate and Place
-            html += '<button type="button" class="button button-primary picot_aio_optimizer-gen-single-btn" data-index="' + index + '">' + (picot_aio_optimizer.strings.gen_and_place || 'Generate and Place') + '</button>';
-            
-            html += '</div>';
+
+            if (imageGenEnabled) {
+                html += '<div style="display:flex; gap:8px; flex-wrap:wrap;">';
+                // Single combined button: Generate and Place
+                html += '<button type="button" class="button button-primary picot_aio_optimizer-gen-single-btn" data-index="' + index + '">' + (picot_aio_optimizer.strings.gen_and_place || 'Generate and Place') + '</button>';
+                html += '</div>';
+            }
+
             html += '</div>';
         });
 
-        // Add batch generation buttons
         html += '<div style="margin-top:20px; padding-top:15px; border-top:1px solid #ccd0d4;">';
-        html += '<button type="button" class="button button-primary" id="picot_aio_optimizer-generate-all" style="width:100%;">' + (picot_aio_optimizer.strings.gen_all || 'Batch Generate and Place') + '</button>';
+        if (imageGenEnabled) {
+            html += '<button type="button" class="button button-primary" id="picot_aio_optimizer-generate-all" style="width:100%;">' + (picot_aio_optimizer.strings.gen_all || 'Batch Generate and Place') + '</button>';
+        } else {
+            html += '<p style="margin:0; color:#856404;">' + escapeHtml(picot_aio_optimizer.strings.image_gen_disabled || 'Image generation is disabled in settings.') + '</p>';
+        }
         html += '</div>';
 
         html += '</div>';
@@ -1132,6 +1170,11 @@
         var suggestion = window.PicotAioOptimizer.imageSuggestions[index];
         if (!suggestion) return;
 
+        var postId = requireEditorPostId();
+        if (!postId) {
+            return;
+        }
+
         var originalText = $btn.text();
         showOverlay(picot_aio_optimizer.strings.generating || 'Generating image...');
         $btn.text(picot_aio_optimizer.strings.generating || 'Generating...').prop('disabled', true);
@@ -1148,7 +1191,8 @@
                 xhr.setRequestHeader('X-WP-Nonce', picot_aio_optimizer.rest_nonce);
             },
             data: {
-                prompt: fullPrompt
+                prompt: fullPrompt,
+                post_id: postId
             },
             success: function(response) {
                 if (response.success && response.data) {
@@ -1187,11 +1231,11 @@
                     var title = getEditorTitle();
                     displayImageSuggestions(cleanSuggestions, title, feat ? feat.featured_text : null, null, feat ? feat.prompt : null);
                 } else {
-                    alert('Generation failed: ' + (response.message || 'Unknown error'));
+                    alert((picot_aio_optimizer.strings.generation_failed || 'Generation failed') + ': ' + (response.message || picot_aio_optimizer.strings.unknown_error || 'Unknown error'));
                 }
             },
             error: function(xhr) {
-                var errorMsg = 'Generation failed';
+                var errorMsg = picot_aio_optimizer.strings.generation_failed || 'Generation failed';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
                 }
@@ -1206,7 +1250,7 @@
 
     // Insert image block or HTML at specific location
     function insertImageBlockAtCursor(attachmentId, imageUrl, altText, targetText) {
-        var imgHtml = '\n<figure class="wp-block-image size-large"><img src="' + imageUrl + '" alt="' + (altText || '') + '" class="wp-image-' + attachmentId + '"/></figure>\n';
+        var imgHtml = '\n<figure class="wp-block-image size-large"><img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(altText || '') + '" class="wp-image-' + encodeURIComponent(attachmentId) + '"/></figure>\n';
         
         try {
             if (isClassicEditorMode()) {
@@ -1286,12 +1330,12 @@
 
     // Helper to inject image HTML into a raw HTML string based on text matching
     function insertImageIntoHtmlString(html, targetText, imageUrl, altText, attachmentId) {
-        if (!targetText) return html + '\n<img src="' + imageUrl + '" alt="' + (altText || '') + '" class="aligncenter" />\n';
+        if (!targetText) return html + '\n<img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(altText || '') + '" class="aligncenter" />\n';
 
         var cleanTarget = stripHtml(targetText).trim();
-        if (cleanTarget.length < 3) return html + '\n<img src="' + imageUrl + '" alt="' + (altText || '') + '" class="aligncenter" />\n';
+        if (cleanTarget.length < 3) return html + '\n<img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(altText || '') + '" class="aligncenter" />\n';
 
-        var imgHtml = '\n<figure class="wp-block-image aligncenter size-large"><img src="' + imageUrl + '" alt="' + (altText || '') + '" class="wp-image-' + attachmentId + '"/></figure>\n';
+        var imgHtml = '\n<figure class="wp-block-image aligncenter size-large"><img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(altText || '') + '" class="wp-image-' + encodeURIComponent(attachmentId) + '"/></figure>\n';
 
         // Try to find target text position
         var pos = html.indexOf(cleanTarget);
@@ -1324,7 +1368,7 @@
             if (isClassicEditorMode()) {
                 var classicContent = getClassicEditorContent();
                 var markerPattern = new RegExp('<div[^>]*class="picot_aio_optimizer-suggestion-marker"[^>]*data-index=["\']' + index + '["\'][^>]*>[\\s\\S]*?</div>', 'i');
-                var imageFigure = '<figure class="wp-block-image size-large"><img src="' + imageUrl + '" alt="' + (altText || '') + '" class="wp-image-' + attachmentId + '"/></figure>';
+                var imageFigure = '<figure class="wp-block-image size-large"><img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(altText || '') + '" class="wp-image-' + encodeURIComponent(attachmentId) + '"/></figure>';
 
                 if (markerPattern.test(classicContent)) {
                     setClassicEditorContent(classicContent.replace(markerPattern, imageFigure));
@@ -1385,6 +1429,11 @@
 
     // Sequential generation for all images
     function generateAllImages() {
+        var postId = requireEditorPostId();
+        if (!postId) {
+            return;
+        }
+
         var suggestions = window.PicotAioOptimizer.imageSuggestions || [];
         var indicesToProcess = [];
 
@@ -1425,7 +1474,7 @@
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-WP-Nonce', picot_aio_optimizer.rest_nonce);
                 },
-                data: { prompt: fullPrompt },
+                data: { prompt: fullPrompt, post_id: postId },
                 success: function(response) {
                     if (response.success && response.data) {
                         var attachmentId = response.data.attachment_id || response.data.id;
@@ -1552,10 +1601,11 @@
                         // User clicked the button, show the list in all panels
                         var html = '<h4>' + (picot_aio_optimizer.strings.history_title || 'History') + '</h4><ul style="border-top:1px solid #eee; padding-top:10px;">';
                         response.data.forEach(function(log) {
+                             var logId = parseInt(log.id, 10) || 0;
                              html += '<li style="margin-bottom:10px; font-size:12px;">';
-                             html += '<strong>[' + log.created_at + ']</strong><br>';
-                             html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.restoreHistoryItem(' + log.id + ')">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button> ';
-                             html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.openHistoryExpand(' + log.id + ')">' + (picot_aio_optimizer.strings.expand_view || '拡大表示') + '</button>';
+                             html += '<strong>[' + escapeHtml(log.created_at) + ']</strong><br>';
+                             html += '<button type="button" class="button button-small picot-history-restore" data-log-id="' + logId + '">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button> ';
+                             html += '<button type="button" class="button button-small picot-history-expand" data-log-id="' + logId + '">' + (picot_aio_optimizer.strings.expand_view || '拡大表示') + '</button>';
                              html += '</li>';
                         });
                         html += '</ul>';
@@ -1629,6 +1679,26 @@
         }
     };
 
+    // インライン onclick を使わず、データ属性から安全にコピーする。
+    $(document).on('click', '.picot_aio_optimizer-copy-btn', function () {
+        window.PicotAioOptimizer.copyToClipboard($(this).attr('data-copy-text') || '');
+    });
+
+    $(document).on('click', '.picot-history-restore', function () {
+        var logId = parseInt($(this).attr('data-log-id'), 10) || 0;
+        var isClassic = $(this).attr('data-classic') === '1';
+        window.PicotAioOptimizer.restoreHistoryItem(logId, isClassic);
+    });
+
+    $(document).on('click', '.picot-history-expand', function () {
+        var logId = parseInt($(this).attr('data-log-id'), 10) || 0;
+        window.PicotAioOptimizer.openHistoryExpand(logId);
+    });
+
+    $(document).on('click', '.picot-clear-results', function () {
+        window.location.reload();
+    });
+
     function fallbackCopy(text) {
         var textarea = document.createElement('textarea');
         textarea.value = text;
@@ -1638,9 +1708,9 @@
         textarea.select();
         try {
             document.execCommand('copy');
-            alert('Copied!');
+            alert(picot_aio_optimizer.strings.copied || 'Copied!');
         } catch (err) {
-            alert('Copy failed. Please copy manually.');
+            alert(picot_aio_optimizer.strings.copy_failed || 'Copy failed. Please copy manually.');
         }
         document.body.removeChild(textarea);
     }
@@ -1648,7 +1718,10 @@
     function analyzeContent() {
  //         console.log('Picot AIO Optimizer: analyzeContent() called');
         var postContent = getEditorContent();
-        var postId = getEditorPostId();
+        var postId = requireEditorPostId();
+        if (!postId) {
+            return;
+        }
 
         if (!postContent) {
              var diagMsg = 'Diagnostics:\n';
@@ -1686,7 +1759,7 @@
                 }
             },
             error: function (xhr) {
-                updatePanels('<div class="notice notice-error"><p>' + handleAjaxError(xhr, 'Analysis') + '</p></div>');
+                updatePanels('<div class="notice notice-error"><p>' + escapeHtml(handleAjaxError(xhr, 'Analysis')) + '</p></div>');
             },
             complete: function() {
                 hideOverlay();
@@ -1812,7 +1885,7 @@
             htmlFallback += '<div style="background:#fff; padding:15px; border:1px solid #ddd; border-radius:4px;">' + renderMarkdown(rawText) + '</div>';
             if (includeClearButton) {
                 htmlFallback += '<div style="margin-top:15px; border-top:1px solid #ccd0d4; padding-top:10px;">';
-                htmlFallback += '<button type="button" class="button button-secondary" onclick="window.location.reload();">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
+                htmlFallback += '<button type="button" class="button button-secondary picot-clear-results">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
                 htmlFallback += '</div>';
             }
             htmlFallback += '</div>';
@@ -1858,7 +1931,7 @@
             response.seo_title_ideas.forEach(function(title) {
                 html += '<li style="margin-bottom:8px;">' + renderMarkdown(title);
                 if (showCopyButtons) {
-                    html += ' <button type="button" class="button button-small" onclick="window.PicotAioOptimizer.copyToClipboard(\'' + escapeHtml(title).replace(/'/g, "\\'") + '\')" style="margin-left:5px; vertical-align:middle;">' + (picot_aio_optimizer.strings.copy_btn || 'Copy') + '</button>';
+                    html += ' <button type="button" class="button button-small picot_aio_optimizer-copy-btn" data-copy-text="' + escapeHtml(title) + '" style="margin-left:5px; vertical-align:middle;">' + (picot_aio_optimizer.strings.copy_btn || 'Copy') + '</button>';
                 }
                 html += '</li>';
             });
@@ -1872,7 +1945,7 @@
             response.meta_description_suggestions.forEach(function(desc) {
                 html += '<li style="margin-bottom:8px;">' + renderMarkdown(desc);
                 if (showCopyButtons) {
-                    html += ' <button type="button" class="button button-small" onclick="window.PicotAioOptimizer.copyToClipboard(\'' + escapeHtml(desc).replace(/'/g, "\\'") + '\')" style="margin-left:5px; vertical-align:middle;">' + (picot_aio_optimizer.strings.copy_btn || 'Copy') + '</button>';
+                    html += ' <button type="button" class="button button-small picot_aio_optimizer-copy-btn" data-copy-text="' + escapeHtml(desc) + '" style="margin-left:5px; vertical-align:middle;">' + (picot_aio_optimizer.strings.copy_btn || 'Copy') + '</button>';
                 }
                 html += '</li>';
             });
@@ -1884,10 +1957,11 @@
             html += '<h4 style="margin:0 0 10px 0; font-size:13px; color:#1d2327;">' + (picot_aio_optimizer.strings.history_title || 'Analysis History') + '</h4>';
             html += '<ul style="margin:0; padding:0; list-style:none;">';
             window.PicotAioOptimizer.currentHistory.forEach(function(log) {
+                var logId = parseInt(log.id, 10) || 0;
                 html += '<li style="margin-bottom:8px; font-size:12px; display:flex; justify-content:space-between; align-items:center;">';
-                html += '<span>' + log.created_at.split(' ')[0] + '</span>';
-                html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.restoreHistoryItem(' + log.id + ', ' + (isClassicTarget ? 'true' : 'false') + ')">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button> ';
-                html += '<button type="button" class="button button-small" onclick="window.PicotAioOptimizer.openHistoryExpand(' + log.id + ')">' + (picot_aio_optimizer.strings.expand_view || '拡大表示') + '</button>';
+                html += '<span>' + escapeHtml(String(log.created_at || '').split(' ')[0]) + '</span>';
+                html += '<button type="button" class="button button-small picot-history-restore" data-log-id="' + logId + '" data-classic="' + (isClassicTarget ? '1' : '0') + '">' + (picot_aio_optimizer.strings.show_btn || 'Show') + '</button> ';
+                html += '<button type="button" class="button button-small picot-history-expand" data-log-id="' + logId + '">' + (picot_aio_optimizer.strings.expand_view || '拡大表示') + '</button>';
                 html += '</li>';
             });
             html += '</ul></div>';
@@ -1895,7 +1969,7 @@
 
         if (includeClearButton) {
             html += '<div style="margin-top:20px; padding-top:15px;">';
-            html += '<button type="button" class="button button-secondary" onclick="window.location.reload();">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
+            html += '<button type="button" class="button button-secondary picot-clear-results">' + (picot_aio_optimizer.strings.clear_results_btn || 'Clear Results') + '</button>';
             html += '</div>';
         }
 
@@ -2129,6 +2203,57 @@
                 $('#picot_aio_optimizer_image_model_row').hide();
             }
         });
+
+        // Toggle image generation UI when paid/free plan changes (before save).
+        (function syncImageGenWithApiPlan() {
+            var $plan = $('#picot_aio_optimizer_api_plan');
+            var $checkbox = $('#picot_aio_optimizer_enable_image_gen');
+            if (!$plan.length || !$checkbox.length) {
+                return;
+            }
+
+            var $planFreeNotice = $('#picot_aio_optimizer_api_plan_free_notice');
+            var $imageFreeNotice = $('#picot_aio_optimizer_image_gen_free_notice');
+            var $imageRows = $('#picot_aio_optimizer_image_style_row, #picot_aio_optimizer_image_model_row');
+            var rememberedChecked = $checkbox.data('saved-checked') === 1 || $checkbox.data('saved-checked') === '1';
+
+            var applyPlan = function () {
+                var isPaid = $plan.val() === 'paid';
+                var $editable = $('#picot_aio_optimizer_image_gen_editable');
+
+                $planFreeNotice.toggle(!isPaid);
+                $imageFreeNotice.toggle(!isPaid);
+
+                if (!isPaid) {
+                    rememberedChecked = $checkbox.is(':checked') || rememberedChecked;
+                    $checkbox.prop('checked', false).prop('disabled', true);
+                    $editable.remove();
+                    $imageRows.hide();
+                    return;
+                }
+
+                $checkbox.prop('disabled', false);
+                if (!$editable.length) {
+                    $checkbox.before('<input type="hidden" name="picot_aio_optimizer_image_gen_editable" id="picot_aio_optimizer_image_gen_editable" value="1">');
+                }
+                if (rememberedChecked) {
+                    $checkbox.prop('checked', true);
+                    $imageRows.show();
+                } else {
+                    $checkbox.prop('checked', false);
+                    $imageRows.hide();
+                }
+            };
+
+            $checkbox.on('change', function () {
+                if ($plan.val() === 'paid') {
+                    rememberedChecked = $checkbox.is(':checked');
+                }
+            });
+
+            $plan.on('change', applyPlan);
+            applyPlan();
+        })();
 
         // Global History List (Settings Page)
         var $historyList = $('#picot_aio_optimizer-history-list');

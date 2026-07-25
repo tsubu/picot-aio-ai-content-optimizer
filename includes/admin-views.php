@@ -45,6 +45,8 @@ class PicotAioOptimizer_Admin_Views
             'no_suggestions'                     => esc_html__('No image suggestions found', 'picot-aio-ai-content-optimizer'),
             'gen_and_place'                      => esc_html__('Generate and Place', 'picot-aio-ai-content-optimizer'),
             'gen_all'                            => esc_html__('Batch Generate and Place', 'picot-aio-ai-content-optimizer'),
+            'image_gen_disabled'                 => esc_html__('Image generation is disabled in settings.', 'picot-aio-ai-content-optimizer'),
+            'post_id_required'                   => esc_html__('Save or wait until the post draft is available, then try again.', 'picot-aio-ai-content-optimizer'),
             'save_date'                          => esc_html__('Saved: ', 'picot-aio-ai-content-optimizer'),
             'featured_set'                       => esc_html__('Featured image set successfully!', 'picot-aio-ai-content-optimizer'),
             'placeholder_replaced'               => esc_html__('Placeholder replaced with image!', 'picot-aio-ai-content-optimizer'),
@@ -78,6 +80,10 @@ class PicotAioOptimizer_Admin_Views
             'fetch_models_done'                  => esc_html__('Done', 'picot-aio-ai-content-optimizer'),
             'fetch_models_error'                 => esc_html__('Error', 'picot-aio-ai-content-optimizer'),
             'no_data'                            => esc_html__('(No data)', 'picot-aio-ai-content-optimizer'),
+            'generation_failed'                  => esc_html__('Generation failed', 'picot-aio-ai-content-optimizer'),
+            'unknown_error'                      => esc_html__('Unknown error', 'picot-aio-ai-content-optimizer'),
+            'copy_failed'                        => esc_html__('Copy failed. Please copy manually.', 'picot-aio-ai-content-optimizer'),
+            'overlay_submessage'                 => esc_html__('Please wait while AI processes your content...', 'picot-aio-ai-content-optimizer'),
         );
     }
 
@@ -116,6 +122,20 @@ class PicotAioOptimizer_Admin_Views
             'paper_cut'         => array(esc_html__('Paper Cut', 'picot-aio-ai-content-optimizer'), 'Paper cut art style, layered, shadows, craft aesthetic'),
             'collage'           => array(esc_html__('Collage', 'picot-aio-ai-content-optimizer'), 'Collage style, mixed media, cut-out elements, artistic'),
         );
+    }
+
+    /**
+     * Restrict the image style option to the known style keys.
+     *
+     * @param mixed $value Raw value.
+     * @return string
+     */
+    public static function sanitize_image_style($value)
+    {
+        $value = sanitize_key(is_string($value) ? $value : '');
+        $styles = self::get_image_styles();
+
+        return isset($styles[$value]) ? $value : 'none';
     }
 
     /**
@@ -179,6 +199,7 @@ class PicotAioOptimizer_Admin_Views
         $available_image_models = PicotAioOptimizer_Ai_Client_Helper::get_model_list_option('picot_aio_optimizer_available_image_models');
         $ai_configured = PicotAioOptimizer_Ai_Client_Helper::supports_text_generation();
         $ai_settings_url = PicotAioOptimizer_Ai_Client_Helper::get_settings_url();
+        $ai_plugin_active = PicotAioOptimizer_Ai_Client_Helper::is_ai_plugin_active();
     ?>
         <div class="wrap picot-aio-optimizer-settings-wrap">
             <h1><?php esc_html_e('Picot AIO AI Content Optimizer Settings', 'picot-aio-ai-content-optimizer'); ?></h1>
@@ -204,6 +225,65 @@ class PicotAioOptimizer_Admin_Views
                         </a>
                         <p class="description">
                             <?php esc_html_e('This plugin uses the Google Gemini connector. Manage API keys under Settings → Connectors. Requests are sent through the WordPress AI Client.', 'picot-aio-ai-content-optimizer'); ?>
+                        </p>
+                        <p class="description">
+                            <?php
+                            printf(
+                                wp_kses(
+                                    /* translators: 1: Google AI Studio URL, 2: Gemini API pricing URL */
+                                    __('To check free-tier quotas, rate limits, and whether a model is free or paid, open <a href="%1$s" target="_blank" rel="noopener noreferrer">Google AI Studio</a> or the <a href="%2$s" target="_blank" rel="noopener noreferrer">Gemini API pricing</a> page.', 'picot-aio-ai-content-optimizer'),
+                                    array(
+                                        'a' => array(
+                                            'href'   => true,
+                                            'target' => true,
+                                            'rel'    => true,
+                                        ),
+                                    )
+                                ),
+                                esc_url('https://aistudio.google.com/'),
+                                esc_url('https://ai.google.dev/gemini-api/docs/pricing')
+                            );
+                            ?>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="picot-settings-row">
+                    <div class="picot-settings-label"><?php esc_html_e('WordPress AI plugin', 'picot-aio-ai-content-optimizer'); ?></div>
+                    <div class="picot-settings-field">
+                        <?php if ($ai_plugin_active) : ?>
+                            <p style="margin: 0 0 10px; color: #155724;"><?php esc_html_e('The official WordPress AI plugin is active.', 'picot-aio-ai-content-optimizer'); ?></p>
+                        <?php else : ?>
+                            <p style="margin: 0 0 10px; color: #856404;"><?php echo esc_html(PicotAioOptimizer_Ai_Client_Helper::ai_plugin_required_message()); ?></p>
+                            <p style="margin: 0 0 10px;">
+                                <a class="button button-primary" href="<?php echo esc_url(PicotAioOptimizer_Ai_Client_Helper::get_ai_plugin_action_url()); ?>">
+                                    <?php echo esc_html(PicotAioOptimizer_Ai_Client_Helper::get_ai_plugin_action_label()); ?>
+                                </a>
+                            </p>
+                        <?php endif; ?>
+                        <p class="description"><?php esc_html_e('Do this after connecting providers under Settings → Connectors. Also supports the AI plugin\'s experimental Connector Approvals feature.', 'picot-aio-ai-content-optimizer'); ?></p>
+                    </div>
+                </div>
+
+                <div class="picot-settings-row">
+                    <div class="picot-settings-label">
+                        <label for="picot_aio_optimizer_api_plan"><?php esc_html_e('Gemini API plan', 'picot-aio-ai-content-optimizer'); ?></label>
+                    </div>
+                    <div class="picot-settings-field">
+                        <?php $api_plan = PicotAioOptimizer_Ai_Client_Helper::get_api_plan(); ?>
+                        <select name="picot_aio_optimizer_api_plan" id="picot_aio_optimizer_api_plan" class="picot-api-plan-select" data-free-notice="picot_aio_optimizer_api_plan_free_notice">
+                            <option value="paid" <?php selected($api_plan, 'paid'); ?>><?php esc_html_e('Paid Gemini API (billing enabled)', 'picot-aio-ai-content-optimizer'); ?></option>
+                            <option value="free" <?php selected($api_plan, 'free'); ?>><?php esc_html_e('Free Gemini API (free tier)', 'picot-aio-ai-content-optimizer'); ?></option>
+                        </select>
+                        <p class="description">
+                            <?php esc_html_e('Choose the plan that matches your Google AI API key. On the free tier, image generation is disabled in this plugin.', 'picot-aio-ai-content-optimizer'); ?>
+                        </p>
+                        <p
+                            id="picot_aio_optimizer_api_plan_free_notice"
+                            class="description picot-api-plan-free-notice"
+                            style="<?php echo $api_plan === 'free' ? '' : 'display:none;'; ?>"
+                        >
+                            <?php esc_html_e('With free API usage, service may become unavailable due to Gemini token limit changes or similar policy updates.', 'picot-aio-ai-content-optimizer'); ?>
                         </p>
                     </div>
                 </div>
@@ -233,12 +313,38 @@ class PicotAioOptimizer_Admin_Views
                 <div class="picot-settings-row">
                     <div class="picot-settings-label"><?php esc_html_e('Image Generation', 'picot-aio-ai-content-optimizer'); ?></div>
                     <div class="picot-settings-field">
+                        <?php
+                        $image_gen_allowed = PicotAioOptimizer_Ai_Client_Helper::is_paid_api_plan();
+                        // 無償プランでは表示上オフにするが、保存済みの選択は data 属性で保持する。
+                        $saved_image_gen = $enable_image_gen ? 1 : 0;
+                        if (!$image_gen_allowed) {
+                            $enable_image_gen = 0;
+                        }
+                        ?>
+                        <?php if ($image_gen_allowed) : ?>
+                            <input type="hidden" name="picot_aio_optimizer_image_gen_editable" id="picot_aio_optimizer_image_gen_editable" value="1">
+                        <?php endif; ?>
                         <label>
-                            <input type="checkbox" name="picot_aio_optimizer_enable_image_gen" id="picot_aio_optimizer_enable_image_gen" value="1" <?php checked($enable_image_gen, 1); ?>>
+                            <input
+                                type="checkbox"
+                                name="picot_aio_optimizer_enable_image_gen"
+                                id="picot_aio_optimizer_enable_image_gen"
+                                value="1"
+                                <?php checked($enable_image_gen, 1); ?>
+                                <?php disabled(!$image_gen_allowed); ?>
+                                data-saved-checked="<?php echo esc_attr($saved_image_gen); ?>"
+                            >
                             <?php esc_html_e('Enable', 'picot-aio-ai-content-optimizer'); ?>
                         </label>
                         <p class="description">
                             <?php esc_html_e('Generate high-quality images using the selected image model.', 'picot-aio-ai-content-optimizer'); ?>
+                        </p>
+                        <p
+                            id="picot_aio_optimizer_image_gen_free_notice"
+                            class="description"
+                            style="color: #856404;<?php echo $image_gen_allowed ? ' display:none;' : ''; ?>"
+                        >
+                            <?php esc_html_e('Free Gemini API plan is selected. Image generation is disabled until you switch to the paid plan setting.', 'picot-aio-ai-content-optimizer'); ?>
                         </p>
                     </div>
                 </div>

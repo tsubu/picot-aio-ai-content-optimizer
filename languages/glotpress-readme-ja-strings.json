@@ -10,13 +10,13 @@
     },
     {
       "context": "Short description (readme line 12)",
-      "original": "AI-powered content optimization using Google Gemini via WordPress AI Client. SEO/AIO advice, one-button rewrite, and AI image generation.",
-      "translation": "WordPress AI Client 経由の Google Gemini による AI コンテンツ最適化。SEO/AIO アドバイス、ワンボタンリライト、AI 画像生成に対応。"
+      "original": "AI-powered content analysis and optimization plugin using Google Gemini API. Provides SEO/AIO advice, one-button rewrite, and AI image generation.",
+      "translation": "Google Gemini API による AI コンテンツ分析・最適化プラグイン。SEO/AIO アドバイス、ワンボタンリライト、AI 画像生成に対応。"
     },
     {
       "context": "Description — paragraph 1",
-      "original": "Picot AIO AI Content Optimizer is a WordPress plugin developed by Tsubu (Picot) that elevates your content quality using Google Gemini through the **WordPress AI Client**. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).",
-      "translation": "Picot AIO AI Content Optimizer は、Tsubu (Picot)が開発した WordPress プラグインです。WordPress AI Client 経由の Google Gemini でコンテンツ品質の向上を支援し、Google の検索品質評価ガイドライン（E-E-A-T）に基づく、実践的な SEO・AIO アドバイスを提供するパーソナルコンサルタントとして機能します。"
+      "original": "Picot AIO AI Content Optimizer is a powerful WordPress plugin developed by Toshifumi Tsuburaya (PICOT) and designed to elevate your content quality using the latest Gemini AI technology. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).",
+      "translation": "Picot AIO AI Content Optimizer は、坪良俊文（PICOT）が開発した WordPress プラグインです。最新の Gemini AI 技術でコンテンツ品質の向上を支援し、Google の検索品質評価ガイドライン（E-E-A-T）に基づく、実践的な SEO・AIO アドバイスを提供するパーソナルコンサルタントとして機能します。"
     },
     {
       "context": "Description — heading",
@@ -84,29 +84,14 @@
       "translation": "投稿ごとの過去の分析結果をエディター内で確認できます。"
     },
     {
-      "context": "Description — feature",
-      "original": "Classic Editor Support",
-      "translation": "クラシックエディター対応"
-    },
-    {
-      "context": "Description — feature detail",
-      "original": "Works in both the block editor and the classic editor.",
-      "translation": "ブロックエディターとクラシックエディターの両方で利用できます。"
-    },
-    {
       "context": "Section heading",
       "original": "External services",
       "translation": "外部サービス"
     },
     {
       "context": "External services — intro",
-      "original": "This plugin sends AI requests through the **WordPress AI Client** (WordPress 7.0+) and **requires the Google Gemini connector**. Install and activate the [Google AI connector plugin](https://wordpress.org/plugins/ai-provider-for-google/), then configure your Gemini API key under **Settings → Connectors**. Picot AIO AI Content Optimizer does not store or read provider API keys directly.",
-      "translation": "本プラグインは **WordPress AI Client**（WordPress 7.0 以降）経由で AI リクエストを送信し、**Google Gemini コネクターが必須**です。[Google AI コネクタープラグイン](https://wordpress.org/plugins/ai-provider-for-google/)をインストール・有効化し、**設定 → コネクター**で Gemini API キーを設定してください。Picot AIO AI Content Optimizer はプロバイダーの API キーを直接保存・参照しません。"
-    },
-    {
-      "context": "External services — intro 2",
-      "original": "This plugin connects to the **Google Generative Language API (Gemini)** provided by Google LLC.",
-      "translation": "本プラグインは Google LLC が提供する **Google Generative Language API（Gemini）** に接続します。"
+      "original": "This plugin relies on the **Google Generative Language API (Gemini)** provided by Google LLC to provide AI-powered content analysis, text generation, and image generation features.",
+      "translation": "本プラグインは、Google LLC が提供する **Google Generative Language API（Gemini）** に依存し、AI によるコンテンツ分析、テキスト生成、画像生成機能を提供します。"
     },
     {
       "context": "External services — label",
@@ -115,8 +100,8 @@
     },
     {
       "context": "External services — detail",
-      "original": "Content analysis for SEO/AIO advice, text rewriting based on user instructions, and image generation based on article context.",
-      "translation": "SEO/AIO アドバイスのためのコンテンツ分析、ユーザー指示に基づくテキストのリライト、記事の文脈に沿った画像生成。"
+      "original": "This plugin connects to the Google Gemini API to analyze post content for SEO/AIO advice, rewrite text based on user instructions, and generate relevant images based on article context.",
+      "translation": "Google Gemini API に接続し、投稿コンテンツの SEO/AIO 分析、ユーザー指示に基づくテキストのリライト、記事の文脈に沿った画像の生成を行います。"
     },
     {
       "context": "External services — label",
@@ -125,17 +110,17 @@
     },
     {
       "context": "External services — detail",
-      "original": "The content of your post (title and body) and your custom AI prompts are sent to Google Gemini only when you manually trigger an analysis, rewrite, or image generation request by clicking the respective buttons. No data is sent automatically in the background.",
-      "translation": "投稿のタイトル・本文およびカスタム AI プロンプトは、分析・リライト・画像生成の各ボタンを手動でクリックしたときのみ Google Gemini に送信されます。バックグラウンドでの自動送信はありません。"
+      "original": "The content of your post (title and body) and your custom AI prompts are sent to Google's API only when you manually trigger an analysis, rewrite, or image generation request by clicking the respective buttons. No data is sent automatically in the background.",
+      "translation": "投稿のタイトル・本文およびカスタム AI プロンプトは、分析・リライト・画像生成の各ボタンを手動でクリックしたときのみ Google の API に送信されます。バックグラウンドでの自動送信はありません。"
     },
     {
       "context": "External services — label",
-      "original": "Legal links",
+      "original": "Legal Links",
       "translation": "関連リンク"
     },
     {
       "context": "External services",
-      "original": "Service provider: Google LLC",
+      "original": "Service Provider: Google LLC",
       "translation": "サービス提供者: Google LLC"
     },
     {
@@ -155,53 +140,33 @@
     },
     {
       "context": "Installation — step 1",
-      "original": "Upload the `picot-aio-ai-content-optimizer` folder to the `/wp-content/plugins/` directory, or install through the WordPress Plugins screen.",
-      "translation": "`picot-aio-ai-content-optimizer` フォルダを `/wp-content/plugins/` ディレクトリにアップロードするか、WordPress のプラグイン画面からインストールします。"
+      "original": "Upload the `picot-aio-ai-content-optimizer` folder to the `/wp-content/plugins/` directory.",
+      "translation": "`picot-aio-ai-content-optimizer` フォルダを `/wp-content/plugins/` ディレクトリにアップロードします。"
     },
     {
       "context": "Installation — step 2",
-      "original": "Activate the plugin through the **Plugins** menu in WordPress (requires WordPress 7.0 or later).",
-      "translation": "WordPress の **プラグイン** メニューから有効化します（WordPress 7.0 以降が必要です）。"
+      "original": "Activate the plugin through the 'Plugins' menu in WordPress.",
+      "translation": "WordPress の「プラグイン」メニューから有効化します。"
     },
     {
       "context": "Installation — step 3",
-      "original": "Install and activate the **Google (Gemini) AI connector** plugin, then open **Settings → Connectors** and connect your Gemini API key.",
-      "translation": "**Google（Gemini）AI コネクター** プラグインをインストール・有効化し、**設定 → コネクター** を開いて Gemini API キーを接続します。"
+      "original": "Go to Settings > Picot AIO AI Content Optimizer and enter your Gemini API Key from Google AI Studio.",
+      "translation": "設定 > Picot AIO AI Content Optimizer を開き、Google AI Studio で取得した Gemini API キーを入力します。"
     },
     {
       "context": "Installation — step 4",
-      "original": "Open **Settings → Picot AIO AI Content Optimizer**, select your preferred Gemini text and image models, then use the optimizer panel in a post editor.",
-      "translation": "**設定 → Picot AIO AI Content Optimizer** を開き、使用する Gemini のテキスト・画像モデルを選択してから、投稿エディターの最適化パネルを利用します。"
+      "original": "Select your preferred AI model and optional image generation model.",
+      "translation": "使用する AI モデルと、必要に応じて画像生成モデルを選択します。"
     },
     {
       "context": "FAQ — question",
-      "original": "Which AI connector do I need?",
-      "translation": "どの AI コネクターが必要ですか？"
+      "original": "Where do I get an API Key?",
+      "translation": "API キーはどこで取得できますか？"
     },
     {
       "context": "FAQ — answer",
-      "original": "This plugin requires the **Google Gemini connector** (AI Provider for Google). Other connectors such as OpenAI or Anthropic are not supported.",
-      "translation": "**Google Gemini コネクター**（AI Provider for Google）が必要です。OpenAI や Anthropic など他のコネクターには対応していません。"
-    },
-    {
-      "context": "FAQ — question",
-      "original": "Do I need to enter an API key in this plugin?",
-      "translation": "このプラグインで API キーを入力する必要はありますか？"
-    },
-    {
-      "context": "FAQ — answer",
-      "original": "No. Configure your Gemini API key under **Settings → Connectors** in WordPress. Picot AIO AI Content Optimizer uses the WordPress AI Client and does not manage credentials itself.",
-      "translation": "いいえ。Gemini API キーは WordPress の **設定 → コネクター** で設定してください。Picot AIO AI Content Optimizer は WordPress AI Client を利用し、認証情報を自前で管理しません。"
-    },
-    {
-      "context": "FAQ — question",
-      "original": "Where do I get a Gemini API key?",
-      "translation": "Gemini API キーはどこで取得できますか？"
-    },
-    {
-      "context": "FAQ — answer",
-      "original": "You can obtain a Gemini API key from [Google AI Studio](https://aistudio.google.com/) and register it in the Google connector under **Settings → Connectors**.",
-      "translation": "[Google AI Studio](https://aistudio.google.com/) で Gemini API キーを取得し、**設定 → コネクター** の Google コネクターに登録してください。"
+      "original": "You can obtain a free Gemini API Key from [Google AI Studio](https://aistudio.google.com/).",
+      "translation": "[Google AI Studio](https://aistudio.google.com/) から無料の Gemini API キーを取得できます。"
     },
     {
       "context": "FAQ — question",
@@ -235,48 +200,13 @@
     },
     {
       "context": "Screenshots — 3",
-      "original": "Settings page where you configure Gemini models.",
-      "translation": "Gemini モデルを設定する設定画面。"
+      "original": "Settings page where you configure the API Key and Model.",
+      "translation": "API キーとモデルを設定する設定画面。"
     },
     {
       "context": "Section heading",
       "original": "Changelog",
       "translation": "変更履歴"
-    },
-    {
-      "context": "Changelog — 1.1.0",
-      "original": "Migrated all AI features to the WordPress AI Client (no direct provider HTTP calls).",
-      "translation": "すべての AI 機能を WordPress AI Client に移行しました（プロバイダーへの直接 HTTP 呼び出しを廃止）。"
-    },
-    {
-      "context": "Changelog — 1.1.0",
-      "original": "Removed plugin-owned API key settings; credentials are managed under Settings → Connectors.",
-      "translation": "プラグイン内の API キー設定を削除しました。認証情報は設定 → コネクターで管理します。"
-    },
-    {
-      "context": "Changelog — 1.1.0",
-      "original": "Fixed rewrite output being truncated on long articles (increased output token limit and improved response parsing).",
-      "translation": "長文記事のリライト出力が途中で切れる問題を修正しました（出力トークン上限の引き上げとレスポンス解析の改善）。"
-    },
-    {
-      "context": "Changelog — 1.1.0",
-      "original": "Updated settings UI for connector-based model selection.",
-      "translation": "コネクター連携向けに設定 UI を更新しました。"
-    },
-    {
-      "context": "Changelog — 1.0.1",
-      "original": "Raised minimum requirements to WordPress 7.0 and PHP 8.3.",
-      "translation": "動作要件を WordPress 7.0 以上・PHP 8.3 以上に更新しました。"
-    },
-    {
-      "context": "Changelog — 1.0.1",
-      "original": "Fixed Classic Editor support for analyze, rewrite, and image suggestions.",
-      "translation": "クラシックエディタでの分析・リライト・画像提案を修正しました。"
-    },
-    {
-      "context": "Changelog — 1.0.1",
-      "original": "Improved script loading, REST API permissions, and image placement reliability.",
-      "translation": "スクリプト読み込み、REST API 権限、画像配置の信頼性を改善しました。"
     },
     {
       "context": "Changelog — 1.0.0",
@@ -287,16 +217,6 @@
       "context": "Section heading",
       "original": "Upgrade Notice",
       "translation": "アップグレード通知"
-    },
-    {
-      "context": "Upgrade Notice — 1.1.0",
-      "original": "Migrates to the WordPress AI Client. Install the Google Gemini connector and configure your API key under Settings → Connectors. Plugin API key settings are no longer used.",
-      "translation": "WordPress AI Client への移行版です。Google Gemini コネクターをインストールし、設定 → コネクターで API キーを設定してください。プラグイン内の API キー設定は使用されません。"
-    },
-    {
-      "context": "Upgrade Notice — 1.0.1",
-      "original": "Classic Editor fixes, security improvements, and WordPress 7.0 / PHP 8.3 requirement update.",
-      "translation": "クラシックエディタ修正、セキュリティ改善、WordPress 7.0 / PHP 8.3 要件更新を含みます。"
     },
     {
       "context": "Upgrade Notice — 1.0.0",

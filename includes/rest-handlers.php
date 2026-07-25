@@ -15,11 +15,24 @@ class PicotAioOptimizer_REST_Handlers
     public static function can_edit_post_param($request)
     {
         $post_id = absint($request->get_param('post_id'));
-        if ($post_id > 0) {
-            return current_user_can('edit_post', $post_id);
+        // 新投稿でも auto-draft の ID を必ず送る。投稿未指定の広い edit_posts フォールバックは使わない。
+        if ($post_id <= 0) {
+            return false;
         }
 
-        return current_user_can('edit_posts');
+        return current_user_can('edit_post', $post_id);
+    }
+
+    /**
+     * Image generation needs upload rights in addition to post edit rights.
+     */
+    public static function can_generate_image($request)
+    {
+        if (!current_user_can('upload_files')) {
+            return false;
+        }
+
+        return self::can_edit_post_param($request);
     }
 
     /**
@@ -41,11 +54,14 @@ class PicotAioOptimizer_REST_Handlers
      */
     private static function sanitize_exception_message($e, $context)
     {
+        $localized = PicotAioOptimizer_Ai_Client_Helper::localize_api_error_message($e->getMessage());
+        $message = trim($context . ' ' . $localized);
+
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            return $context . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
+            $message .= ' [' . $e->getFile() . ':' . $e->getLine() . ']';
         }
 
-        return $context;
+        return $message;
     }
 
     /**
@@ -53,10 +69,18 @@ class PicotAioOptimizer_REST_Handlers
      */
     public static function analyze_content($request)
     {
-        set_time_limit(0); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Required for long-running AI API requests that exceed default PHP timeout
+        self::relax_execution_limit();
 
-        $content = $request->get_param('content');
-        $post_id = $request->get_param('post_id');
+        $content = (string) $request->get_param('content');
+        $post_id = absint($request->get_param('post_id'));
+
+        if (trim($content) === '') {
+            return new WP_Error('missing_content', __('Article content is required.', 'picot-aio-ai-content-optimizer'), array('status' => 400));
+        }
+
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_ready()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::readiness_error_message(), array('status' => 400));
+        }
 
         if (!PicotAioOptimizer_Ai_Client_Helper::supports_text_generation()) {
             return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
@@ -64,14 +88,18 @@ class PicotAioOptimizer_REST_Handlers
 
         $model = get_option('picot_aio_optimizer_model', PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL);
 
-        $result = PicotAioOptimizer_Client::call_gemini_api($content, $model);
+        try {
+            $result = PicotAioOptimizer_Client::call_gemini_api($content, $model);
+        } catch (Throwable $e) {
+            return new WP_Error('fatal_error', self::sanitize_exception_message($e, __('Analysis failed.', 'picot-aio-ai-content-optimizer')), array('status' => 500));
+        }
 
         if (is_wp_error($result)) {
             return $result;
         }
 
         // Save log to DB
-        if (!empty($post_id)) {
+        if ($post_id > 0) {
             PicotAioOptimizer_Database::gar_save_analysis_log($post_id, $result);
         }
 
@@ -82,11 +110,22 @@ class PicotAioOptimizer_REST_Handlers
     }
 
     /**
+     * Relax PHP limits for long-running AI requests when the host allows it.
+     */
+    private static function relax_execution_limit()
+    {
+        if (function_exists('set_time_limit')) {
+            // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Required for long-running AI API requests that exceed default PHP timeout
+            @set_time_limit(0);
+        }
+    }
+
+    /**
      * Rewrite Article handler
      */
     public static function rewrite_article($request)
     {
-        set_time_limit(0); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Required for long-running AI API requests that exceed default PHP timeout
+        self::relax_execution_limit();
 
         try {
             $params = $request->get_json_params();
@@ -94,12 +133,22 @@ class PicotAioOptimizer_REST_Handlers
             $content = isset($params['content']) ? $params['content'] : $request->get_param('content');
             $instructions = isset($params['instructions']) ? $params['instructions'] : $request->get_param('instructions', '');
 
+            $title = sanitize_text_field((string) $title);
+            $content = (string) $content;
+            $instructions = sanitize_textarea_field((string) $instructions);
+
+            if (!PicotAioOptimizer_Ai_Client_Helper::is_ready()) {
+                return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::readiness_error_message(), array('status' => 400));
+            }
+
             if (!PicotAioOptimizer_Ai_Client_Helper::supports_text_generation()) {
                 return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
             }
 
             $model_id = get_option('picot_aio_optimizer_model', PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL);
-            $gen_img = get_option('picot_aio_optimizer_enable_image_gen', 0);
+            // 画像生成は有償プランのみ有効。
+            $gen_img = get_option('picot_aio_optimizer_enable_image_gen', 0)
+                && PicotAioOptimizer_Ai_Client_Helper::is_paid_api_plan();
 
             // UTF-8 Sanitization
             if (function_exists('mb_convert_encoding')) {
@@ -120,7 +169,7 @@ class PicotAioOptimizer_REST_Handlers
                 'success' => true,
                 'data' => array(
                     'title' => $title,
-                    'content' => isset($result['content']) ? $result['content'] : ''
+                    'content' => isset($result['content']) ? wp_kses_post((string) $result['content']) : ''
                 )
             ));
         } catch (Throwable $e) {
@@ -133,12 +182,19 @@ class PicotAioOptimizer_REST_Handlers
      */
     public static function suggest_images($request)
     {
-        set_time_limit(0); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Required for long-running AI API requests that exceed default PHP timeout
+        self::relax_execution_limit();
 
         try {
             $params = $request->get_json_params();
             $title = isset($params['title']) ? $params['title'] : $request->get_param('title');
             $content = isset($params['content']) ? $params['content'] : $request->get_param('content');
+
+            $title = sanitize_text_field((string) $title);
+            $content = (string) $content;
+
+            if (!PicotAioOptimizer_Ai_Client_Helper::is_ready()) {
+                return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::readiness_error_message(), array('status' => 400));
+            }
 
             if (!PicotAioOptimizer_Ai_Client_Helper::supports_text_generation()) {
                 return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
@@ -228,10 +284,11 @@ class PicotAioOptimizer_REST_Handlers
             }
 
             // Normalize response structure
+            $suggestions = isset($parsed['suggestions']) ? $parsed['suggestions'] : (isset($parsed[0]) ? $parsed : array());
             $data = array(
-                'featured_text'   => isset($parsed['featured_text']) ? $parsed['featured_text'] : '',
-                'featured_prompt' => isset($parsed['featured_prompt']) ? $parsed['featured_prompt'] : '',
-                'suggestions'     => isset($parsed['suggestions']) ? $parsed['suggestions'] : (isset($parsed[0]) ? $parsed : array())
+                'featured_text'   => isset($parsed['featured_text']) ? sanitize_text_field((string) $parsed['featured_text']) : '',
+                'featured_prompt' => isset($parsed['featured_prompt']) ? sanitize_textarea_field((string) $parsed['featured_prompt']) : '',
+                'suggestions'     => self::sanitize_suggestions($suggestions),
             );
 
             return rest_ensure_response(array(
@@ -244,10 +301,46 @@ class PicotAioOptimizer_REST_Handlers
     }
 
     /**
+     * Normalize AI-provided image suggestions into plain text fields.
+     *
+     * @param mixed $suggestions Raw suggestion list.
+     * @return array
+     */
+    private static function sanitize_suggestions($suggestions)
+    {
+        if (!is_array($suggestions)) {
+            return array();
+        }
+
+        $clean = array();
+        foreach ($suggestions as $suggestion) {
+            if (!is_array($suggestion)) {
+                continue;
+            }
+
+            $clean[] = array(
+                'location'    => isset($suggestion['location']) ? sanitize_text_field((string) $suggestion['location']) : '',
+                'description' => isset($suggestion['description']) ? sanitize_text_field((string) $suggestion['description']) : '',
+                'prompt'      => isset($suggestion['prompt']) ? sanitize_textarea_field((string) $suggestion['prompt']) : '',
+            );
+        }
+
+        return $clean;
+    }
+
+    /**
      * Generate Image handler
      */
     public static function generate_image($request)
     {
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_paid_api_plan()) {
+            return new WP_Error(
+                'free_plan',
+                __('Image generation requires a paid Gemini API plan. Set Gemini API plan to Paid on the settings screen.', 'picot-aio-ai-content-optimizer'),
+                array('status' => 403)
+            );
+        }
+
         if (!get_option('picot_aio_optimizer_enable_image_gen', 0)) {
             return new WP_Error('disabled', __('Image generation is disabled in settings.', 'picot-aio-ai-content-optimizer'), array('status' => 403));
         }
@@ -257,19 +350,29 @@ class PicotAioOptimizer_REST_Handlers
             return new WP_Error('missing_prompt', __('Image prompt is required.', 'picot-aio-ai-content-optimizer'), array('status' => 400));
         }
 
+        $post_id = absint($request->get_param('post_id'));
+
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_ready()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::readiness_error_message(), array('status' => 400));
+        }
+
         if (!PicotAioOptimizer_Ai_Client_Helper::supports_image_generation()) {
             return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
         }
 
         $image_model = get_option('picot_aio_optimizer_image_model', PicotAioOptimizer_Client::DEFAULT_IMAGE_MODEL);
 
-        $image_data = PicotAioOptimizer_Client::gar_generate_image_via_api($prompt, $image_model);
+        try {
+            $image_data = PicotAioOptimizer_Client::gar_generate_image_via_api($prompt, $image_model);
 
-        if (is_wp_error($image_data)) {
-            return $image_data;
+            if (is_wp_error($image_data)) {
+                return $image_data;
+            }
+
+            $upload_result = PicotAioOptimizer_Media::gar_upload_base64_image_to_wp($image_data, $prompt, $post_id);
+        } catch (Throwable $e) {
+            return new WP_Error('fatal_error', self::sanitize_exception_message($e, __('Image generation failed.', 'picot-aio-ai-content-optimizer')), array('status' => 500));
         }
-
-        $upload_result = PicotAioOptimizer_Media::gar_upload_base64_image_to_wp($image_data, $prompt);
 
         if (is_wp_error($upload_result)) {
             return $upload_result;
@@ -291,7 +394,7 @@ class PicotAioOptimizer_REST_Handlers
         $suggestions_raw = $request->get_param('suggestions');
 
         if ($post_id <= 0) {
-            return new WP_Error('missing_post_id', 'Post ID required', array('status' => 400));
+            return new WP_Error('missing_post_id', __('Post ID is required.', 'picot-aio-ai-content-optimizer'), array('status' => 400));
         }
 
         if (empty($suggestions_raw)) {
@@ -314,7 +417,7 @@ class PicotAioOptimizer_REST_Handlers
             $featured_prompt = '';
         }
 
-        update_post_meta($post_id, '_picot_aio_optimizer_image_suggestions', wp_json_encode($suggestions));
+        update_post_meta($post_id, '_picot_aio_optimizer_image_suggestions', wp_json_encode(self::sanitize_suggestions($suggestions)));
         update_post_meta($post_id, '_picot_aio_optimizer_featured_text', sanitize_text_field($featured_text));
         update_post_meta($post_id, '_picot_aio_optimizer_featured_prompt', sanitize_textarea_field($featured_prompt));
         update_post_meta($post_id, '_picot_aio_optimizer_image_suggestions_updated', current_time('mysql'));
@@ -329,7 +432,7 @@ class PicotAioOptimizer_REST_Handlers
     {
         $post_id = absint($request->get_param('post_id'));
         if ($post_id <= 0) {
-            return new WP_Error('missing_post_id', 'Post ID is required', array('status' => 400));
+            return new WP_Error('missing_post_id', __('Post ID is required.', 'picot-aio-ai-content-optimizer'), array('status' => 400));
         }
 
         $suggestions_meta = get_post_meta($post_id, '_picot_aio_optimizer_image_suggestions', true);
@@ -354,14 +457,15 @@ class PicotAioOptimizer_REST_Handlers
             $suggestions = array();
         }
 
+        // 旧形式や meta 直接改ざんに備え、返却前に必ず再サニタイズする。
         return rest_ensure_response(array(
             'success' => true,
             'data' => array(
-                'suggestions' => $suggestions,
-                'featured_text' => $featured_text ? $featured_text : '',
-                'featured_prompt' => $featured_prompt ? $featured_prompt : ''
+                'suggestions' => self::sanitize_suggestions($suggestions),
+                'featured_text' => $featured_text ? sanitize_text_field($featured_text) : '',
+                'featured_prompt' => $featured_prompt ? sanitize_textarea_field($featured_prompt) : ''
             ),
-            'updated' => $updated ? $updated : null
+            'updated' => $updated ? sanitize_text_field($updated) : null
         ));
     }
 
@@ -408,8 +512,8 @@ class PicotAioOptimizer_REST_Handlers
      */
     public static function fetch_models($request)
     {
-        if (!PicotAioOptimizer_Ai_Client_Helper::is_available()) {
-            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::unavailable_message(), array('status' => 400));
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_ready()) {
+            return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::readiness_error_message(), array('status' => 400));
         }
 
         try {
@@ -417,7 +521,7 @@ class PicotAioOptimizer_REST_Handlers
             $text_items = $manager->list_models();
             $image_items = $manager->list_image_models();
         } catch (Throwable $e) {
-            return new WP_Error('api_error', $e->getMessage(), array('status' => 500));
+            return new WP_Error('api_error', PicotAioOptimizer_Ai_Client_Helper::localize_api_error_message($e->getMessage()), array('status' => 500));
         }
 
         $text_models = array();

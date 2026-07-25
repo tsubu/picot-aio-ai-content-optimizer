@@ -4,7 +4,7 @@
  * Plugin Name: Picot AIO AI Content Optimizer
  * Plugin URI: https://github.com/tsubu/picot-aio-ai-content-optimizer
  * Description: AI-powered content analysis and optimization using Google Gemini via the WordPress AI Client. Provides SEO advice, content recommendations, and automated image generation for WordPress posts and pages.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Requires at least: 7.0
  * Requires PHP: 8.3
  * Author: tsubu
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 
 // Define plugin constants
-define('PICOT_AIO_OPTIMIZER_VERSION', '1.1.0');
+define('PICOT_AIO_OPTIMIZER_VERSION', '1.1.1');
 define('PICOT_AIO_OPTIMIZER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PICOT_AIO_OPTIMIZER_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -51,9 +51,9 @@ class PicotAioOptimizer
     public function __construct()
     {
         // Hooks
-        add_action('init', array($this, 'load_textdomain'));
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'admin_init'));
+        add_action('admin_notices', array($this, 'maybe_show_ai_plugin_notice'));
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_settings_link'));
         add_action('rest_api_init', array($this, 'gar_register_rest_routes'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
@@ -62,17 +62,31 @@ class PicotAioOptimizer
         // Classic Editor support
         add_action('add_meta_boxes', array($this, 'add_meta_box'));
 
-        // Initialize DB / Migrate on load
-        PicotAioOptimizer_Database::gar_init_db();
+        // DB 初期化は管理画面のみ。フロントの毎リクエスト実行を避ける。
+        add_action('admin_init', array('PicotAioOptimizer_Database', 'gar_init_db'));
     }
 
-    public function load_textdomain()
+    /**
+     * Prompt to install/activate the official AI plugin on the post editor.
+     *
+     * @return void
+     */
+    public function maybe_show_ai_plugin_notice()
     {
-        load_plugin_textdomain(
-            'picot-aio-ai-content-optimizer',
-            false,
-            dirname(plugin_basename(__FILE__)) . '/languages'
-        );
+        if (!current_user_can('activate_plugins') || PicotAioOptimizer_Ai_Client_Helper::is_ai_plugin_active()) {
+            return;
+        }
+
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if (!$screen || !in_array($screen->base, array('post', 'post-new'), true)) {
+            return;
+        }
+
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_google_configured()) {
+            return;
+        }
+
+        PicotAioOptimizer_Ai_Client_Helper::print_ai_plugin_requirement_notice();
     }
 
     public function admin_init()
@@ -87,6 +101,14 @@ class PicotAioOptimizer
             }
 
             // Save Inputs
+            if (isset($_POST['picot_aio_optimizer_api_plan'])) {
+                update_option(
+                    'picot_aio_optimizer_api_plan',
+                    PicotAioOptimizer_Ai_Client_Helper::sanitize_api_plan(
+                        sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_api_plan']))
+                    )
+                );
+            }
             if (isset($_POST['picot_aio_optimizer_model'])) {
                 $model = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec(
                     sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_model']))
@@ -95,12 +117,25 @@ class PicotAioOptimizer
                     update_option('picot_aio_optimizer_model', $model);
                 }
             }
-            // Checkbox handling: if not set, it's 0
-            $enable_gen = isset($_POST['picot_aio_optimizer_enable_image_gen']) ? 1 : 0;
-            update_option('picot_aio_optimizer_enable_image_gen', $enable_gen);
+            // 有償かつチェックボックスが操作可能なときだけ更新。無償時は disabled で POST されないため、
+            // 保存済みの「有効」設定を消さない。free→paid 同一保存で JS 無効の場合も既存値を維持する。
+            if (PicotAioOptimizer_Ai_Client_Helper::is_paid_api_plan()) {
+                if (
+                    isset($_POST['picot_aio_optimizer_enable_image_gen'])
+                    || isset($_POST['picot_aio_optimizer_image_gen_editable'])
+                ) {
+                    $enable_gen = isset($_POST['picot_aio_optimizer_enable_image_gen']) ? 1 : 0;
+                    update_option('picot_aio_optimizer_enable_image_gen', $enable_gen);
+                }
+            }
 
             if (isset($_POST['picot_aio_optimizer_image_style'])) {
-                update_option('picot_aio_optimizer_image_style', sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_image_style'])));
+                update_option(
+                    'picot_aio_optimizer_image_style',
+                    PicotAioOptimizer_Admin_Views::sanitize_image_style(
+                        sanitize_text_field(wp_unslash($_POST['picot_aio_optimizer_image_style']))
+                    )
+                );
             }
             if (isset($_POST['picot_aio_optimizer_image_model'])) {
                 $image_model = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec(
@@ -120,9 +155,16 @@ class PicotAioOptimizer
             exit;
         }
 
+        register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_api_plan', array(
+            'sanitize_callback' => array('PicotAioOptimizer_Ai_Client_Helper', 'sanitize_api_plan'),
+            'default'           => 'paid',
+        ));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_model', array('sanitize_callback' => 'sanitize_text_field'));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_enable_image_gen', array('sanitize_callback' => 'absint'));
-        register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_image_style', array('sanitize_callback' => 'sanitize_text_field'));
+        register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_image_style', array(
+            'sanitize_callback' => array('PicotAioOptimizer_Admin_Views', 'sanitize_image_style'),
+            'default'           => 'none',
+        ));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_image_model', array('sanitize_callback' => 'sanitize_text_field'));
     }
 
@@ -172,9 +214,7 @@ class PicotAioOptimizer
         register_rest_route($ns, '/rewrite', array(
             'methods' => 'POST',
             'callback' => array('PicotAioOptimizer_REST_Handlers', 'rewrite_article'),
-            'permission_callback' => function () {
-                return current_user_can('edit_posts');
-            }
+            'permission_callback' => array('PicotAioOptimizer_REST_Handlers', 'can_edit_post_param'),
         ));
 
         register_rest_route($ns, '/models', array(
@@ -194,9 +234,7 @@ class PicotAioOptimizer
         register_rest_route($ns, '/generate-image', array(
             'methods' => 'POST',
             'callback' => array('PicotAioOptimizer_REST_Handlers', 'generate_image'),
-            'permission_callback' => function () {
-                return current_user_can('upload_files');
-            }
+            'permission_callback' => array('PicotAioOptimizer_REST_Handlers', 'can_generate_image'),
         ));
 
         register_rest_route($ns, '/history', array(
@@ -208,9 +246,7 @@ class PicotAioOptimizer
         register_rest_route($ns, '/suggest-images', array(
             'methods' => 'POST',
             'callback' => array('PicotAioOptimizer_REST_Handlers', 'suggest_images'),
-            'permission_callback' => function () {
-                return current_user_can('edit_posts');
-            }
+            'permission_callback' => array('PicotAioOptimizer_REST_Handlers', 'can_edit_post_param'),
         ));
 
         register_rest_route($ns, '/save-image-suggestions', array(
@@ -232,7 +268,8 @@ class PicotAioOptimizer
     public function enqueue_admin_scripts($hook)
     {
         // Only load on post edit pages and the plugin settings page
-        $is_settings_page = (isset($_GET['page']) && $_GET['page'] === 'picot_aio_optimizer'); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading admin page slug only, not processing form data
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading admin page slug only, not processing form data
+        $is_settings_page = (isset($_GET['page']) && sanitize_text_field(wp_unslash($_GET['page'])) === 'picot_aio_optimizer');
 
         if ('post.php' !== $hook && 'post-new.php' !== $hook && ! $is_settings_page) {
             return;
@@ -298,7 +335,8 @@ class PicotAioOptimizer
             'rest_url_models'           => rest_url('picot_aio_optimizer/v1/models'),
             'rest_nonce'                => wp_create_nonce('wp_rest'),
             'nonce'                     => wp_create_nonce('picot_aio_optimizer_nonce'),
-            'enable_image_gen'          => (bool) get_option('picot_aio_optimizer_enable_image_gen', 0),
+            'enable_image_gen'          => (bool) get_option('picot_aio_optimizer_enable_image_gen', 0)
+                && PicotAioOptimizer_Ai_Client_Helper::is_paid_api_plan(),
             'image_style_desc'          => PicotAioOptimizer_Admin_Views::get_selected_image_style_desc(),
             'debug_mode'                => (defined('WP_DEBUG') && WP_DEBUG),
             'strings'                   => PicotAioOptimizer_Admin_Views::get_localized_strings(),

@@ -60,9 +60,10 @@ class PicotAioOptimizer_Database
             }
         }
 
-        // Check and add missing index if needed (cached for 24h)
+        // Check and add missing index if needed (cached for 24h). テーブルが確実に存在する場合のみ。
+        $table_exists = get_transient('picot_aio_optimizer_table_exists');
         $index_checked = get_transient('picot_aio_optimizer_index_checked');
-        if (false === $index_checked) {
+        if ($table_exists === '1' && false === $index_checked) {
             $index_exists = $wpdb->get_results($wpdb->prepare("SHOW INDEX FROM {$wpdb->prefix}picot_aio_optimizer_logs WHERE Key_name = %s", 'created_at')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             if (empty($index_exists)) {
                 $wpdb->query("ALTER TABLE {$wpdb->prefix}picot_aio_optimizer_logs ADD KEY created_at (created_at)"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
@@ -95,7 +96,7 @@ class PicotAioOptimizer_Database
 
         // Safely encode array to JSON with UTF-8 support
         if (is_array($advice_result)) {
-            $json_result = json_encode($advice_result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $json_result = wp_json_encode($advice_result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($json_result === false) {
                 self::log_error('JSON encoding failed: ' . json_last_error_msg(), true);
                 return false;
