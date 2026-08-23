@@ -156,6 +156,11 @@ class PicotAioOptimizer_Client
             $final_prompt .= ', ' . $style_desc;
         }
 
+        $common_image_prompt = PicotAioOptimizer_Ai_Client_Helper::get_common_image_prompt();
+        if ($common_image_prompt !== '') {
+            $final_prompt .= ', ' . $common_image_prompt;
+        }
+
         $request_options = new RequestOptions();
         $request_options->setTimeout((float) PICOT_AIO_OPTIMIZER_IMAGE_API_TIMEOUT);
 
@@ -444,8 +449,18 @@ class PicotAioOptimizer_Client
         $thumb_label = __('Thumbnail Prompt', 'picot-aio-ai-content-optimizer');
         $system_instruction = str_replace('{{THUMBNAIL_LABEL}}', $thumb_label, $system_instruction);
 
-        if (!empty($instructions)) {
-            $system_instruction .= "\n\n" . $additional_label . $instructions;
+        $instructions = trim((string) $instructions);
+        if ($instructions !== '') {
+            if ($lang_code === 'ja') {
+                $priority = "【最優先】次のリライト指示に必ず従ってください。他のルールと矛盾する場合は、この指示を優先します。\n"
+                    . $instructions
+                    . "\n\n";
+            } else {
+                $priority = "HIGHEST PRIORITY: You MUST follow these rewrite instructions. If they conflict with other rules, these instructions win.\n"
+                    . $instructions
+                    . "\n\n";
+            }
+            $system_instruction = $priority . $system_instruction . "\n\n" . $additional_label . $instructions;
         }
 
         return $system_instruction;

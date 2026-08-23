@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: picot-aio-ai-content-optimizer 1.1.1\n"
+"Project-Id-Version: picot-aio-ai-content-optimizer 1.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/picot-aio-ai-content-optimizer/\n"
 "POT-Creation-Date: 2026-07-06 21:34+0000\n"
 "PO-Revision-Date: 2026-07-22 17:51+0000\n"
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Digital Art"
 msgstr ""
 
-msgid "Discovering images..."
+msgid "Discovering image placement points..."
 msgstr ""
 
 msgid "Done"
@@ -313,6 +313,9 @@ msgstr ""
 msgid "Refresh the model list after connecting the Google Gemini connector."
 msgstr ""
 
+msgid "Models with Lite or -lite in the name, usually listed near the top, are recommended. Older models may not be available."
+msgstr ""
+
 msgid "Rewrite Instructions"
 msgstr ""
 
@@ -368,7 +371,7 @@ msgstr ""
 msgid "Structure Analysis"
 msgstr ""
 
-msgid "Suggest Images"
+msgid "Discover Image Placement Points"
 msgstr ""
 
 msgid "Summary"
@@ -539,4 +542,34 @@ msgstr ""
 msgid ""
 "With free API usage, service may become unavailable due to Gemini token "
 "limit changes or similar policy updates."
+msgstr ""
+
+msgid "Common rewrite prompt"
+msgstr ""
+
+msgid "Common image prompt"
+msgstr ""
+
+msgid ""
+"These instructions are always added when generating images."
+msgstr ""
+
+msgid ""
+"Example: Clean composition, no text in the image, natural lighting, blog-ready illustration."
+msgstr ""
+
+msgid ""
+"These instructions are always added when rewriting. Additional instructions "
+"in the editor are appended after this prompt."
+msgstr ""
+
+msgid ""
+"Example: Keep a professional tone. Prefer short paragraphs. Do not add "
+"information that is not in the original."
+msgstr ""
+
+msgid "Generating image..."
+msgstr ""
+
+msgid "Image Opportunities"
 msgstr ""

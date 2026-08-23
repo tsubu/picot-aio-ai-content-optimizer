@@ -18,7 +18,7 @@ class PicotAioOptimizer_Admin_Views
             'analyzing'                          => esc_html__('Analyzing...', 'picot-aio-ai-content-optimizer'),
             'rewriting'                          => esc_html__('Rewriting...', 'picot-aio-ai-content-optimizer'),
             'processing'                         => esc_html__('Processing...', 'picot-aio-ai-content-optimizer'),
-            'discovering'                        => esc_html__('Discovering images...', 'picot-aio-ai-content-optimizer'),
+            'discovering'                        => esc_html__('Discovering image placement points...', 'picot-aio-ai-content-optimizer'),
             'confirm_rewrite'                    => esc_html__('Are you sure you want to rewrite content? The current title and content will be overwritten.', 'picot-aio-ai-content-optimizer'),
             'success_rewrite'                    => esc_html__('Rewrite completed successfully!', 'picot-aio-ai-content-optimizer'),
             'error'                              => esc_html__('Error occurred.', 'picot-aio-ai-content-optimizer'),
@@ -37,7 +37,7 @@ class PicotAioOptimizer_Admin_Views
             'label_titles'                       => esc_html__('SEO Title Ideas', 'picot-aio-ai-content-optimizer'),
             'label_meta'                         => esc_html__('Meta Description Suggestions', 'picot-aio-ai-content-optimizer'),
             'label_history'                      => esc_html__('View History for this Post', 'picot-aio-ai-content-optimizer'),
-            'discover_images_btn'                => esc_html__('Suggest Images', 'picot-aio-ai-content-optimizer'),
+            'discover_images_btn'                => esc_html__('Discover Image Placement Points', 'picot-aio-ai-content-optimizer'),
             'generate_btn'                       => esc_html__('Generate', 'picot-aio-ai-content-optimizer'),
             'generating'                         => esc_html__('Generating...', 'picot-aio-ai-content-optimizer'),
             'featured_image'                     => esc_html__('Featured Image', 'picot-aio-ai-content-optimizer'),
@@ -77,6 +77,7 @@ class PicotAioOptimizer_Admin_Views
             'network_error'                      => esc_html__('Network error. Please check your connection.', 'picot-aio-ai-content-optimizer'),
             'no_suggestions_near'                => esc_html__('No suitable image placement found', 'picot-aio-ai-content-optimizer'),
             'fetching_models'                    => esc_html__('Fetching...', 'picot-aio-ai-content-optimizer'),
+            'fetching'                           => esc_html__('Fetching...', 'picot-aio-ai-content-optimizer'),
             'fetch_models_done'                  => esc_html__('Done', 'picot-aio-ai-content-optimizer'),
             'fetch_models_error'                 => esc_html__('Error', 'picot-aio-ai-content-optimizer'),
             'no_data'                            => esc_html__('(No data)', 'picot-aio-ai-content-optimizer'),
@@ -84,6 +85,8 @@ class PicotAioOptimizer_Admin_Views
             'unknown_error'                      => esc_html__('Unknown error', 'picot-aio-ai-content-optimizer'),
             'copy_failed'                        => esc_html__('Copy failed. Please copy manually.', 'picot-aio-ai-content-optimizer'),
             'overlay_submessage'                 => esc_html__('Please wait while AI processes your content...', 'picot-aio-ai-content-optimizer'),
+            'generating_image'                   => esc_html__('Generating image...', 'picot-aio-ai-content-optimizer'),
+            'image_opportunities'                => esc_html__('Image Opportunities', 'picot-aio-ai-content-optimizer'),
         );
     }
 
@@ -153,6 +156,7 @@ class PicotAioOptimizer_Admin_Views
      */
     public static function render_meta_box($post)
     {
+        $image_gen_enabled = PicotAioOptimizer_Ai_Client_Helper::is_image_generation_enabled();
 ?>
         <div id="picot_aio_optimizer-classic-editor-ui">
             <div style="margin-bottom:15px;">
@@ -167,11 +171,13 @@ class PicotAioOptimizer_Admin_Views
                         <?php echo esc_html(self::get_localized_strings()['rewrite_btn']); ?>
                     </button>
                 </div>
+                <?php if ($image_gen_enabled) : ?>
                 <div style="margin-bottom:10px;">
                     <button type="button" class="button button-secondary" id="picot_aio_optimizer-classic-discover-images" style="width:100%; height:40px; justify-content:center; display:flex; align-items:center;">
                         <?php echo esc_html(self::get_localized_strings()['discover_images_btn']); ?>
                     </button>
                 </div>
+                <?php endif; ?>
             </div>
             <div id="picot_aio_optimizer-classic-results" style="padding:10px; background:#f9f9f9; border:1px solid #ddd; min-height:50px;">
                 <p style="color:#666; font-style:italic;">
@@ -193,7 +199,9 @@ class PicotAioOptimizer_Admin_Views
         $image_model      = PicotAioOptimizer_Ai_Client_Helper::normalize_model_spec(
             get_option('picot_aio_optimizer_image_model', PicotAioOptimizer_Client::DEFAULT_IMAGE_MODEL)
         );
-        $enable_image_gen = get_option('picot_aio_optimizer_enable_image_gen', 0);
+        $enable_image_gen = (int) get_option('picot_aio_optimizer_enable_image_gen', 0) === 1;
+        $common_rewrite_prompt = (string) get_option('picot_aio_optimizer_common_rewrite_prompt', '');
+        $common_image_prompt = (string) get_option('picot_aio_optimizer_common_image_prompt', '');
         $image_style      = get_option('picot_aio_optimizer_image_style', 'none');
         $available_models = PicotAioOptimizer_Ai_Client_Helper::get_model_list_option('picot_aio_optimizer_available_models');
         $available_image_models = PicotAioOptimizer_Ai_Client_Helper::get_model_list_option('picot_aio_optimizer_available_image_models');
@@ -307,6 +315,27 @@ class PicotAioOptimizer_Admin_Views
                         <p class="description">
                             <?php esc_html_e('Refresh the model list after connecting the Google Gemini connector.', 'picot-aio-ai-content-optimizer'); ?>
                         </p>
+                        <p class="description">
+                            <?php esc_html_e('Models with Lite or -lite in the name, usually listed near the top, are recommended. Older models may not be available.', 'picot-aio-ai-content-optimizer'); ?>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="picot-settings-row">
+                    <div class="picot-settings-label">
+                        <label for="picot_aio_optimizer_common_rewrite_prompt"><?php esc_html_e('Common rewrite prompt', 'picot-aio-ai-content-optimizer'); ?></label>
+                    </div>
+                    <div class="picot-settings-field">
+                        <textarea
+                            name="picot_aio_optimizer_common_rewrite_prompt"
+                            id="picot_aio_optimizer_common_rewrite_prompt"
+                            rows="6"
+                            class="large-text"
+                            placeholder="<?php echo esc_attr__('Example: Keep a professional tone. Prefer short paragraphs. Do not add information that is not in the original.', 'picot-aio-ai-content-optimizer'); ?>"
+                        ><?php echo esc_textarea($common_rewrite_prompt); ?></textarea>
+                        <p class="description">
+                            <?php esc_html_e('These instructions are always added when rewriting. Additional instructions in the editor are appended after this prompt.', 'picot-aio-ai-content-optimizer'); ?>
+                        </p>
                     </div>
                 </div>
 
@@ -379,6 +408,24 @@ class PicotAioOptimizer_Admin_Views
                         </select>
                         <p class="description">
                             <?php esc_html_e('Select the style for generated images. It will be automatically added to the prompt.', 'picot-aio-ai-content-optimizer'); ?>
+                        </p>
+                    </div>
+                </div>
+
+                <div id="picot_aio_optimizer_common_image_prompt_row" class="picot-settings-row" style="<?php echo $enable_image_gen ? '' : 'display:none;'; ?>">
+                    <div class="picot-settings-label">
+                        <label for="picot_aio_optimizer_common_image_prompt"><?php esc_html_e('Common image prompt', 'picot-aio-ai-content-optimizer'); ?></label>
+                    </div>
+                    <div class="picot-settings-field">
+                        <textarea
+                            name="picot_aio_optimizer_common_image_prompt"
+                            id="picot_aio_optimizer_common_image_prompt"
+                            rows="6"
+                            class="large-text"
+                            placeholder="<?php echo esc_attr__('Example: Clean composition, no text in the image, natural lighting, blog-ready illustration.', 'picot-aio-ai-content-optimizer'); ?>"
+                        ><?php echo esc_textarea($common_image_prompt); ?></textarea>
+                        <p class="description">
+                            <?php esc_html_e('These instructions are always added when generating images.', 'picot-aio-ai-content-optimizer'); ?>
                         </p>
                     </div>
                 </div>

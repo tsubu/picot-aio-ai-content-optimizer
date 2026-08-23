@@ -6,6 +6,11 @@
     window.picot_aio_optimizer = window.picot_aio_optimizer || { strings: {} };
     var picot_aio_optimizer = window.picot_aio_optimizer;
 
+    function isImageGenerationEnabled() {
+        var value = picot_aio_optimizer.enable_image_gen;
+        return value === true || value === 1 || value === '1';
+    }
+
     /**
      * Centralized AJAX error handler
      * Logs detailed error to console and shows user-friendly message
@@ -205,9 +210,7 @@
          * resultPanelId differentiates the two result containers.
          */
         var buildPanelContent = function(rewriteInstructions, setRewriteInstructions, resultPanelId) {
-            return el(
-                Fragment,
-                {},
+            var nodes = [
                 // Row 1: Analyze
                 el('div', { style: { marginBottom: '15px' } },
                     el(Button, {
@@ -231,19 +234,24 @@
                         style: { width: '100%', justifyContent: 'center' },
                         onClick: function() { triggerRewrite(rewriteInstructions); }
                     }, picot_aio_optimizer.strings.rewrite_btn || 'AI Rewrite')
-                ),
-                // Row 3: Discover Images
-                el('div', { style: { marginBottom: '15px' } },
-                    el(Button, {
-                        id: 'picot_aio_optimizer-discover-btn',
-                        isSecondary: true, isLarge: true,
-                        style: { width: '100%', justifyContent: 'center' },
-                        onClick: function() { discoverImagePrompts(); }
-                    }, picot_aio_optimizer.strings.discover_images_btn || 'Suggest Images')
-                ),
-                // Row 4: Results container
+                )
+            ];
+
+            if (isImageGenerationEnabled()) {
+                nodes.push(
+                    el('div', { style: { marginBottom: '15px' } },
+                        el(Button, {
+                            id: 'picot_aio_optimizer-discover-btn',
+                            isSecondary: true, isLarge: true,
+                            style: { width: '100%', justifyContent: 'center' },
+                            onClick: function() { discoverImagePrompts(); }
+                        }, picot_aio_optimizer.strings.discover_images_btn || 'Discover Image Placement Points')
+                    )
+                );
+            }
+
+            nodes.push(
                 el('div', { id: resultPanelId, style: { marginTop: '10px' } }),
-                // Row 5: History
                 el('div', { style: { marginTop: '20px', borderTop: '1px solid #ddd', paddingTop: '10px' } },
                     el(Button, {
                         isTertiary: true,
@@ -252,6 +260,8 @@
                     }, picot_aio_optimizer.strings.label_history || 'View History')
                 )
             );
+
+            return el.apply(null, [Fragment, {}].concat(nodes));
         };
 
         var PicotAioOptimizerSidebar = function() {
@@ -501,7 +511,9 @@
 
     // NEW: Discover Image Prompt Opportunities
     function discoverImagePrompts() {
- //         console.log('Picot AIO Optimizer: discoverImagePrompts() called');
+        if (!isImageGenerationEnabled()) {
+            return;
+        }
         var title = getEditorTitle();
         var content = getEditorContent();
 
@@ -1052,6 +1064,9 @@
 
     // Load saved image suggestions on post load
     function loadSavedImageSuggestions() {
+        if (!isImageGenerationEnabled()) {
+            return;
+        }
         var postId = $('#post_ID').val();
         if (!postId) return;
 
@@ -1093,6 +1108,9 @@
     }
 
     function displayImageSuggestions(suggestions, postTitle, featuredText, updatedDate, featuredPrompt) {
+        if (!isImageGenerationEnabled()) {
+            return;
+        }
         var updatePanels = function(htmlStr) { getAllResultPanels().html(htmlStr); };
         
         // Always add Featured Image as first item
@@ -1116,7 +1134,7 @@
         window.PicotAioOptimizer.lastFeaturedPrompt = featuredPrompt || finalFeaturedPrompt;
 
         var html = '<div style="font-size:13px; color:#1d2327;">';
-        html += '<h3 style="margin-top:0; margin-bottom:15px; padding-bottom:8px; border-bottom:1px solid #ccd0d4; font-size:14px;">🖼️ ' + (picot_aio_optimizer.strings.discover_images_btn || 'Image Opportunities') + '</h3>';
+        html += '<h3 style="margin-top:0; margin-bottom:15px; padding-bottom:8px; border-bottom:1px solid #ccd0d4; font-size:14px;">🖼️ ' + (picot_aio_optimizer.strings.image_opportunities || picot_aio_optimizer.strings.discover_images_btn || 'Image Opportunities') + '</h3>';
         
         // Show saved date if available
         if (updatedDate) {
@@ -1124,7 +1142,7 @@
         }
 
         // 画像生成が無効なら生成ボタンは出さず、プロンプトの提示のみに留める。
-        var imageGenEnabled = !!picot_aio_optimizer.enable_image_gen;
+        var imageGenEnabled = isImageGenerationEnabled();
 
         allSuggestions.forEach(function(item, index) {
             var borderColor = item.isFeatured ? '#f56e28' : '#2271b1';
@@ -1142,13 +1160,11 @@
             html += '</div>';
         });
 
-        html += '<div style="margin-top:20px; padding-top:15px; border-top:1px solid #ccd0d4;">';
         if (imageGenEnabled) {
+            html += '<div style="margin-top:20px; padding-top:15px; border-top:1px solid #ccd0d4;">';
             html += '<button type="button" class="button button-primary" id="picot_aio_optimizer-generate-all" style="width:100%;">' + (picot_aio_optimizer.strings.gen_all || 'Batch Generate and Place') + '</button>';
-        } else {
-            html += '<p style="margin:0; color:#856404;">' + escapeHtml(picot_aio_optimizer.strings.image_gen_disabled || 'Image generation is disabled in settings.') + '</p>';
+            html += '</div>';
         }
-        html += '</div>';
 
         html += '</div>';
         updatePanels(html);
@@ -1176,7 +1192,7 @@
         }
 
         var originalText = $btn.text();
-        showOverlay(picot_aio_optimizer.strings.generating || 'Generating image...');
+        showOverlay(picot_aio_optimizer.strings.generating_image || picot_aio_optimizer.strings.generating || 'Generating image...');
         $btn.text(picot_aio_optimizer.strings.generating || 'Generating...').prop('disabled', true);
 
         var fullPrompt = suggestion.prompt;
@@ -2146,7 +2162,7 @@
             $fetchBtn.on('click', function() {
                 var $status = $('#picot_aio_optimizer_fetch_status');
                 $fetchBtn.prop('disabled', true);
-                $status.text(picot_aio_optimizer.strings.fetching || 'Fetching...');
+                $status.text(picot_aio_optimizer.strings.fetching || picot_aio_optimizer.strings.fetching_models || 'Fetching...');
                 
                 $.ajax({
                     url: picot_aio_optimizer.rest_url_models,
@@ -2198,9 +2214,11 @@
             if ($(this).is(':checked')) {
                 $('#picot_aio_optimizer_image_style_row').show();
                 $('#picot_aio_optimizer_image_model_row').show();
+                $('#picot_aio_optimizer_common_image_prompt_row').show();
             } else {
                 $('#picot_aio_optimizer_image_style_row').hide();
                 $('#picot_aio_optimizer_image_model_row').hide();
+                $('#picot_aio_optimizer_common_image_prompt_row').hide();
             }
         });
 
@@ -2214,7 +2232,7 @@
 
             var $planFreeNotice = $('#picot_aio_optimizer_api_plan_free_notice');
             var $imageFreeNotice = $('#picot_aio_optimizer_image_gen_free_notice');
-            var $imageRows = $('#picot_aio_optimizer_image_style_row, #picot_aio_optimizer_image_model_row');
+            var $imageRows = $('#picot_aio_optimizer_image_style_row, #picot_aio_optimizer_image_model_row, #picot_aio_optimizer_common_image_prompt_row');
             var rememberedChecked = $checkbox.data('saved-checked') === 1 || $checkbox.data('saved-checked') === '1';
 
             var applyPlan = function () {

@@ -183,6 +183,96 @@ class PicotAioOptimizer_Ai_Client_Helper
     }
 
     /**
+     * Whether image generation UI and API are currently enabled.
+     *
+     * @return bool
+     */
+    public static function is_image_generation_enabled()
+    {
+        return (int) get_option('picot_aio_optimizer_enable_image_gen', 0) === 1
+            && self::is_paid_api_plan();
+    }
+
+    /**
+     * Shared rewrite prompt from plugin settings.
+     *
+     * @return string
+     */
+    public static function get_common_rewrite_prompt()
+    {
+        return trim((string) get_option('picot_aio_optimizer_common_rewrite_prompt', ''));
+    }
+
+    /**
+     * Shared image prompt from plugin settings.
+     *
+     * @return string
+     */
+    public static function get_common_image_prompt()
+    {
+        return trim((string) get_option('picot_aio_optimizer_common_image_prompt', ''));
+    }
+
+    /**
+     * Combine the shared rewrite prompt with extra editor instructions.
+     *
+     * @param string $extra_instructions Instructions from the editor.
+     * @return string
+     */
+    public static function merge_rewrite_instructions($extra_instructions = '')
+    {
+        $common = self::get_common_rewrite_prompt();
+        $extra = trim((string) $extra_instructions);
+
+        if ($common === '') {
+            return $extra;
+        }
+        if ($extra === '') {
+            return $common;
+        }
+
+        return $common . "\n\n" . $extra;
+    }
+
+    /**
+     * User-prompt block that makes rewrite instructions hard to ignore.
+     *
+     * @param string $extra_instructions Instructions from the editor.
+     * @return string Empty when no instructions are set.
+     */
+    public static function format_rewrite_instruction_block($extra_instructions = '')
+    {
+        $common = self::get_common_rewrite_prompt();
+        $extra = trim((string) $extra_instructions);
+        if ($common === '' && $extra === '') {
+            return '';
+        }
+
+        $lang_code = substr(get_locale(), 0, 2);
+        $block = '';
+
+        if ($lang_code === 'ja') {
+            if ($common !== '') {
+                $block .= "【必須】リライト用の共通プロンプト:\n" . $common . "\n\n";
+            }
+            if ($extra !== '') {
+                $block .= "【追加指示】\n" . $extra . "\n\n";
+            }
+            $block .= "上記の指示に必ず従って本文を書き換えてください。\n\n";
+        } else {
+            if ($common !== '') {
+                $block .= "MANDATORY common rewrite prompt:\n" . $common . "\n\n";
+            }
+            if ($extra !== '') {
+                $block .= "Additional instructions:\n" . $extra . "\n\n";
+            }
+            $block .= "Follow the instructions above when rewriting the article.\n\n";
+        }
+
+        return $block;
+    }
+
+    /**
      * Free-tier prompt instruction to keep output within token limits.
      *
      * @return string Empty on paid plan; instruction text on free plan.

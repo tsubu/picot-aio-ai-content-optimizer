@@ -4,7 +4,7 @@
  * Plugin Name: Picot AIO AI Content Optimizer
  * Plugin URI: https://github.com/tsubu/picot-aio-ai-content-optimizer
  * Description: AI-powered content analysis and optimization using Google Gemini via the WordPress AI Client. Provides SEO advice, content recommendations, and automated image generation for WordPress posts and pages.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Requires at least: 7.0
  * Requires PHP: 8.3
  * Author: tsubu
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 
 // Define plugin constants
-define('PICOT_AIO_OPTIMIZER_VERSION', '1.1.1');
+define('PICOT_AIO_OPTIMIZER_VERSION', '1.1.2');
 define('PICOT_AIO_OPTIMIZER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PICOT_AIO_OPTIMIZER_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -66,11 +66,6 @@ class PicotAioOptimizer
         add_action('admin_init', array('PicotAioOptimizer_Database', 'gar_init_db'));
     }
 
-    /**
-     * Prompt to install/activate the official AI plugin on the post editor.
-     *
-     * @return void
-     */
     public function maybe_show_ai_plugin_notice()
     {
         if (!current_user_can('activate_plugins') || PicotAioOptimizer_Ai_Client_Helper::is_ai_plugin_active()) {
@@ -129,6 +124,16 @@ class PicotAioOptimizer
                 }
             }
 
+            $common_rewrite_prompt = isset($_POST['picot_aio_optimizer_common_rewrite_prompt'])
+                ? sanitize_textarea_field(wp_unslash($_POST['picot_aio_optimizer_common_rewrite_prompt']))
+                : '';
+            update_option('picot_aio_optimizer_common_rewrite_prompt', $common_rewrite_prompt);
+
+            $common_image_prompt = isset($_POST['picot_aio_optimizer_common_image_prompt'])
+                ? sanitize_textarea_field(wp_unslash($_POST['picot_aio_optimizer_common_image_prompt']))
+                : '';
+            update_option('picot_aio_optimizer_common_image_prompt', $common_image_prompt);
+
             if (isset($_POST['picot_aio_optimizer_image_style'])) {
                 update_option(
                     'picot_aio_optimizer_image_style',
@@ -161,6 +166,20 @@ class PicotAioOptimizer
         ));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_model', array('sanitize_callback' => 'sanitize_text_field'));
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_enable_image_gen', array('sanitize_callback' => 'absint'));
+        register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_common_rewrite_prompt', array(
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_textarea_field',
+            'default'           => '',
+            'show_in_rest'      => false,
+        ));
+        add_option('picot_aio_optimizer_common_rewrite_prompt', '');
+        register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_common_image_prompt', array(
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_textarea_field',
+            'default'           => '',
+            'show_in_rest'      => false,
+        ));
+        add_option('picot_aio_optimizer_common_image_prompt', '');
         register_setting('picot_aio_optimizer_settings_group', 'picot_aio_optimizer_image_style', array(
             'sanitize_callback' => array('PicotAioOptimizer_Admin_Views', 'sanitize_image_style'),
             'default'           => 'none',
@@ -335,8 +354,7 @@ class PicotAioOptimizer
             'rest_url_models'           => rest_url('picot_aio_optimizer/v1/models'),
             'rest_nonce'                => wp_create_nonce('wp_rest'),
             'nonce'                     => wp_create_nonce('picot_aio_optimizer_nonce'),
-            'enable_image_gen'          => (bool) get_option('picot_aio_optimizer_enable_image_gen', 0)
-                && PicotAioOptimizer_Ai_Client_Helper::is_paid_api_plan(),
+            'enable_image_gen'          => (bool) PicotAioOptimizer_Ai_Client_Helper::is_image_generation_enabled(),
             'image_style_desc'          => PicotAioOptimizer_Admin_Views::get_selected_image_style_desc(),
             'debug_mode'                => (defined('WP_DEBUG') && WP_DEBUG),
             'strings'                   => PicotAioOptimizer_Admin_Views::get_localized_strings(),

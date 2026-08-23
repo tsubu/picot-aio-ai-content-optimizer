@@ -3,8 +3,8 @@ Contributors: tsubu
 Donate link: https://github.com/tsubu/picot-aio-ai-content-optimizer
 Tags: ai, gemini, seo, content-quality, rewrite
 Requires at least: 7.0
-Tested up to: 7.0
-Stable tag: 1.1.1
+Tested up to: 7.1
+Stable tag: 1.1.2
 Requires PHP: 8.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -88,6 +88,12 @@ Yes. When the Classic Editor is active, the plugin automatically shows a meta bo
 
 == Changelog ==
 
+= 1.1.2 =
+* Added shared rewrite and image prompts in settings, applied on every rewrite and image generation.
+* Hide image discovery controls when image generation is disabled.
+* Recommend Lite / -lite analysis models and note that older models may be unavailable.
+* Removed load_plugin_textdomain() so WordPress.org can load translations automatically.
+
 = 1.1.1 =
 * Added detailed WordPress AI connector integration, including support for the experimental Connector Approvals feature, readiness checks, and clear setup guidance.
 * Added explicit requirements for the Google Gemini connector and the official AI plugin.
@@ -111,6 +117,9 @@ Yes. When the Classic Editor is active, the plugin automatically shows a meta bo
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+Adds shared rewrite/image prompts and hides image tools when image generation is off.
 
 = 1.1.1 =
 Security and connector integration update. Requires the Google Gemini connector and the official AI plugin; free-tier text use is supported with stricter limits.

@@ -2,9 +2,9 @@
 
 Contributors: tsubu  
 Requires at least: 7.0  
-Tested up to: 7.0  
+Tested up to: 7.1  
 Requires PHP: 8.3  
-Stable tag: 1.1.1  
+Stable tag: 1.1.2  
 License: GPLv2 or later  
 
 AI-powered content analysis and optimization plugin for WordPress using Google Gemini API. It acts as your personal SEO and AIO consultant, providing actionable advice based on Google's Search Quality Rater Guidelines (E-E-A-T).

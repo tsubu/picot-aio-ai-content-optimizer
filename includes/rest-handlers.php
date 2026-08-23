@@ -135,7 +135,8 @@ class PicotAioOptimizer_REST_Handlers
 
             $title = sanitize_text_field((string) $title);
             $content = (string) $content;
-            $instructions = sanitize_textarea_field((string) $instructions);
+            $extra_instructions = sanitize_textarea_field((string) $instructions);
+            $instructions = PicotAioOptimizer_Ai_Client_Helper::merge_rewrite_instructions($extra_instructions);
 
             if (!PicotAioOptimizer_Ai_Client_Helper::is_ready()) {
                 return new WP_Error('ai_unavailable', PicotAioOptimizer_Ai_Client_Helper::readiness_error_message(), array('status' => 400));
@@ -147,8 +148,7 @@ class PicotAioOptimizer_REST_Handlers
 
             $model_id = get_option('picot_aio_optimizer_model', PicotAioOptimizer_Client::DEFAULT_TEXT_MODEL);
             // 画像生成は有償プランのみ有効。
-            $gen_img = get_option('picot_aio_optimizer_enable_image_gen', 0)
-                && PicotAioOptimizer_Ai_Client_Helper::is_paid_api_plan();
+            $gen_img = PicotAioOptimizer_Ai_Client_Helper::is_image_generation_enabled();
 
             // UTF-8 Sanitization
             if (function_exists('mb_convert_encoding')) {
@@ -157,7 +157,8 @@ class PicotAioOptimizer_REST_Handlers
                 }
             }
 
-            $full_prompt = "Title: {$title}\n\nContent: {$content}";
+            $instruction_block = PicotAioOptimizer_Ai_Client_Helper::format_rewrite_instruction_block($extra_instructions);
+            $full_prompt = $instruction_block . "Title: {$title}\n\nContent: {$content}";
             $result = PicotAioOptimizer_Client::gar_call_gemini_api_rewrite($full_prompt, $model_id, $gen_img, $instructions);
 
             if (is_wp_error($result)) {
@@ -178,11 +179,15 @@ class PicotAioOptimizer_REST_Handlers
     }
 
     /**
-     * Suggest Images handler
+     * Discover Image Placement Points handler
      */
     public static function suggest_images($request)
     {
         self::relax_execution_limit();
+
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_image_generation_enabled()) {
+            return new WP_Error('disabled', __('Image generation is disabled in settings.', 'picot-aio-ai-content-optimizer'), array('status' => 403));
+        }
 
         try {
             $params = $request->get_json_params();
@@ -341,7 +346,7 @@ class PicotAioOptimizer_REST_Handlers
             );
         }
 
-        if (!get_option('picot_aio_optimizer_enable_image_gen', 0)) {
+        if (!PicotAioOptimizer_Ai_Client_Helper::is_image_generation_enabled()) {
             return new WP_Error('disabled', __('Image generation is disabled in settings.', 'picot-aio-ai-content-optimizer'), array('status' => 403));
         }
 

@@ -25,6 +25,8 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
         'picot_aio_optimizer_image_model',
         'picot_aio_optimizer_image_style',
         'picot_aio_optimizer_enable_image_gen',
+        'picot_aio_optimizer_common_rewrite_prompt',
+        'picot_aio_optimizer_common_image_prompt',
         'picot_aio_optimizer_available_models',
         'picot_aio_optimizer_available_image_models',
     );
